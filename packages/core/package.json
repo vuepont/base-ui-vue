@@ -1,0 +1,74 @@
+{
+  "name": "base-ui-vue",
+  "type": "module",
+  "version": "0.0.0",
+  "description": "Vue port of Base UI",
+  "author": "vuepont",
+  "license": "MIT",
+  "homepage": "https://github.com/vuepont/base-ui-vue",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vuepont/base-ui-vue.git"
+  },
+  "keywords": [
+    "vue",
+    "nuxt",
+    "base-ui",
+    "vue-component",
+    "unstyled"
+  ],
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "!src/**/*.story.vue",
+    "!src/**/*.test.*",
+    "!src/**/_*.vue",
+    "!src/**/__snapshots__",
+    "!src/**/stories",
+    "!src/**/story",
+    "dist",
+    "src"
+  ],
+  "scripts": {
+    "build": "pnpm type-check && pnpm build-only",
+    "build-only": "tsdown && tsx scripts/postbuild.ts",
+    "watch": "tsdown --watch",
+    "type-check": "vue-tsc -p tsconfig.check.json --noEmit",
+    "test": "vitest",
+    "test-update": "vitest -u",
+    "pub:release": "pnpm publish --no-git-checks --access public"
+  },
+  "peerDependencies": {
+    "vue": ">= 3.2.0"
+  },
+  "devDependencies": {
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/user-event": "^14.6.1",
+    "@testing-library/vue": "^8.1.0",
+    "@tsconfig/node24": "^24.0.0",
+    "@types/jsdom": "^27.0.0",
+    "@types/node": "^25.2.1",
+    "@vitejs/plugin-vue": "^6.0.4",
+    "@vitest/coverage-istanbul": "^4.0.18",
+    "@vue/test-utils": "^2.4.6",
+    "@vue/tsconfig": "^0.7.0",
+    "jsdom": "^28.0.0",
+    "tsdown": "^0.20.3",
+    "vite": "^7.3.1",
+    "vitest": "^4.0.18",
+    "vitest-axe": "^0.1.0",
+    "vitest-canvas-mock": "^1.1.3",
+    "vue": "^3.5.27",
+    "vue-tsc": "^3.2.4"
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "name": "plugins",
+  "type": "module",
+  "version": "0.0.0",
+  "description": "Nuxt module for Base UI Vue",
+  "author": "vuepont",
+  "license": "MIT",
+  "keywords": [
+    "vue",
+    "base-ui",
+    "nuxt-module",
+    "nuxt"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "unbuild",
+    "stub": "unbuild --stub"
+  },
+  "dependencies": {
+    "unbuild": "^3.6.1"
+  }
+}

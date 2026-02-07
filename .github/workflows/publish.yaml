@@ -1,0 +1,36 @@
+name: Publish Docs
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'docs/**'
+  workflow_dispatch:
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      deployments: write
+    name: Publish docs to Cloudflare Workers
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup (Install node & pnpm)
+        uses: ./.github/actions/setup
+
+      - name: Build Base UI Vue
+        run: pnpm --filter base-ui-vue build
+
+      - name: Build Docs
+        run: pnpm docs:build
+
+      - name: Publish to Cloudflare Workers via Wrangler
+        working-directory: docs
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_UNOVUE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_UNOVUE_ACCOUNT_ID }}
+        run: pnpm --filter docs run deploy

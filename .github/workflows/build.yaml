@@ -1,0 +1,49 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'packages/**'
+
+  pull_request:
+    paths:
+      - 'packages/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup (Install node & pnpm)
+        uses: ./.github/actions/setup
+
+      - name: Build
+        run: pnpm --filter base-ui-vue build
+
+      - name: Check for errors
+        run: |
+          if [ $? -eq 0 ]; then
+            echo "Build succeeded"
+          else
+            echo "Build failed"
+            exit 1
+          fi
+
+  test:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup (Install node & pnpm)
+        uses: ./.github/actions/setup
+
+      - name: Test
+        run: pnpm test
