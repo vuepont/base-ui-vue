@@ -19,6 +19,7 @@ jobs:
         run: pnpm run build
 
       - name: Publish with pkg-pr-new
-        run: pnpm dlx pkg-pr-new publish --compact --packageManager=pnpm ./packages/core
+        # TODO: add --compact when the package is published to npm (for shorter install URLs)
+        run: pnpm dlx pkg-pr-new publish --packageManager=pnpm ./packages/core
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
