@@ -1,15 +1,17 @@
 {
   "name": "docs",
+  "type": "module",
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "dev": "nuxt dev --extends docus",
-    "build": "nuxt build --extends docus",
-    "deploy": "npx wrangler --cwd .output/ deploy"
+    "docs:dev": "vitepress dev",
+    "docs:build": "vitepress build",
+    "docs:preview": "vitepress preview"
   },
   "dependencies": {
-    "better-sqlite3": "^12.5.0",
-    "docus": "latest",
-    "nuxt": "^4.2.2"
+    "vue": "^3.5.27"
+  },
+  "devDependencies": {
+    "vitepress": "2.0.0-alpha.16"
   }
 }

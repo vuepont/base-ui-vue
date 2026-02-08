@@ -3,20 +3,21 @@
   "type": "module",
   "version": "0.0.0",
   "private": true,
-  "packageManager": "pnpm@10.28.2",
+  "packageManager": "pnpm@10.29.1",
   "license": "MIT",
   "workspaces": [
     "packages/*"
   ],
   "engines": {
-    "pnpm": "10.28.2",
+    "pnpm": "10.29.1",
     "node": ">=22.18.0"
   },
   "scripts": {
     "build": "pnpm run --filter base-ui-vue build && pnpm run --filter plugins build",
     "build-only": "pnpm run -r build-only",
-    "docs:dev": "pnpm --filter docs dev",
-    "docs:build": "pnpm --filter docs build",
+    "docs:dev": "pnpm --filter docs docs:dev",
+    "docs:build": "pnpm --filter docs docs:build",
+    "docs:preview": "pnpm --filter docs docs:preview",
     "prepare": "pnpm simple-git-hooks",
     "test": "pnpm --filter base-ui-vue test",
     "test-update": "pnpm --filter base-ui-vue test-update",

@@ -1,35 +1,20 @@
 ---
-seo:
-  title: Base UI Vue
-  description: Unstyled UI components for building accessible user interfaces.
+layout: home
+hero:
+  name: "Base UI Vue"
+  text: "Unstyled UI components for building accessible user interfaces"
+  actions:
+    - theme: brand
+      text: Getting Started
+      link: /docs/overview/getting-started
+    - theme: alt
+      text: Components
+      link: /docs/components/
+features:
+  - title: Composable
+    details: Build your own system with unstyled primitives.
+  - title: Accessible
+    details: Focus on a11y and keyboard-friendly patterns.
+  - title: Flexible
+    details: Works with any styling solution.
 ---
-
-::u-page-hero
-#title
-Base UI Vue
-
-#description
-Unstyled UI components for building accessible user interfaces.
-
-#links
-  :::u-button
-  ---
-  color: neutral
-  size: xl
-  to: /overview/quick-start
-  trailing-icon: i-lucide-arrow-right
-  ---
-  Get started
-  :::
-
-  :::u-button
-  ---
-  color: neutral
-  icon: simple-icons-github
-  size: xl
-  to: https://github.com/vuepont/base-ui-vue
-  variant: outline
-  ---
-  Star on GitHub
-  :::
-::
