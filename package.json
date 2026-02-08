@@ -1,0 +1,52 @@
+{
+  "name": "base-ui-vue",
+  "type": "module",
+  "version": "0.0.0",
+  "private": true,
+  "packageManager": "pnpm@10.29.1",
+  "license": "MIT",
+  "workspaces": [
+    "packages/*"
+  ],
+  "engines": {
+    "pnpm": "10.29.1",
+    "node": ">=22.18.0"
+  },
+  "scripts": {
+    "build": "pnpm run --filter base-ui-vue build && pnpm run --filter plugins build",
+    "build-only": "pnpm run -r build-only",
+    "docs:dev": "pnpm --filter docs docs:dev",
+    "docs:build": "pnpm --filter docs docs:build",
+    "docs:preview": "pnpm --filter docs docs:preview",
+    "prepare": "pnpm simple-git-hooks",
+    "test": "pnpm --filter base-ui-vue test",
+    "test-update": "pnpm --filter base-ui-vue test-update",
+    "lint": "eslint",
+    "lint:fix": "eslint --fix",
+    "bumpp": "bumpp package.json packages/*/package.json docs/package.json",
+    "pub:release": "cd packages/core && pnpm pub:release"
+  },
+  "devDependencies": {
+    "@antfu/eslint-config": "^7.2.0",
+    "@commitlint/cli": "^20.4.1",
+    "@commitlint/config-conventional": "^20.4.1",
+    "bumpp": "^10.4.1",
+    "eslint": "^9.39.2",
+    "lint-staged": "^16.2.7",
+    "simple-git-hooks": "^2.13.1",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  },
+  "simple-git-hooks": {
+    "pre-commit": "pnpm lint-staged",
+    "commit-msg": "pnpm commitlint --edit ${1}"
+  },
+  "lint-staged": {
+    "*": "eslint --fix"
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ]
+  }
+}
