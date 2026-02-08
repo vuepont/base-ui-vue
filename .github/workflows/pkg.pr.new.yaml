@@ -1,0 +1,26 @@
+name: Publish Any Commit
+on: [push, pull_request]
+
+permissions: {}
+
+jobs:
+  build:
+    if: |
+      (github.event_name == 'push' && !contains(github.event.head_commit.message, 'docs:')) ||
+      (github.event_name == 'pull_request' && !contains(github.event.pull_request.title, 'docs:'))
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup (Install node & pnpm)
+        uses: ./.github/actions/setup
+
+      - name: Build base-ui-vue and plugins
+        run: pnpm run build
+
+      - name: Publish with pkg-pr-new
+        run: pnpm dlx pkg-pr-new publish --compact --packageManager=pnpm ./packages/core
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
