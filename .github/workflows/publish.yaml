@@ -31,8 +31,8 @@ jobs:
       - name: Publish to Cloudflare Pages
         uses: cloudflare/pages-action@v1.5.0
         with:
-          apiToken: ${{ secrets.CLOUDFLARE_UNOVUE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_UNOVUE_ACCOUNT_ID }}
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           projectName: base-ui-vue
           directory: .vitepress/dist
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
