@@ -45,11 +45,7 @@ const mergedProps = computed(() => {
 </script>
 
 <template>
-  <component
-    :is="props.as"
-    ref="buttonRef"
-    v-bind="mergedProps"
-  >
+  <component :is="props.as" ref="buttonRef" v-bind="mergedProps">
     <slot />
   </component>
 </template>

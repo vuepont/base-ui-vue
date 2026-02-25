@@ -9,6 +9,8 @@ describe('<Button />', () => {
       const user = userEvent.setup()
       const handleClick = vi.fn()
       const handleMousedown = vi.fn()
+      const handlePointerDown = vi.fn()
+      const handleKeyDown = vi.fn()
 
       const wrapper = mount(Button, {
         props: {
@@ -17,7 +19,10 @@ describe('<Button />', () => {
         attrs: {
           onClick: handleClick,
           onMousedown: handleMousedown,
+          onPointerDown: handlePointerDown,
+          onKeydown: handleKeyDown,
         },
+        attachTo: document.body,
       })
 
       const button = wrapper.element as HTMLButtonElement
@@ -35,6 +40,10 @@ describe('<Button />', () => {
 
       expect(handleClick).not.toHaveBeenCalled()
       expect(handleMousedown).not.toHaveBeenCalled()
+      expect(handlePointerDown).not.toHaveBeenCalled()
+      expect(handleKeyDown).not.toHaveBeenCalled()
+
+      wrapper.unmount()
     })
 
     it('custom element: applies aria-disabled and is not focusable', async () => {
@@ -49,6 +58,7 @@ describe('<Button />', () => {
         attrs: {
           onClick: handleClick,
         },
+        attachTo: document.body,
       })
 
       const button = wrapper.element as HTMLElement
@@ -63,6 +73,8 @@ describe('<Button />', () => {
 
       await user.click(button)
       expect(handleClick).not.toHaveBeenCalled()
+
+      wrapper.unmount()
     })
   })
 
@@ -79,6 +91,7 @@ describe('<Button />', () => {
         attrs: {
           onClick: handleClick,
         },
+        attachTo: document.body,
       })
 
       const button = wrapper.element as HTMLButtonElement
@@ -98,6 +111,8 @@ describe('<Button />', () => {
       await user.keyboard('[Enter]')
 
       expect(handleClick).not.toHaveBeenCalled()
+
+      wrapper.unmount()
     })
 
     it('custom element: prevents interactions but remains focusable', async () => {
@@ -113,6 +128,7 @@ describe('<Button />', () => {
         attrs: {
           onClick: handleClick,
         },
+        attachTo: document.body,
       })
 
       const button = wrapper.element as HTMLElement
@@ -127,6 +143,8 @@ describe('<Button />', () => {
 
       await user.click(button)
       expect(handleClick).not.toHaveBeenCalled()
+
+      wrapper.unmount()
     })
   })
 })

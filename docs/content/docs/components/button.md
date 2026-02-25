@@ -5,17 +5,21 @@ A button component that can be rendered as another tag or focusable when disable
 ## Preview
 
 <div class="preview-container flex gap-4 p-4 border border-gray-200 rounded-lg">
-  <BaseUIButton class="demo-button" @click="() => window.alert('Base UI Button Clicked!')">
+  <BaseUIButton class="demo-button" @click="window.alert('Base UI Button Clicked!')">
     Base UI Button
   </BaseUIButton>
 
-  <BaseUIButton disabled class="demo-button demo-disabled">
-    Disabled Button
+  <BaseUIButton disabled class="demo-button demo-disabled" style="color: red;">
+    Disabled Buttonsss
   </BaseUIButton>
 
-  <BaseUIButton as="div" class="demo-button demo-div" @click="() => window.alert('Div acting as Button Clicked!')">
-    Div as Button
-  </BaseUIButton>
+<BaseUIButton as="div" class="demo-button demo-div" @click="console.log('Div acting as Button Clicked!')">
+Div as Button
+</BaseUIButton>
+
+  <BaseUIButton disabled focusable-when-disabled>
+  Loading...
+</BaseUIButton>
 </div>
 
 ## Usage
@@ -44,7 +48,7 @@ The button can remain keyboard accessible while being rendered as another tag, s
 
 ```vue
 <template>
-  <BaseUIButton as="div" @click="() => window.alert('div clicked')">
+  <BaseUIButton as="div" @click="window.alert('div clicked')">
     I am a div but act as a button
   </BaseUIButton>
 </template>
@@ -54,7 +58,7 @@ The button can remain keyboard accessible while being rendered as another tag, s
 
 ```vue
 <template>
-  <BaseUIButton disabled @click="() => window.alert('This should not show')">
+  <BaseUIButton disabled @click="window.alert('This should not show')">
     Disabled Button
   </BaseUIButton>
 </template>
@@ -64,10 +68,40 @@ The button can remain keyboard accessible while being rendered as another tag, s
 
 For buttons that enter a loading state after being clicked, specify the `focusable-when-disabled` prop to ensure focus remains on the button when it becomes disabled.
 
+<div class="preview-container flex gap-4 p-4 border border-gray-200 rounded-lg mt-4 mb-4">
+  <BaseUIButton
+    class="demo-button"
+    :disabled="loading"
+    focusable-when-disabled
+    @click="submit"
+  >
+    {{ loading ? 'Submitting...' : 'Submit' }}
+  </BaseUIButton>
+</div>
+
 ```vue
+<script setup>
+import { Button } from 'base-ui-vue'
+import { ref } from 'vue'
+
+const loading = ref(false)
+
+function submit() {
+  loading.value = true
+  setTimeout(() => {
+    loading.value = false
+  }, 4000)
+}
+</script>
+
 <template>
-  <BaseUIButton disabled focusable-when-disabled>
-    Loading...
+  <BaseUIButton
+    class="demo-button"
+    :disabled="loading"
+    focusable-when-disabled
+    @click="submit"
+  >
+    {{ loading ? "Submitting..." : "Submit" }}
   </BaseUIButton>
 </template>
 ```
@@ -76,12 +110,12 @@ For buttons that enter a loading state after being clicked, specify the `focusab
 
 ### Props
 
-| Name | Type | Default | Description |
-| --- | --- | --- | --- |
-| `as` | `string \| Component` | `'button'` | The element or component to use for the root node. |
-| `disabled` | `boolean` | `false` | Whether the button should ignore user interaction. |
-| `focusable-when-disabled` | `boolean` | `false` | Whether the button should be focusable when disabled. |
-| `native-button` | `boolean` | `undefined` | Whether the component renders a native `<button>` element. If undefined, it is inferred from `as`. |
+| Name                      | Type                  | Default     | Description                                                                                        |
+| ------------------------- | --------------------- | ----------- | -------------------------------------------------------------------------------------------------- |
+| `as`                      | `string \| Component` | `'button'`  | The element or component to use for the root node.                                                 |
+| `disabled`                | `boolean`             | `false`     | Whether the button should ignore user interaction.                                                 |
+| `focusable-when-disabled` | `boolean`             | `false`     | Whether the button should be focusable when disabled.                                              |
+| `native-button`           | `boolean`             | `undefined` | Whether the component renders a native `<button>` element. If undefined, it is inferred from `as`. |
 
 <style>
 .preview-container {
@@ -127,3 +161,15 @@ For buttons that enter a loading state after being clicked, specify the `focusab
   background-color: #059669;
 }
 </style>
+
+<script setup>
+import { ref } from 'vue';
+
+const loading = ref(false);
+function submit() {
+  loading.value = true;
+  setTimeout(() => {
+    loading.value = false;
+  }, 4000);
+}
+</script>

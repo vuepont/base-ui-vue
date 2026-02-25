@@ -1,10 +1,10 @@
-import type { BaseUIComponentProps, NativeButtonProps } from "../utils/types";
+import type { BaseUIComponentProps, NativeButtonProps } from '../utils/types'
 
 export interface ButtonState {
   /**
    * Whether the button should ignore user interaction.
    */
-  disabled: boolean;
+  disabled: boolean
 }
 
 export interface ButtonProps
@@ -13,15 +13,10 @@ export interface ButtonProps
    * Whether the button should ignore user interaction.
    * @default false
    */
-  disabled?: boolean;
+  disabled?: boolean
   /**
    * Whether the button should be focusable when disabled.
    * @default false
    */
-  focusableWhenDisabled?: boolean;
-}
-
-export namespace Button {
-  export type State = ButtonState;
-  export type Props = ButtonProps;
+  focusableWhenDisabled?: boolean
 }
