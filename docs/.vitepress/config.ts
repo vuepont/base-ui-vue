@@ -1,7 +1,6 @@
 import { resolve } from 'node:path'
 import tailwindcss from '@tailwindcss/vite'
 import { defineConfig } from 'vitepress'
-import { resolve } from 'node:path'
 import { version } from '../../package.json'
 import { github, releases, siteDescription, siteName, siteShortName } from './meta'
 import ComponentPreviewPlugin from './plugins/ComponentPreview'
