@@ -44,10 +44,10 @@ export function useFocusableWhenDisabled(
       || (!isNativeButton && disabled)
     ) {
       // Only set aria-disabled when true; Vue renders false as "false" attribute
-      // unlike React which removes it entirely
-      if (disabled) {
-        additionalProps['aria-disabled'] = 'true'
-      }
+      // if (disabled) {
+      // additionalProps['aria-disabled'] = 'true'
+      // }
+      additionalProps['aria-disabled'] = disabled
     }
 
     if (isNativeButton && (!focusableWhenDisabled || isNonFocusableComposite)) {

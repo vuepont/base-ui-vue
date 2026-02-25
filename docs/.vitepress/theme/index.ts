@@ -3,7 +3,6 @@ import { Button } from 'base-ui-vue'
 import DefaultTheme from 'vitepress/theme'
 // https://vitepress.dev/guide/custom-theme
 import { h } from 'vue'
-import { Button } from 'base-ui-vue'
 import './style.css'
 
 export default {

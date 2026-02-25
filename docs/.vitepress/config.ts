@@ -1,8 +1,9 @@
 import { resolve } from 'node:path'
+import tailwindcss from '@tailwindcss/vite'
 import { defineConfig } from 'vitepress'
-import { resolve } from 'node:path'
 import { version } from '../../package.json'
 import { github, releases, siteDescription, siteName, siteShortName } from './meta'
+import ComponentPreviewPlugin from './plugins/ComponentPreview'
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
@@ -12,7 +13,14 @@ export default defineConfig({
   titleTemplate: siteShortName,
   lastUpdated: true,
   srcDir: 'content',
+  markdown: {
+    theme: 'github-dark',
+    preConfig(md) {
+      md.use(ComponentPreviewPlugin)
+    },
+  },
   vite: {
+    plugins: [tailwindcss()],
     resolve: {
       alias: {
         'base-ui-vue': resolve(__dirname, '../../packages/core/src/index.ts'),
