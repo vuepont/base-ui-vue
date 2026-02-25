@@ -9,7 +9,8 @@
     "docs:preview": "vitepress preview"
   },
   "dependencies": {
-    "vue": "^3.5.27"
+    "vue": "^3.5.27",
+    "base-ui-vue": "workspace:*"
   },
   "devDependencies": {
     "vitepress": "2.0.0-alpha.16"

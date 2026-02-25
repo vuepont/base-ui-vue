@@ -1,4 +1,5 @@
 import { defineConfig } from 'vitepress'
+import { resolve } from 'node:path'
 import { version } from '../../package.json'
 import { github, releases, siteDescription, siteName, siteShortName } from './meta'
 
@@ -10,6 +11,13 @@ export default defineConfig({
   titleTemplate: siteShortName,
   lastUpdated: true,
   srcDir: 'content',
+  vite: {
+    resolve: {
+      alias: {
+        'base-ui-vue': resolve(__dirname, '../../packages/core/src/index.ts'),
+      },
+    },
+  },
   themeConfig: {
     logo: '/logo.svg',
 
@@ -37,6 +45,7 @@ export default defineConfig({
         text: 'Components',
         items: [
           { text: 'Introduction', link: '/docs/components/' },
+          { text: 'Button', link: '/docs/components/button' },
         ],
       },
     ],

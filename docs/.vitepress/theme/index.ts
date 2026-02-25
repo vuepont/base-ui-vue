@@ -2,6 +2,7 @@ import type { Theme } from 'vitepress'
 import DefaultTheme from 'vitepress/theme'
 // https://vitepress.dev/guide/custom-theme
 import { h } from 'vue'
+import { Button } from 'base-ui-vue'
 import './style.css'
 
 export default {
@@ -13,6 +14,6 @@ export default {
   },
   // eslint-disable-next-line unused-imports/no-unused-vars
   enhanceApp({ app, router, siteData }) {
-    // ...
+    app.component('BaseUIButton', Button)
   },
 } satisfies Theme

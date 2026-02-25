@@ -38,6 +38,9 @@ importers:
 
   docs:
     dependencies:
+      base-ui-vue:
+        specifier: workspace:*
+        version: link:../packages/core
       vue:
         specifier: ^3.5.27
         version: 3.5.27(typescript@5.9.3)
@@ -111,6 +114,10 @@ importers:
       unbuild:
         specifier: ^3.6.1
         version: 3.6.1(typescript@5.9.3)(vue-tsc@3.2.4(typescript@5.9.3))(vue@3.5.27(typescript@5.9.3))
+    devDependencies:
+      vue:
+        specifier: ^3.5.27
+        version: 3.5.27(typescript@5.9.3)
 
 packages:
 
