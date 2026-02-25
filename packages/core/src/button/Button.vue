@@ -39,6 +39,8 @@ const mergedProps = computed(() => {
   const stateAttributes = getStateAttributesProps(state.value)
   return getButtonProps({
     ...attrs,
+    class: typeof props.class === 'function' ? props.class(state.value) : props.class,
+    style: typeof props.style === 'function' ? props.style(state.value) : props.style,
     ...stateAttributes,
   })
 })

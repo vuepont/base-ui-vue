@@ -9,9 +9,9 @@ A button component that can be rendered as another tag or focusable when disable
     Base UI Button
   </BaseUIButton>
 
-  <BaseUIButton disabled class="demo-button demo-disabled" style="color: red;">
-    Disabled Buttonsss
-  </BaseUIButton>
+<BaseUIButton disabled class="demo-button demo-disabled" style="color: red;" id="my-btn">
+Disabled Buttonsss
+</BaseUIButton>
 
 <BaseUIButton as="div" class="demo-button demo-div" @click="console.log('Div acting as Button Clicked!')">
 Div as Button
