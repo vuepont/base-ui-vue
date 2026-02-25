@@ -2,11 +2,7 @@
 
 A button component that can be rendered as another tag or focusable when disabled.
 
-## Preview
-
-  <BaseUIButton class="demo-button" id="my-btn">
-    Base UI Button
-  </BaseUIButton>
+<ComponentPreview name="Button" />
 
 ## Usage guidelines
 
@@ -33,18 +29,14 @@ import { Button } from 'base-ui-vue'
 
 The button can remain keyboard accessible while being rendered as another tag, such as a `<div>`, by specifying `as="div"`.
 
-<BaseUIButton as="div" :native-button="false" class="demo-button">
-Div as Button
-</BaseUIButton>
-
 ```vue title="Custom tag button" "as"
 <script setup>
 import { Button } from 'base-ui-vue'
 </script>
 
 <template>
-  <Button as="div" :native-button="false">
-    Div as Button
+  <Button as="div">
+    I am a div but act as a button
   </Button>
 </template>
 ```
@@ -59,88 +51,17 @@ If a link needs to look like a button visually, style the `<a>` element directly
 
 For buttons that enter a loading state after being clicked, specify the `focusable-when-disabled` prop to ensure focus remains on the button when it becomes disabled. This prevents focus from being lost and maintains the tab order.
 
-<div>
-<BaseUIButton
-class="demo-button"
-:disabled="loading"
-focusable-when-disabled
-@click="submit"
->
-    {{ loading ? 'Submitting...' : 'Submit' }}
-</BaseUIButton>
-</div>
-
-<script setup>
-import { ref } from 'vue';
-
-const loading = ref(false);
-function submit() {
-  loading.value = true;
-  setTimeout(() => {
-    loading.value = false;
-  }, 4000);
-}
-</script>
-
-```vue title="Loading button" "focusable-when-disabled"
-<script setup>
-import { Button } from 'base-ui-vue'
-import { ref } from 'vue'
-
-const loading = ref(false)
-
-function submit() {
-  loading.value = true
-  setTimeout(() => {
-    loading.value = false
-  }, 4000)
-}
-</script>
-
-<template>
-  <Button :disabled="loading" focusable-when-disabled @click="submit">
-    {{ loading ? "Submitting..." : "Submit" }}
-  </Button>
-</template>
-```
+<ComponentPreview name="ButtonLoading" />
 
 ### Disabled state
 
-  <BaseUIButton disabled class="demo-button">
-  Disabled Button
-</BaseUIButton>
-
-```vue title="Disabled button" "disabled"
-<script setup>
-import { Button } from 'base-ui-vue'
-</script>
-
-<template>
-  <Button disabled>
-    Disabled Button
-  </Button>
-</template>
-```
+<ComponentPreview name="ButtonDisabled" />
 
 ### Focusable when disabled
 
-<BaseUIButton focusable-when-disabled disabled class="demo-button">
-Focusable disabled Button
-</BaseUIButton>
+<ComponentPreview name="ButtonFocusableDisabled" />
 
-```vue title="Focusable disabled button" "focusable-when-disabled"
-<script setup>
-import { Button } from 'base-ui-vue'
-</script>
-
-<template>
-  <Button focusable-when-disabled disabled>
-    Focusable disabled Button
-  </Button>
-</template>
-```
-
-## API reference
+## API Reference
 
 ### Props
 
@@ -158,70 +79,3 @@ import { Button } from 'base-ui-vue'
 | Attribute       | Description                          |
 | --------------- | ------------------------------------ |
 | `data-disabled` | Present when the button is disabled. |
-
-<style>
-:root {
-  --color-blue: oklch(45% 50% 264deg);
-  --color-gray-50: oklch(98% 0.25% 264deg);
-  --color-gray-100: oklch(12% 9.5% 264deg / 5%);
-  --color-gray-200: oklch(12% 9% 264deg / 7%);
-  --color-gray-300: oklch(12% 8.5% 264deg / 17%);
-  --color-gray-500: oklch(12% 7.5% 264deg / 50%);
-  --color-gray-900: oklch(12% 5% 264deg / 90%);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --color-blue: oklch(69% 50% 264deg);
-    --color-gray-50: oklch(17% 0.25% 264deg);
-    --color-gray-100: oklch(28% 0.75% 264deg / 65%);
-    --color-gray-200: oklch(29% 0.75% 264deg / 80%);
-    --color-gray-300: oklch(35% 0.75% 264deg / 80%);
-    --color-gray-500: oklch(64% 1% 264deg / 80%);
-    --color-gray-900: oklch(95% 0.5% 264deg / 90%);
-  }
-}
-
-.demo-button {
-  box-sizing: border-box;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 2.5rem;
-  padding: 0 0.875rem;
-  margin: 0;
-  outline: 0;
-  border: 1px solid var(--color-gray-200);
-  border-radius: 0.375rem;
-  background-color: var(--color-gray-50);
-  font-family: inherit;
-  font-size: 1rem;
-  font-weight: 500;
-  line-height: 1.5rem;
-  color: var(--color-gray-900);
-  user-select: none;
-  cursor: pointer;
-}
-
-@media (hover: hover) {
-  .demo-button:hover:not([data-disabled]) {
-    background-color: var(--color-gray-100);
-  }
-}
-
-.demo-button:active:not([data-disabled]) {
-  background-color: var(--color-gray-200);
-  box-shadow: inset 0 1px 3px var(--color-gray-200);
-  border-top-color: var(--color-gray-300);
-}
-
-.demo-button:focus-visible {
-  outline: 2px solid var(--color-blue);
-  outline-offset: -1px;
-}
-
-.demo-button[data-disabled] {
-  color: var(--color-gray-500);
-  cursor: default;
-}
-</style>
