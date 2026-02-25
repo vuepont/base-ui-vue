@@ -1,14 +1,7 @@
-import type { Component, HTMLAttributes, StyleValue } from 'vue'
+import type { Component, StyleValue } from 'vue'
+import type { BaseUIEvent, HTMLProps } from '../types'
 
-export type HTMLProps = HTMLAttributes & {
-  ref?: any
-}
-
-export interface BaseUIEvent<T = Event> {
-  baseUIHandlerPrevented?: boolean
-  preventBaseUIHandler?: () => void
-  nativeEvent: T
-}
+export type { BaseUIEvent, HTMLProps }
 
 /**
  * Props shared by all Base UI components.

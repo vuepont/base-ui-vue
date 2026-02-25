@@ -13,7 +13,7 @@ A button component that can be rendered as another tag or focusable when disable
 Disabled Buttonsss
 </BaseUIButton>
 
-<BaseUIButton as="div" class="demo-button demo-div" @click="console.log('Div acting as Button Clicked!')">
+<BaseUIButton as="span" class="demo-button demo-div" @click="console.log('Div acting as Button Clicked!')">
 Div as Button
 </BaseUIButton>
 

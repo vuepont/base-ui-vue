@@ -1,4 +1,5 @@
 import type { MaybeRefOrGetter } from 'vue'
+import type { BaseUIEvent } from '../types'
 import { ref, toValue } from 'vue'
 import { mergeProps } from '../../../plugins/src/merge-props'
 import { useFocusableWhenDisabled } from '../../../plugins/src/use-focusable-when-disabled'
@@ -45,14 +46,14 @@ export function useButton(parameters: UseButtonParameters = {}) {
     return mergeProps(
       {
         type,
-        onClick(event: MouseEvent & { preventBaseUIHandler?: () => void }) {
+        onClick(event: BaseUIEvent<MouseEvent>) {
           if (disabled) {
             event.preventDefault()
             event.stopImmediatePropagation()
             event.preventBaseUIHandler?.()
           }
         },
-        onMousedown(event: MouseEvent & { preventBaseUIHandler?: () => void }) {
+        onMousedown(event: BaseUIEvent<MouseEvent>) {
           if (disabled) {
             event.preventDefault()
             event.preventBaseUIHandler?.()

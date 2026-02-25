@@ -1,18 +1,15 @@
-export interface BaseUIEvent<T = Event> {
-  baseUIHandlerPrevented?: boolean
-  preventBaseUIHandler?: () => void
-  nativeEvent: T
-}
+import type { BaseUIEvent } from '../../core/src/types'
 
 export function makeEventPreventable<T extends Event>(
-  event: any,
+  event: T,
 ): BaseUIEvent<T> {
-  if (!event.preventBaseUIHandler) {
-    event.preventBaseUIHandler = () => {
-      event.baseUIHandlerPrevented = true
+  const baseUIEvent = event as BaseUIEvent<T>
+  if (!baseUIEvent.preventBaseUIHandler) {
+    baseUIEvent.preventBaseUIHandler = () => {
+      baseUIEvent.baseUIHandlerPrevented = true
     }
   }
-  return event
+  return baseUIEvent
 }
 
 export function mergeClassNames(
@@ -82,7 +79,7 @@ function mergeEventHandlers(
  * - style: Merged.
  */
 export function mergeProps(...args: (Record<string, any> | undefined)[]) {
-  let merged: Record<string, any> = {}
+  const merged: Record<string, any> = {}
 
   for (const props of args) {
     if (!props)
