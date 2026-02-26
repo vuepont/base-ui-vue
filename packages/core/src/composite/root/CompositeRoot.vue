@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { BaseUIComponentProps } from '../../utils/types'
 import type { Dimensions, ModifierKey } from '../composite'
+import type { CompositeMetadata } from '../list/CompositeList.vue'
 import { computed, provide, reactive, useAttrs } from 'vue'
 import { useDirection } from '../../direction-provider/DirectionContext'
 import CompositeList from '../list/CompositeList.vue'
@@ -24,6 +25,7 @@ export interface CompositeRootProps extends BaseUIComponentProps<any> {
 
 export interface CompositeRootEmits {
   (e: 'update:highlightedIndex', index: number): void
+  (e: 'mapChange', newMap: Map<Node, CompositeMetadata<any> | null>): void
 }
 
 defineOptions({
@@ -76,7 +78,10 @@ provide(
 </script>
 
 <template>
-  <CompositeList :elements-ref="root.elementsRef" @map-change="root.onMapChange">
+  <CompositeList
+    :elements-ref="root.elementsRef"
+    @map-change="(newMap: any) => { emit('mapChange', newMap); root.onMapChange(newMap) }"
+  >
     <component
       :is="props.as" :ref="root.mergedRef" v-bind="root.getRootProps(attrs)"
       :class="typeof props.class === 'function' ? props.class({}) : props.class"

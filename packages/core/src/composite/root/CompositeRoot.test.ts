@@ -389,5 +389,228 @@ describe('composite', () => {
 
       expect(item9).toHaveAttribute('tabindex', '0')
     })
+
+    describe('prop: disabledIndices', () => {
+      it('disables navigating item when their index is included', async () => {
+        const App = defineComponent({
+          components: { CompositeRoot, CompositeItem },
+          setup() {
+            const highlightedIndex = ref(0)
+            return { highlightedIndex }
+          },
+          template: `
+            <CompositeRoot
+              v-model:highlightedIndex="highlightedIndex"
+              :disabledIndices="[1]"
+              :cols="3"
+            >
+              <CompositeItem data-testid="1" />
+              <CompositeItem data-testid="2" />
+              <CompositeItem data-testid="3" />
+              <CompositeItem data-testid="4" />
+              <CompositeItem data-testid="5" />
+              <CompositeItem data-testid="6" />
+              <CompositeItem data-testid="7" />
+              <CompositeItem data-testid="8" />
+              <CompositeItem data-testid="9" />
+            </CompositeRoot>
+          `,
+        })
+
+        render(App)
+
+        const item1 = screen.getByTestId('1')
+        const item3 = screen.getByTestId('3')
+
+        item1.focus()
+        await flushPromises()
+
+        await fireEvent.keyDown(item1, { key: 'ArrowRight' })
+        await flushPromises()
+
+        expect(item3).toHaveAttribute('tabindex', '0')
+        expect(item3).toHaveFocus()
+
+        await fireEvent.keyDown(item3, { key: 'ArrowLeft' })
+        await flushPromises()
+
+        expect(item1).toHaveAttribute('tabindex', '0')
+        expect(item1).toHaveFocus()
+      })
+    })
+  })
+
+  describe('prop: disabledIndices', () => {
+    it('disables navigating item when their index is included', async () => {
+      const App = defineComponent({
+        components: { CompositeRoot, CompositeItem },
+        setup() {
+          const highlightedIndex = ref(0)
+          return { highlightedIndex }
+        },
+        template: `
+          <CompositeRoot
+            v-model:highlightedIndex="highlightedIndex"
+            :disabledIndices="[1]"
+          >
+            <CompositeItem data-testid="1" />
+            <CompositeItem data-testid="2" />
+            <CompositeItem data-testid="3" />
+          </CompositeRoot>
+        `,
+      })
+
+      render(App)
+
+      const item1 = screen.getByTestId('1')
+      const item3 = screen.getByTestId('3')
+
+      item1.focus()
+      await flushPromises()
+
+      await fireEvent.keyDown(item1, { key: 'ArrowDown' })
+      await flushPromises()
+
+      expect(item3).toHaveAttribute('tabindex', '0')
+      expect(item3).toHaveFocus()
+
+      await fireEvent.keyDown(item3, { key: 'ArrowUp' })
+      await flushPromises()
+
+      expect(item1).toHaveAttribute('tabindex', '0')
+      expect(item1).toHaveFocus()
+    })
+
+    it('allows navigating items disabled in the DOM when their index is excluded', async () => {
+      const App = defineComponent({
+        components: { CompositeRoot, CompositeItem },
+        setup() {
+          const highlightedIndex = ref(0)
+          return { highlightedIndex }
+        },
+        template: `
+          <CompositeRoot
+            v-model:highlightedIndex="highlightedIndex"
+            :disabledIndices="[]"
+          >
+            <CompositeItem as="span" data-testid="1" data-disabled aria-disabled="true" disabled />
+            <CompositeItem as="span" data-testid="2" data-disabled aria-disabled="true" disabled />
+            <CompositeItem as="span" data-testid="3" data-disabled aria-disabled="true" disabled />
+          </CompositeRoot>
+        `,
+      })
+
+      render(App)
+
+      const item1 = screen.getByTestId('1')
+      const item2 = screen.getByTestId('2')
+      const item3 = screen.getByTestId('3')
+
+      item1.focus()
+      await flushPromises()
+
+      await fireEvent.keyDown(item1, { key: 'ArrowDown' })
+      await flushPromises()
+
+      expect(item2).toHaveAttribute('tabindex', '0')
+      expect(item2).toHaveFocus()
+
+      await fireEvent.keyDown(item2, { key: 'ArrowDown' })
+      await flushPromises()
+
+      expect(item3).toHaveAttribute('tabindex', '0')
+      expect(item3).toHaveFocus()
+
+      await fireEvent.keyDown(item3, { key: 'ArrowDown' })
+      await flushPromises()
+
+      expect(item1).toHaveAttribute('tabindex', '0')
+      expect(item1).toHaveFocus()
+
+      await fireEvent.keyDown(item1, { key: 'ArrowUp' })
+      await flushPromises()
+
+      expect(item3).toHaveAttribute('tabindex', '0')
+      expect(item3).toHaveFocus()
+    })
+  })
+
+  describe('prop: modifierKeys', () => {
+    it('prevents arrow key navigation when any modifier key is pressed by default', async () => {
+      const App = defineComponent({
+        components: { CompositeRoot, CompositeItem },
+        template: `
+          <CompositeRoot>
+            <CompositeItem data-testid="1">1</CompositeItem>
+            <CompositeItem data-testid="2">2</CompositeItem>
+          </CompositeRoot>
+        `,
+      })
+
+      render(App)
+
+      const item1 = screen.getByTestId('1')
+
+      item1.focus()
+      await flushPromises()
+
+      expect(item1).toHaveFocus()
+
+      await fireEvent.keyDown(item1, { key: 'ArrowDown', shiftKey: true })
+      await flushPromises()
+      expect(item1).toHaveFocus()
+
+      await fireEvent.keyDown(item1, { key: 'ArrowDown', ctrlKey: true })
+      await flushPromises()
+      expect(item1).toHaveFocus()
+
+      await fireEvent.keyDown(item1, { key: 'ArrowDown', altKey: true })
+      await flushPromises()
+      expect(item1).toHaveFocus()
+
+      await fireEvent.keyDown(item1, { key: 'ArrowDown', metaKey: true })
+      await flushPromises()
+      expect(item1).toHaveFocus()
+    })
+
+    it('specifies allowed modifier keys that do not prevent arrow key navigation when pressed', async () => {
+      const App = defineComponent({
+        components: { CompositeRoot, CompositeItem },
+        template: `
+          <CompositeRoot :modifierKeys="['Alt', 'Meta']">
+            <CompositeItem data-testid="1">1</CompositeItem>
+            <CompositeItem data-testid="2">2</CompositeItem>
+            <CompositeItem data-testid="3">3</CompositeItem>
+          </CompositeRoot>
+        `,
+      })
+
+      render(App)
+
+      const item1 = screen.getByTestId('1')
+      const item2 = screen.getByTestId('2')
+      const item3 = screen.getByTestId('3')
+
+      item1.focus()
+      await flushPromises()
+
+      expect(item1).toHaveFocus()
+
+      await fireEvent.keyDown(item1, { key: 'ArrowDown', shiftKey: true })
+      await flushPromises()
+      expect(item1).toHaveFocus()
+
+      await fireEvent.keyDown(item1, { key: 'ArrowDown', ctrlKey: true })
+      await flushPromises()
+      expect(item1).toHaveFocus()
+
+      await fireEvent.keyDown(item1, { key: 'ArrowDown', altKey: true })
+      await flushPromises()
+      expect(item2).toHaveFocus()
+
+      await fireEvent.keyDown(item2, { key: 'ArrowDown', metaKey: true })
+      await flushPromises()
+      expect(item3).toHaveFocus()
+    })
   })
 })

@@ -1,3 +1,4 @@
+<!-- eslint-disable vue/no-mutating-props -->
 <script setup lang="ts" generic="Metadata">
 import type { Ref } from 'vue'
 import { computed, onBeforeUnmount, provide, ref, shallowRef, watch } from 'vue'
@@ -14,7 +15,8 @@ const props = defineProps<{
 }>()
 
 const nextIndexRef = ref(0)
-const listeners = ref(new Set<Function>())
+type MapChangeListener = (map: Map<Element, CompositeMetadata<Metadata> | null>) => void
+const listeners = ref(new Set<MapChangeListener>())
 
 const map = shallowRef<Map<Element, CompositeMetadata<Metadata> | null>>(new Map())
 const mapTick = ref(0)
@@ -50,7 +52,8 @@ function sortByDocumentPosition(a: Element, b: Element) {
 }
 
 const sortedMap = computed(() => {
-  const _tick = mapTick.value
+  // `mapTick` is the reactive trigger as `map` is stable (shallowRef).
+  void mapTick.value
 
   const newMap = new Map<Element, CompositeMetadata<Metadata>>()
   const sortedNodes = Array.from(map.value.keys())
