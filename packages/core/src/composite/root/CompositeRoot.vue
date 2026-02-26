@@ -2,6 +2,7 @@
 import type { BaseUIComponentProps } from '../../utils/types'
 import type { Dimensions, ModifierKey } from '../composite'
 import { computed, provide, reactive, useAttrs } from 'vue'
+import { useDirection } from '../../direction-provider/DirectionContext'
 import CompositeList from '../list/CompositeList.vue'
 import { compositeRootContextKey } from './CompositeRootContext'
 import { useCompositeRoot } from './useCompositeRoot'
@@ -43,6 +44,7 @@ const props = withDefaults(defineProps<CompositeRootProps>(), {
 
 const emit = defineEmits<CompositeRootEmits>()
 const attrs = useAttrs()
+const direction = useDirection()
 
 const root = useCompositeRoot({
   orientation: () => props.orientation,
@@ -59,6 +61,7 @@ const root = useCompositeRoot({
   stopEventPropagation: () => props.stopEventPropagation,
   disabledIndices: () => props.disabledIndices,
   modifierKeys: () => props.modifierKeys,
+  direction,
 })
 
 provide(
@@ -70,16 +73,12 @@ provide(
     relayKeyboardEvent: root.relayKeyboardEvent,
   }),
 )
-
-function setRootRef(el: any) {
-  root.rootRef.value = el?.$el || el
-}
 </script>
 
 <template>
   <CompositeList :elements-ref="root.elementsRef" @map-change="root.onMapChange">
     <component
-      :is="props.as" :ref="setRootRef" v-bind="root.getRootProps(attrs)"
+      :is="props.as" :ref="root.mergedRef" v-bind="root.getRootProps(attrs)"
       :class="typeof props.class === 'function' ? props.class({}) : props.class"
       :style="typeof props.style === 'function' ? props.style({}) : props.style"
     >

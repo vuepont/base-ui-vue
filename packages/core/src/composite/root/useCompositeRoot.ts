@@ -1,9 +1,11 @@
+import type { Ref } from 'vue'
+import type { TextDirection } from '../../direction-provider/DirectionContext'
+import type { HTMLProps } from '../../types'
 import type { Dimensions, ModifierKey } from '../composite'
 import type { CompositeMetadata } from '../list/CompositeList.vue'
 import { computed, ref } from 'vue'
-import { useDirection } from '../../direction-provider/DirectionContext'
-import { EMPTY_ARRAY } from '../../utils/constants'
-import { isElementDisabled } from '../../utils/isElementDisabled'
+import { isElementDisabled } from '../../../../plugins/src/isElementDisabled'
+import { useMergedRefs } from '../../../../plugins/src/useMergedRefs'
 import {
   ALL_KEYS,
   ARROW_DOWN,
@@ -12,7 +14,6 @@ import {
   ARROW_RIGHT,
   ARROW_UP,
   createGridCellMap,
-
   END,
   findNonDisabledListIndex,
   getGridCellIndexOfCorner,
@@ -27,7 +28,6 @@ import {
   isListIndexDisabled,
   isNativeInput,
   MODIFIER_KEYS,
-
   scrollIntoViewIfNeeded,
   VERTICAL_KEYS,
   VERTICAL_KEYS_WITH_EXTRA_KEYS,
@@ -42,12 +42,35 @@ export interface UseCompositeRootParameters {
   defaultHighlightedIndex?: () => number | undefined
   onHighlightedIndexChange?: (index: number) => void
   dense?: () => boolean | undefined
+  direction: TextDirection
   itemSizes?: () => Array<Dimensions> | undefined
+  rootRef?: Ref<HTMLElement | null>
+  /**
+   * When `true`, pressing the Home key moves focus to the first item,
+   * and pressing the End key moves focus to the last item.
+   * @default false
+   */
   enableHomeAndEndKeys?: () => boolean | undefined
+  /**
+   * When `true`, keypress events on Composite's navigation keys
+   * be stopped with event.stopPropagation().
+   * @default false
+   */
   stopEventPropagation?: () => boolean | undefined
+  /**
+   * Array of item indices to be considered disabled.
+   * Used for composite items that are focusable when disabled.
+   */
   disabledIndices?: () => number[] | undefined
+  /**
+   * Array of [modifier key values](https://developer.mozilla.org/en-US/docs/Web/API/UI_Events/Keyboard_event_key_values#modifier_keys) that should allow normal keyboard actions
+   * when pressed. By default, all modifier keys prevent normal actions.
+   * @default []
+   */
   modifierKeys?: () => ModifierKey[] | undefined
 }
+
+const EMPTY_ARRAY: never[] = []
 
 export function useCompositeRoot(params: UseCompositeRootParameters) {
   const orientation = computed(() => params.orientation?.() ?? 'both')
@@ -72,10 +95,11 @@ export function useCompositeRoot(params: UseCompositeRootParameters) {
   const externalSetHighlightedIndex = params.onHighlightedIndexChange
 
   const internalHighlightedIndex = ref(params.defaultHighlightedIndex?.() ?? 0)
-  const direction = useDirection()
+  const { direction } = params
   const isGrid = computed(() => cols.value > 1)
 
   const rootRef = ref<HTMLElement | null>(null)
+  const mergedRef = useMergedRefs(rootRef, params.rootRef)
   const elementsRef = ref<Array<HTMLElement | null>>([])
   let hasSetDefaultIndex = false
 
@@ -103,7 +127,7 @@ export function useCompositeRoot(params: UseCompositeRootParameters) {
       scrollIntoViewIfNeeded(
         rootRef.value,
         newActiveItem,
-        direction as any,
+        direction,
         orientation.value,
       )
     }
@@ -118,6 +142,7 @@ export function useCompositeRoot(params: UseCompositeRootParameters) {
     const activeItem = (sortedElements.find(compositeElement =>
       compositeElement?.hasAttribute(ACTIVE_COMPOSITE_ITEM),
     ) ?? null) as HTMLElement | null
+    // Set the default highlighted index of an arbitrary composite item.
     const activeIndex = activeItem ? sortedElements.indexOf(activeItem) : -1
 
     if (activeIndex !== -1) {
@@ -127,24 +152,9 @@ export function useCompositeRoot(params: UseCompositeRootParameters) {
     scrollIntoViewIfNeeded(
       rootRef.value,
       activeItem,
-      direction as any,
+      direction,
       orientation.value,
     )
-  }
-
-  function isModifierKeySet(
-    event: KeyboardEvent,
-    ignoredModifierKeys: ModifierKey[],
-  ) {
-    for (const key of MODIFIER_KEYS.values()) {
-      if (ignoredModifierKeys.includes(key as any)) {
-        continue
-      }
-      if (event.getModifierState(key)) {
-        return true
-      }
-    }
-    return false
   }
 
   function handleFocus(event: FocusEvent) {
@@ -170,7 +180,7 @@ export function useCompositeRoot(params: UseCompositeRootParameters) {
     if (!element) {
       return
     }
-    const isRtl = direction === 'rtl' // Handle dynamic direction if it's a ref, but `useDirection` usually gives string. Wait, assuming useDirection returns the text.
+    const isRtl = direction === 'rtl'
 
     const horizontalForwardKey = isRtl ? ARROW_LEFT : ARROW_RIGHT
     const forwardKey = {
@@ -194,6 +204,8 @@ export function useCompositeRoot(params: UseCompositeRootParameters) {
       const selectionStart = target.selectionStart
       const selectionEnd = target.selectionEnd
       const textContent = target.value ?? ''
+      // return to native textbox behavior when
+      // 1 - Shift is held to make a text selection, or if there already is a text selection
       if (
         selectionStart == null
         || event.shiftKey
@@ -201,9 +213,11 @@ export function useCompositeRoot(params: UseCompositeRootParameters) {
       ) {
         return
       }
+      // 2 - arrow-ing forward and not in the last position of the text
       if (event.key !== backwardKey && selectionStart < textContent.length) {
         return
       }
+      // 3 - arrow-ing backward and not in the first position of the text
       if (event.key !== forwardKey && selectionStart > 0) {
         return
       }
@@ -220,12 +234,15 @@ export function useCompositeRoot(params: UseCompositeRootParameters) {
             width: 1,
             height: 1,
           }))
+      // To calculate movements on the grid, we use hypothetical cell indices
+      // as if every item was 1x1, then convert back to real indices.
       const cellMap = createGridCellMap(sizes, cols.value, dense.value)
       const minGridIndex = cellMap.findIndex(
         index =>
           index != null
           && !isListIndexDisabled(elementsRef, index, disabledIndices.value),
       )
+      // last enabled index
       const maxGridIndex = cellMap.reduce(
         (foundIndex: number, index, cellIndex) =>
           index != null
@@ -241,6 +258,8 @@ export function useCompositeRoot(params: UseCompositeRootParameters) {
           orientation: orientation.value,
           loopFocus: loopFocus.value,
           cols: cols.value,
+          // treat undefined (empty grid spaces) as disabled indices so we
+          // don't end up in them
           disabledIndices: getGridCellIndices(
             [
               ...((disabledIndices.value.length > 0
@@ -262,6 +281,10 @@ export function useCompositeRoot(params: UseCompositeRootParameters) {
             sizes,
             cellMap,
             cols.value,
+            // use a corner matching the edge closest to the direction we're
+            // moving in so we don't end up in the same item. Prefer
+            // top/left over bottom/right.
+
             event.key === ARROW_DOWN
               ? 'bl'
               : event.key === ARROW_RIGHT
@@ -270,7 +293,7 @@ export function useCompositeRoot(params: UseCompositeRootParameters) {
           ),
           rtl: isRtl,
         })
-      ] as number
+      ] as number // navigated cell will never be nullish
     }
 
     const forwardKeys = {
@@ -346,6 +369,7 @@ export function useCompositeRoot(params: UseCompositeRootParameters) {
       }
       onHighlightedIndexChange(nextIndex, true)
 
+      // Wait for FocusManager `returnFocus` to execute.
       queueMicrotask(() => {
         elementsRef.value[nextIndex]?.focus()
       })
@@ -353,7 +377,7 @@ export function useCompositeRoot(params: UseCompositeRootParameters) {
   }
 
   return {
-    getRootProps: (externalProps: Record<string, any> = {}) => ({
+    getRootProps: (externalProps: Record<string, any> = {}): HTMLProps => ({
       ...externalProps,
       'aria-orientation':
         orientation.value === 'both' ? undefined : orientation.value,
@@ -369,6 +393,7 @@ export function useCompositeRoot(params: UseCompositeRootParameters) {
       },
     }),
     rootRef,
+    mergedRef,
     highlightedIndex,
     onHighlightedIndexChange,
     elementsRef,
@@ -376,4 +401,19 @@ export function useCompositeRoot(params: UseCompositeRootParameters) {
     onMapChange,
     relayKeyboardEvent: handleKeydown,
   }
+}
+
+function isModifierKeySet(
+  event: KeyboardEvent,
+  ignoredModifierKeys: ModifierKey[],
+) {
+  for (const key of MODIFIER_KEYS.values()) {
+    if (ignoredModifierKeys.includes(key as any)) {
+      continue
+    }
+    if (event.getModifierState(key)) {
+      return true
+    }
+  }
+  return false
 }
