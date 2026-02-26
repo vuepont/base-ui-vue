@@ -20,7 +20,10 @@ describe('mergeProps', () => {
     } as any)
     mergedProps.onPaste?.({ nativeEvent: new Event('paste') } as any)
 
-    // In Vue implementation, ourProps runs first
+    const ourCallOrder = ourProps.onClick.mock.invocationCallOrder[0]
+    const theirCallOrder = theirProps.onClick.mock.invocationCallOrder[0]
+
+    expect(ourCallOrder).toBeLessThan(theirCallOrder)
     expect(ourProps.onClick).toHaveBeenCalled()
     expect(theirProps.onClick).toHaveBeenCalled()
     expect(theirProps.onKeydown).toHaveBeenCalled()
@@ -33,23 +36,22 @@ describe('mergeProps', () => {
     const mergedProps = mergeProps(
       {
         onClick() {
-          log.push('1') // Our
+          log.push('1')
         },
       },
       {
         onClick() {
-          log.push('2') // Their
+          log.push('2')
         },
       },
       {
         onClick() {
-          log.push('3') // Their their
+          log.push('3')
         },
       },
     )
 
     mergedProps.onClick?.({ nativeEvent: new MouseEvent('click') } as any)
-    // Vue mergeProps currently evaluates left-to-right natively
     expect(log).toEqual(['1', '2', '3'])
   })
 
@@ -112,17 +114,32 @@ describe('mergeProps', () => {
     expect(mergedProps.style).toBeUndefined()
   })
 
-  it('merges classes properly', () => {
+  it('merges classes with rightmost first', () => {
     const theirProps = {
-      class: 'external-class', // Using standard Vue 'class'
+      class: 'external-class',
     }
     const ourProps = {
       class: 'internal-class',
     }
     const mergedProps = mergeProps(ourProps, theirProps)
 
-    // Vue merges rightmost to leftmost in space separated sequence
     expect(mergedProps.class).toBe('external-class internal-class')
+  })
+
+  it('merges multiple classes', () => {
+    const mergedProps = mergeProps(
+      {
+        class: 'class-1',
+      },
+      {
+        class: 'class-2',
+      },
+      {
+        class: 'class-3',
+      },
+    )
+
+    expect(mergedProps.class).toBe('class-3 class-2 class-1')
   })
 
   it('merges classes with undefined', () => {
@@ -144,14 +161,12 @@ describe('mergeProps', () => {
     expect(mergedProps.class).toBeUndefined()
   })
 
-  it('does not prevent external handler if preventBaseUIHandler is NOT called', () => {
+  it('does not prevent external handler if event.preventBaseUIHandler is NOT called', () => {
     let ran = false
 
     const mergedProps = mergeProps(
       {
-        onClick() {
-          // Standard handler
-        },
+        onClick() {},
       },
       {
         onClick() {
@@ -165,26 +180,84 @@ describe('mergeProps', () => {
     expect(ran).toBe(true)
   })
 
-  it('prevents external handler if preventBaseUIHandler IS called by our handler', () => {
+  it('prevents external handler if event.preventBaseUIHandler() IS called', () => {
     let ran = false
 
     const mergedProps = mergeProps(
       {
         onClick(event: BaseUIEvent<MouseEvent>) {
-          event.preventBaseUIHandler() // We prevent it
+          event.preventBaseUIHandler()
         },
       },
       {
         onClick() {
-          ran = true // Should not run
+          ran = true
+        },
+      },
+      {
+        onClick() {
+          ran = true
+        },
+      },
+    )
+
+    const event = { nativeEvent: new MouseEvent('click') } as any
+    mergedProps.onClick?.(event)
+
+    expect(ran).toBe(false)
+  })
+
+  it('prevents handlers merged after event.preventBaseUIHandler() is called', () => {
+    const log: string[] = []
+
+    const mergedProps = mergeProps(
+      {
+        onClick() {
+          log.push('1')
+        },
+      },
+      {
+        onClick(event: BaseUIEvent<MouseEvent>) {
+          event.preventBaseUIHandler()
+          log.push('2')
+        },
+      },
+      {
+        onClick() {
+          log.push('3')
         },
       },
     )
 
     mergedProps.onClick?.({ nativeEvent: new MouseEvent('click') } as any)
 
-    expect(ran).toBe(false)
-  })
+    expect(log).toEqual(['1', '2'])
+  });
+
+  [true, 13, 'newValue', { key: 'value' }, ['value'], () => 'value'].forEach(
+    (eventArgument) => {
+      it('handles non-standard event handlers without error', () => {
+        const log: string[] = []
+
+        const mergedProps = mergeProps(
+          {
+            onValueChange() {
+              log.push('1')
+            },
+          },
+          {
+            onValueChange() {
+              log.push('2')
+            },
+          },
+        )
+
+        mergedProps.onValueChange(eventArgument)
+
+        expect(log).toEqual(['1', '2'])
+      })
+    },
+  )
 
   it('merges internal props so that the ones defined later override earlier ones', () => {
     const mergedProps = mergeProps(
