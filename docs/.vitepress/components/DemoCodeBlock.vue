@@ -22,7 +22,7 @@ const slotsFramework = computed(() =>
 )
 
 const cssFrameworkOptions = computed(() => [
-  { label: 'CSS', value: 'css' },
+  { label: 'CSS Modules', value: 'css' },
   { label: 'Tailwind CSS', value: 'tailwind' },
 ].filter(i => slotsFramework.value.includes(i.value)))
 
