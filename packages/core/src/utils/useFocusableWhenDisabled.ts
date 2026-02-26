@@ -1,17 +1,45 @@
-import type { MaybeRefOrGetter } from 'vue'
+import type { ComputedRef, MaybeRefOrGetter } from 'vue'
 import { computed, toValue } from 'vue'
 
 export interface UseFocusableWhenDisabledParameters {
+  /**
+   * Whether the component should be focusable when disabled.
+   * When `undefined`, composite items are focusable when disabled by default.
+   */
   focusableWhenDisabled?: MaybeRefOrGetter<boolean | undefined>
+  /**
+   * The disabled state of the component.
+   */
   disabled: MaybeRefOrGetter<boolean>
+  /**
+   * Whether this is a composite item or not.
+   * @default false
+   */
   composite?: MaybeRefOrGetter<boolean>
+  /**
+   * @default 0
+   */
   tabIndex?: MaybeRefOrGetter<number>
+  /**
+   * @default true
+   */
   isNativeButton: MaybeRefOrGetter<boolean>
+}
+
+interface FocusableWhenDisabledProps {
+  'aria-disabled'?: boolean | undefined
+  'disabled'?: boolean | undefined
+  'onKeydown': (event: KeyboardEvent) => void
+  'tabIndex': number
+}
+
+export interface UseFocusableWhenDisabledReturnValue {
+  props: ComputedRef<FocusableWhenDisabledProps>
 }
 
 export function useFocusableWhenDisabled(
   params: UseFocusableWhenDisabledParameters,
-) {
+): UseFocusableWhenDisabledReturnValue {
   const props = computed(() => {
     const focusableWhenDisabled = toValue(params.focusableWhenDisabled)
     const disabled = toValue(params.disabled)
@@ -23,13 +51,13 @@ export function useFocusableWhenDisabled(
     const isNonFocusableComposite
       = composite && focusableWhenDisabled === false
 
-    const additionalProps: Record<string, any> = {
+    const additionalProps = {
       onKeydown(event: KeyboardEvent) {
         if (disabled && focusableWhenDisabled && event.key !== 'Tab') {
           event.preventDefault()
         }
       },
-    }
+    } as FocusableWhenDisabledProps
 
     if (!composite) {
       additionalProps.tabIndex = tabIndexProp
@@ -43,10 +71,6 @@ export function useFocusableWhenDisabled(
       (isNativeButton && (focusableWhenDisabled || isFocusableComposite))
       || (!isNativeButton && disabled)
     ) {
-      // Only set aria-disabled when true; Vue renders false as "false" attribute
-      // if (disabled) {
-      // additionalProps['aria-disabled'] = 'true'
-      // }
       additionalProps['aria-disabled'] = disabled
     }
 

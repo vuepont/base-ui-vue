@@ -2,7 +2,7 @@ import type { MaybeRefOrGetter } from 'vue'
 import type { BaseUIEvent } from '../types'
 import { ref, toValue } from 'vue'
 import { mergeProps } from '../merge-props'
-import { useFocusableWhenDisabled } from '../utils/use-focusable-when-disabled'
+import { useFocusableWhenDisabled } from '../utils/useFocusableWhenDisabled'
 
 export interface UseButtonParameters {
   /**
