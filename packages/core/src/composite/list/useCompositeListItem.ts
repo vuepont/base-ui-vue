@@ -1,5 +1,5 @@
 import type { Ref } from 'vue'
-import { computed, onMounted, ref, watchEffect } from 'vue'
+import { computed, ref, watchEffect } from 'vue'
 import { useCompositeListContext } from './CompositeListContext'
 
 export enum IndexGuessBehavior {
@@ -12,12 +12,25 @@ export interface UseCompositeListItemParameters<Metadata> {
   label?: () => string | null | undefined
   metadata?: () => Metadata | undefined
   textRef?: () => Ref<HTMLElement | null> | undefined
+  /**
+   * Enables guessing the indexes. This avoids a re-render after mount, which is useful for
+   * large lists. This should be used for lists that are likely flat and vertical, other cases
+   * might trigger a re-render anyway.
+   */
   indexGuessBehavior?: () => IndexGuessBehavior | undefined
 }
 
+export interface UseCompositeListItemReturnValue {
+  ref: (node: HTMLElement | null) => void
+  index: Readonly<Ref<number>>
+}
+
+/**
+ * Used to register a list item and its index (DOM position) in the `CompositeList`.
+ */
 export function useCompositeListItem<Metadata>(
   params: UseCompositeListItemParameters<Metadata> = {},
-) {
+): UseCompositeListItemReturnValue {
   const externalIndex = computed(() => params.index?.())
   const label = computed(() => params.label?.())
   const metadata = computed(() => params.metadata?.())
@@ -31,7 +44,7 @@ export function useCompositeListItem<Metadata>(
     elementsRef,
     labelsRef,
     nextIndexRef,
-  } = useCompositeListContext()
+  } = useCompositeListContext()!
 
   const indexRef = ref(-1)
 
@@ -70,10 +83,6 @@ export function useCompositeListItem<Metadata>(
     }
   }
 
-  onMounted(() => {
-    // Unregister and register cleanup via watchEffect handles this usually.
-  })
-
   watchEffect(
     (onCleanup) => {
       if (externalIndex.value != null) {
@@ -98,11 +107,12 @@ export function useCompositeListItem<Metadata>(
       }
 
       const unsubscribe = subscribeMapChange((map) => {
-        if (componentRef.value) {
-          const itemData = map.get(componentRef.value)
-          if (itemData && itemData.index != null) {
-            internalIndex.value = itemData.index
-          }
+        const i = componentRef.value
+          ? map.get(componentRef.value)?.index
+          : null
+
+        if (i != null) {
+          internalIndex.value = i
         }
       })
 

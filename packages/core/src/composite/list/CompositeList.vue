@@ -1,6 +1,3 @@
-<script lang="ts">
-</script>
-
 <script setup lang="ts" generic="Metadata">
 import type { Ref } from 'vue'
 import { computed, onBeforeUnmount, provide, ref, shallowRef, watch } from 'vue'
@@ -53,7 +50,6 @@ function sortByDocumentPosition(a: Element, b: Element) {
 }
 
 const sortedMap = computed(() => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const _tick = mapTick.value
 
   const newMap = new Map<Element, CompositeMetadata<Metadata>>()
