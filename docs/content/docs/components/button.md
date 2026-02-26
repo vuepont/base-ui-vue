@@ -4,12 +4,12 @@ A button component that can be rendered as another tag or focusable when disable
 
 ## Preview
 
-<div class="preview-container flex gap-4 p-4 border border-gray-200 rounded-lg">
-  <BaseUIButton class="demo-button" @click="window.alert('Base UI Button Clicked!')">
+<div class="preview-container">
+  <BaseUIButton class="demo-button" id="my-btn">
     Base UI Button
   </BaseUIButton>
 
-<BaseUIButton disabled class="demo-button demo-disabled" style="color: red;" id="my-btn">
+<BaseUIButton @click="console.log('Disabled Button Clicked!')" focusable-when-disabled disabled class="demo-button demo-disabled" style="color: red;" >
 Disabled Buttonsss
 </BaseUIButton>
 
