@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "paths": {
+      "base-ui-vue": ["../packages/core/src/index.ts"]
+    },
+    "resolveJsonModule": true,
+    "types": ["vitepress/client"],
+    "strict": true,
+    "skipLibCheck": true
+  },
+  "include": [
+    "**/*.ts",
+    "**/*.vue",
+    ".vitepress/**/*.ts",
+    ".vitepress/**/*.vue",
+    "components/**/*.ts",
+    "components/**/*.vue"
+  ],
+  "exclude": ["node_modules", ".vitepress/cache"]
+}
