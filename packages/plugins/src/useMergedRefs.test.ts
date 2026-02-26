@@ -1,6 +1,3 @@
-/**
- * @vitest-environment jsdom
- */
 import { render, screen } from '@testing-library/vue'
 import { describe, expect, it, vi } from 'vitest'
 import { defineComponent, nextTick, ref } from 'vue'
@@ -8,35 +5,24 @@ import { useMergedRefs } from './useMergedRefs'
 
 describe('useMergedRefs', () => {
   it('returns a single ref-setter function that forks the ref to its inputs', async () => {
-    let outerRefCurrent: Element | null = null
-
-    const outerRef = (el: Element | null) => {
-      outerRefCurrent = el
-    }
+    const outerRef = ref<HTMLDivElement | null>(null)
 
     const Component = defineComponent({
-      props: ['innerRef'],
-      setup(props) {
+      setup() {
         const ownRef = ref<HTMLDivElement | null>(null)
-        const handleRef = useMergedRefs(props.innerRef as any, ownRef)
+        const handleRef = useMergedRefs(outerRef, ownRef)
 
         return { handleRef, ownRef }
       },
       template: `<div :ref="handleRef" data-testid="target">{{ ownRef ? 'has a ref' : 'has no ref' }}</div>`,
     })
 
-    render(Component, {
-      props: { innerRef: outerRef },
-    })
-
+    render(Component)
     await nextTick()
 
-    // ownRef should have been assigned and triggered a re-render
     expect(screen.getByTestId('target').textContent).toBe('has a ref')
-
-    // outerRef should have been called with the same element
-    expect(outerRefCurrent).not.toBeNull()
-    expect((outerRefCurrent as Element).tagName).toBe('DIV')
+    expect(outerRef.value).not.toBeNull()
+    expect(outerRef.value!.textContent).toBe('has a ref')
   })
 
   it('forks if only one of the branches requires a ref', async () => {
@@ -46,8 +32,7 @@ describe('useMergedRefs', () => {
         const handleOwnRef = () => {
           hasRef.value = true
         }
-        const nullRef = null
-        const handleRef = useMergedRefs(handleOwnRef, nullRef)
+        const handleRef = useMergedRefs(handleOwnRef, null)
 
         return { handleRef, hasRef }
       },
@@ -57,6 +42,11 @@ describe('useMergedRefs', () => {
     render(Component)
     await nextTick()
     expect(screen.getByTestId('hasRef').textContent).toBe('true')
+  })
+
+  it('returns null if none of the forked branches requires a ref', () => {
+    const result = useMergedRefs(null, undefined, null)
+    expect(result).toBeNull()
   })
 
   it('handles unwrapping component instances to get the $el', async () => {
@@ -72,12 +62,11 @@ describe('useMergedRefs', () => {
         const handleRef = useMergedRefs(innerRef)
         return { handleRef }
       },
-      template: `<Child :ref="handleRef" />`, // Component template ref normally returns ComponentPublicInstance
+      template: `<Child :ref="handleRef" />`,
     })
 
     render(Parent)
 
-    // useMergedRefs should extract the $el property from the component
     expect(innerRef.value).not.toBeNull()
     expect(innerRef.value?.tagName).toBe('SPAN')
     expect(innerRef.value?.textContent).toBe('child')
@@ -105,9 +94,69 @@ describe('useMergedRefs', () => {
 
     unmount()
 
-    // Vue sets template refs to null on unmount
+    // Ref object should be set to null
     expect(objRef.value).toBeNull()
+    // Callback ref should be called with null
     expect(fnRef).toHaveBeenCalledTimes(2)
     expect(fnRef.mock.calls[1][0]).toBeNull()
+  })
+
+  it('calls cleanup function if it exists', () => {
+    const cleanup = vi.fn()
+    const setup = vi.fn()
+    const setup2 = vi.fn()
+    const nullHandler = vi.fn()
+
+    function onRefChangeWithCleanup(el: Element | null) {
+      if (el) {
+        setup(el.id)
+      }
+      else {
+        nullHandler()
+      }
+      return cleanup
+    }
+
+    function onRefChangeWithoutCleanup(el: Element | null) {
+      if (el) {
+        setup2(el.id)
+      }
+      else {
+        nullHandler()
+      }
+    }
+
+    const Component = defineComponent({
+      setup() {
+        const handleRef = useMergedRefs(
+          onRefChangeWithCleanup as any,
+          onRefChangeWithoutCleanup as any,
+        )
+        return { handleRef }
+      },
+      template: `<div id="test" :ref="handleRef" />`,
+    })
+
+    const { unmount } = render(Component)
+
+    // Both setup fns should have been called with the element id
+    expect(setup).toHaveBeenCalledTimes(1)
+    expect(setup.mock.calls[0][0]).toBe('test')
+    expect(cleanup).toHaveBeenCalledTimes(0)
+
+    expect(setup2).toHaveBeenCalledTimes(1)
+    expect(setup2.mock.calls[0][0]).toBe('test')
+
+    unmount()
+
+    // Setup was not called again
+    expect(setup).toHaveBeenCalledTimes(1)
+    // Cleanup WAS called because onRefChangeWithCleanup returned it
+    expect(cleanup).toHaveBeenCalledTimes(1)
+
+    // Setup2 was not called again
+    expect(setup2).toHaveBeenCalledTimes(1)
+    // nullHandler was called because onRefChangeWithoutCleanup has no cleanup
+    expect(nullHandler).toHaveBeenCalledTimes(1)
   })
 })
