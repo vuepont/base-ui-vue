@@ -1,9 +1,6 @@
-<script lang="ts">
+<script setup lang="ts">
 import type { BaseUIComponentProps } from '../../utils/types'
 import type { Dimensions, ModifierKey } from '../composite'
-</script>
-
-<script setup lang="ts">
 import { computed, provide, reactive, useAttrs } from 'vue'
 import CompositeList from '../list/CompositeList.vue'
 import { compositeRootContextKey } from './CompositeRootContext'
