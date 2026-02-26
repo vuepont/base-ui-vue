@@ -77,7 +77,7 @@ function mergeEventHandlers(
 
 /**
  * Merges multiple sets of props.
- * Follows the Base UI pattern: rightmost takes precedence, except for:
+ * Follows the Base UI Vue pattern: rightmost takes precedence, except for:
  * - Event handlers: Merged, leftmost (internal) executes first, can prevent rightmost.
  * - class: Concatenated.
  * - style: Merged.

@@ -4,7 +4,7 @@ import type { BaseUIEvent, HTMLProps } from '../types'
 export type { BaseUIEvent, HTMLProps }
 
 /**
- * Props shared by all Base UI components.
+ * Props shared by all Base UI Vue components.
  */
 export interface BaseUIComponentProps<State> {
   /**
@@ -29,6 +29,15 @@ export interface NativeButtonProps {
    *  via the `as` prop.
    * Set to `true` if the rendered element is a native button.
    * @default true
+   */
+  nativeButton?: boolean
+}
+export interface NonNativeButtonProps {
+  /**
+   * Whether the component renders a native `<button>` element when replaceing it.
+   *  via the `as` prop.
+   * Set to `true` if the rendered element is a native button.
+   * @default false
    */
   nativeButton?: boolean
 }
