@@ -1,4 +1,9 @@
-export * from './empty'
-export * from './error'
-export * from './isElementDisabled'
-export * from './useMergedRefs'
+/**
+ * TODO: Implement plugins
+ *
+ * - Nuxt Modules
+ * - Resolvers
+ */
+
+export const name = 'plugins'
+export const version = '0.0.0'
