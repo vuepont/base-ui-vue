@@ -1,3 +1,4 @@
+import type { HTMLProps } from '../../utils/types'
 import type { UseCompositeListItemParameters } from '../list/useCompositeListItem'
 import { computed, ref, watch } from 'vue'
 import { useMergedRefs } from '../../../../plugins/src/useMergedRefs'
@@ -34,33 +35,28 @@ export function useCompositeItem<Metadata>(
     }
   })
 
-  return {
-    getCompositeProps: (externalProps: Record<string, any> = {}) => ({
-      ...externalProps,
-      tabindex: isHighlighted.value ? 0 : -1,
-      onFocus(event: FocusEvent) {
-        externalProps.onFocus?.(event)
-        if (!event.defaultPrevented && index.value !== -1) {
-          context.onHighlightedIndexChange(index.value)
-        }
-      },
-      onMousemove(event: MouseEvent) {
-        externalProps.onMousemove?.(event)
-        if (!event.defaultPrevented) {
-          const item = itemRef.value
-          if (!context.highlightItemOnHover || !item) {
-            return
-          }
+  const compositeProps = computed<HTMLProps>(() => ({
+    tabindex: isHighlighted.value ? 0 : -1,
+    onFocus() {
+      context.onHighlightedIndexChange(index.value)
+    },
+    onMousemove() {
+      const item = itemRef.value
+      if (!context.highlightItemOnHover || !item) {
+        return
+      }
 
-          const disabled
-            = item.hasAttribute('disabled')
-              || item.getAttribute('aria-disabled') === 'true'
-          if (!isHighlighted.value && !disabled) {
-            item.focus()
-          }
-        }
-      },
-    }),
+      const disabled
+        = item.hasAttribute('disabled')
+          || item.getAttribute('aria-disabled') === 'true'
+      if (!isHighlighted.value && !disabled) {
+        item.focus()
+      }
+    },
+  }))
+
+  return {
+    compositeProps,
     compositeRef: mergedRef,
     index,
   }
