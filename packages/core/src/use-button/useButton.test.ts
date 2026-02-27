@@ -2,8 +2,8 @@ import userEvent from '@testing-library/user-event'
 import { fireEvent, render, screen } from '@testing-library/vue'
 import { describe, expect, it, vi } from 'vitest'
 import { defineComponent, ref } from 'vue'
-import { useMergedRefs } from '../../../plugins/src/useMergedRefs'
 import { CompositeRoot } from '../composite/root'
+import { useMergedRefs } from '../utils/useMergedRefs'
 import { useButton } from './useButton'
 
 describe('useButton', () => {

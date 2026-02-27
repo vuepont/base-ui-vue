@@ -2,7 +2,7 @@ import { afterEach, beforeAll, expect, vi } from 'vitest'
 import { configureAxe } from 'vitest-axe'
 
 import * as matchers from 'vitest-axe/matchers'
-import { reset } from '../plugins/src/error'
+import { reset } from './src/utils/error'
 import '@testing-library/jest-dom/vitest'
 import 'vitest-canvas-mock'
 

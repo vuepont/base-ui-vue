@@ -3,9 +3,9 @@ import type { MaybeRefOrGetter, Ref } from 'vue'
 import type { BaseUIEvent, HTMLProps } from '../types'
 import { isHTMLElement } from '@floating-ui/utils/dom'
 import { ref, toValue, watchEffect } from 'vue'
-import { error } from '../../../plugins/src/error'
 import { useCompositeRootContext } from '../composite/root/CompositeRootContext'
 import { makeEventPreventable, mergeProps } from '../merge-props'
+import { error } from '../utils/error'
 import { useFocusableWhenDisabled } from '../utils/useFocusableWhenDisabled'
 
 export interface UseButtonParameters {

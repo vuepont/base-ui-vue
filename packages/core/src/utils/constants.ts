@@ -1,1 +1,1 @@
-export { EMPTY_ARRAY, EMPTY_OBJECT } from '../../../plugins/src/empty'
+export { EMPTY_ARRAY, EMPTY_OBJECT } from './empty'

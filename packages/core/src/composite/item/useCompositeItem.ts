@@ -1,7 +1,7 @@
 import type { HTMLProps } from '../../utils/types'
 import type { UseCompositeListItemParameters } from '../list/useCompositeListItem'
 import { computed, ref, watch } from 'vue'
-import { useMergedRefs } from '../../../../plugins/src/useMergedRefs'
+import { useMergedRefs } from '../../utils/useMergedRefs'
 import { useCompositeListItem } from '../list/useCompositeListItem'
 import { useCompositeRootContext } from '../root/CompositeRootContext'
 

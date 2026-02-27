@@ -4,8 +4,8 @@ import type { HTMLProps } from '../../types'
 import type { Dimensions, ModifierKey } from '../composite'
 import type { CompositeMetadata } from '../list/CompositeList.vue'
 import { computed, ref } from 'vue'
-import { isElementDisabled } from '../../../../plugins/src/isElementDisabled'
-import { useMergedRefs } from '../../../../plugins/src/useMergedRefs'
+import { isElementDisabled } from '../../utils/isElementDisabled'
+import { useMergedRefs } from '../../utils/useMergedRefs'
 import {
   ALL_KEYS,
   ARROW_DOWN,
