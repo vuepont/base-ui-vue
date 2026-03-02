@@ -23,41 +23,45 @@ import { AvatarFallback, AvatarImage, AvatarRoot } from 'base-ui-vue'
 
 ## API reference
 
-### AvatarRoot Props
+### Root
 
-| Name    | Type                                           | Default     | Description                                                                                             |
-| ------- | ---------------------------------------------- | ----------- | ------------------------------------------------------------------------------------------------------- |
-| `as`    | `string \| Component`                          | `'span'`    | The element or component to use for the root node.                                                      |
-| `class` | `string \| ((state: State) => string)`         | `undefined` | CSS class applied to the element, or a function that returns a class based on the component's state.    |
-| `style` | `StyleValue \| ((state: State) => StyleValue)` | `undefined` | Style applied to the element, or a function that returns a style object based on the component's state. |
+Displays a user's profile picture, initials, or fallback icon. Renders a `<span>` element.
 
-### AvatarImage Props
+| Prop    | Default  | Type                                                                                                                                                          |
+| ------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `as`    | `'span'` | `string \| Component`<br><br>The element or component to use for the root node.                                                                               |
+| `class` | —        | `string \| ((state: State) => string)`<br><br>CSS class applied to the element, or a function that returns a class based on the component's state.            |
+| `style` | —        | `StyleValue \| ((state: State) => StyleValue)`<br><br>Style applied to the element, or a function that returns a style object based on the component's state. |
 
-| Name             | Type                                           | Default     | Description                                                                                             |
-| ---------------- | ---------------------------------------------- | ----------- | ------------------------------------------------------------------------------------------------------- |
-| `as`             | `string \| Component`                          | `'img'`     | The element or component to use for the root node.                                                      |
-| `src`            | `string`                                       | `undefined` | The image source.                                                                                       |
-| `referrerPolicy` | `string`                                       | `undefined` | The referrer policy for the image.                                                                      |
-| `crossOrigin`    | `string`                                       | `undefined` | The cross origin attribute for the image.                                                               |
-| `class`          | `string \| ((state: State) => string)`         | `undefined` | CSS class applied to the element, or a function that returns a class based on the component's state.    |
-| `style`          | `StyleValue \| ((state: State) => StyleValue)` | `undefined` | Style applied to the element, or a function that returns a style object based on the component's state. |
+### Image
 
-**Emits:**
+The image to be displayed in the avatar. Renders an `<img>` element.
 
-- `@loadingStatusChange(status: 'idle' | 'loading' | 'loaded' | 'error')`: Callback fired when the loading status changes.
+| Prop             | Default | Type                                                                                                                                                          |
+| ---------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `as`             | `'img'` | `string \| Component`<br><br>The element or component to use for the root node.                                                                               |
+| `src`            | —       | `string`<br><br>The image source.                                                                                                                             |
+| `referrerPolicy` | —       | `string`<br><br>The referrer policy for the image.                                                                                                            |
+| `crossOrigin`    | —       | `string`<br><br>The cross origin attribute for the image.                                                                                                     |
+| `class`          | —       | `string \| ((state: State) => string)`<br><br>CSS class applied to the element, or a function that returns a class based on the component's state.            |
+| `style`          | —       | `StyleValue \| ((state: State) => StyleValue)`<br><br>Style applied to the element, or a function that returns a style object based on the component's state. |
 
-### AvatarImage Data attributes
+| Emits                 | Type                                                  | Description                                     |
+| --------------------- | ----------------------------------------------------- | ----------------------------------------------- |
+| `loadingStatusChange` | `((status: ImageLoadingStatus) => void) \| undefined` | Callback fired when the loading status changes. |
 
 | Attribute             | Description                              |
 | --------------------- | ---------------------------------------- |
 | `data-starting-style` | Present when the image is animating in.  |
 | `data-ending-style`   | Present when the image is animating out. |
 
-### AvatarFallback Props
+### Fallback
 
-| Name    | Type                                           | Default     | Description                                                                                             |
-| ------- | ---------------------------------------------- | ----------- | ------------------------------------------------------------------------------------------------------- |
-| `as`    | `string \| Component`                          | `'span'`    | The element or component to use for the root node.                                                      |
-| `delay` | `number`                                       | `undefined` | How long to wait before showing the fallback. Specified in milliseconds.                                |
-| `class` | `string \| ((state: State) => string)`         | `undefined` | CSS class applied to the element, or a function that returns a class based on the component's state.    |
-| `style` | `StyleValue \| ((state: State) => StyleValue)` | `undefined` | Style applied to the element, or a function that returns a style object based on the component's state. |
+Rendered when the image fails to load or when no image is provided. Renders a `<span>` element.
+
+| Prop    | Default  | Type                                                                                                                                                          |
+| ------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `as`    | `'span'` | `string \| Component`<br><br>The element or component to use for the root node.                                                                               |
+| `delay` | —        | `number`<br><br>How long to wait before showing the fallback. Specified in milliseconds.                                                                      |
+| `class` | —        | `string \| ((state: State) => string)`<br><br>CSS class applied to the element, or a function that returns a class based on the component's state.            |
+| `style` | —        | `StyleValue \| ((state: State) => StyleValue)`<br><br>Style applied to the element, or a function that returns a style object based on the component's state. |
