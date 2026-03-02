@@ -29,17 +29,7 @@ import { Button } from 'base-ui-vue'
 
 The button can remain keyboard accessible while being rendered as another tag, such as a `<div>`, by specifying `as="div"`.
 
-```vue title="Custom tag button" "as"
-<script setup>
-import { Button } from 'base-ui-vue'
-</script>
-
-<template>
-  <Button as="div">
-    I am a div but act as a button
-  </Button>
-</template>
-```
+<ComponentPreview name="ButtonAs" />
 
 ### Rendering links as buttons
 
