@@ -1,12 +1,12 @@
-import type { Ref } from 'vue'
-import { nextTick, unref } from 'vue'
+import type { MaybeRefOrGetter } from 'vue'
+import { nextTick, toValue } from 'vue'
 import { resolveRef } from './resolveRef'
 import { TransitionStatusDataAttributes } from './stateAttributesMapping'
 import { useAnimationFrame } from './useAnimationFrame'
 
 export function useAnimationsFinished(
   elementOrRef: any,
-  waitForStartingStyleRemoved: boolean | Ref<boolean> = false,
+  waitForStartingStyleRemoved: MaybeRefOrGetter<boolean | undefined> = false,
   treatAbortedAsFinished = true,
 ) {
   const frame = useAnimationFrame()
@@ -90,7 +90,7 @@ export function useAnimationsFinished(
           })
       }
 
-      if (unref(waitForStartingStyleRemoved)) {
+      if (toValue(waitForStartingStyleRemoved)) {
         execWaitForStartingStyleRemoved()
         return
       }

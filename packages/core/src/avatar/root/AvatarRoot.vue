@@ -13,6 +13,12 @@ export interface AvatarRootState {
 
 export interface AvatarRootProps extends BaseUIComponentProps<AvatarRootState> { }
 
+/**
+ * Displays a user's profile picture, initials, or fallback icon.
+ * Renders a \`<span>\` element.
+ *
+ * Documentation: [Base UI Avatar](https://base-ui-vue.com/components/avatar)
+ */
 defineOptions({
   name: 'AvatarRoot',
   inheritAttrs: false,
