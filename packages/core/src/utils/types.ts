@@ -22,22 +22,3 @@ export interface BaseUIComponentProps<State> {
    */
   style?: StyleValue | ((state: State) => StyleValue)
 }
-
-export interface NativeButtonProps {
-  /**
-   * Whether the component renders a native `<button>` element when replaceing it.
-   *  via the `as` prop.
-   * Set to `true` if the rendered element is a native button.
-   * @default true
-   */
-  nativeButton?: boolean
-}
-export interface NonNativeButtonProps {
-  /**
-   * Whether the component renders a native `<button>` element when replaceing it.
-   *  via the `as` prop.
-   * Set to `true` if the rendered element is a native button.
-   * @default false
-   */
-  nativeButton?: boolean
-}
