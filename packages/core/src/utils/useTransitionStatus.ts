@@ -30,7 +30,12 @@ export function useTransitionStatus(
       transitionStatus.value = 'starting'
     }
 
-    if (!open.value && mounted.value && transitionStatus.value !== 'ending' && !deferEndingState.value) {
+    if (
+      !open.value
+      && mounted.value
+      && transitionStatus.value !== 'ending'
+      && !deferEndingState.value
+    ) {
       transitionStatus.value = 'ending'
     }
 
@@ -40,7 +45,12 @@ export function useTransitionStatus(
   })
 
   watchEffect((onCleanup) => {
-    if (!open.value && mounted.value && transitionStatus.value !== 'ending' && deferEndingState.value) {
+    if (
+      !open.value
+      && mounted.value
+      && transitionStatus.value !== 'ending'
+      && deferEndingState.value
+    ) {
       const frame = AnimationFrame.request(() => {
         transitionStatus.value = 'ending'
       })
@@ -57,6 +67,7 @@ export function useTransitionStatus(
     }
 
     const frame = AnimationFrame.request(() => {
+      // Avoid `flushSync` here due to Firefox.
       transitionStatus.value = undefined
     })
 

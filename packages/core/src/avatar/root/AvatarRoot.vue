@@ -13,11 +13,6 @@ export interface AvatarRootState {
 
 export interface AvatarRootProps extends BaseUIComponentProps<AvatarRootState> { }
 
-// export namespace AvatarRoot {
-//   export type State = AvatarRootState
-//   export type Props = AvatarRootProps
-// }
-
 defineOptions({
   name: 'AvatarRoot',
   inheritAttrs: false,

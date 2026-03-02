@@ -1,7 +1,9 @@
 <script setup lang="ts">
+import type { StateAttributesMapping } from '../../utils/getStateAttributesProps'
 import type { BaseUIComponentProps } from '../../utils/types'
 import type { TransitionStatus } from '../../utils/useTransitionStatus'
-import type { AvatarRootState, ImageLoadingStatus } from '../root/AvatarRoot.vue'
+import type { AvatarRootState } from '../root/AvatarRoot.vue'
+import type { ImageLoadingStatus } from './useImageLoadingStatus'
 import { computed, ref, useAttrs, watchEffect } from 'vue'
 import { getStateAttributesProps } from '../../utils/getStateAttributesProps'
 import { transitionStatusMapping } from '../../utils/stateAttributesMapping'
@@ -70,7 +72,7 @@ useOpenChangeComplete({
   },
 })
 
-const stateAttributesMapping = {
+const stateAttributesMapping: StateAttributesMapping<AvatarImageState> = {
   ...avatarStateAttributesMapping,
   ...transitionStatusMapping,
 }

@@ -1,23 +1,26 @@
-import type { ImageLoadingStatus } from '../root/AvatarRoot.vue'
-import { ref, watchEffect } from 'vue'
+import type { MaybeRefOrGetter } from 'vue'
+import { ref, toValue, watchEffect } from 'vue'
+import { NOOP } from '../../utils/noop'
 
-interface UseImageLoadingStatusOptions {
-  referrerPolicy?: HTMLImageElement['referrerPolicy']
-  crossOrigin?: '' | 'anonymous' | 'use-credentials'
+export type ImageLoadingStatus = 'idle' | 'loading' | 'loaded' | 'error'
+
+export interface UseImageLoadingStatusOptions {
+  referrerPolicy?: HTMLImageElement['referrerPolicy'] | undefined
+  crossOrigin?: HTMLImageElement['crossOrigin'] | undefined
 }
 
 export function useImageLoadingStatus(
-  srcRef: any, // Can be a ref or raw value
-  options: UseImageLoadingStatusOptions,
+  srcRef: MaybeRefOrGetter<string | undefined>,
+  { referrerPolicy, crossOrigin }: UseImageLoadingStatusOptions,
 ) {
   const loadingStatus = ref<ImageLoadingStatus>('idle')
 
   watchEffect((onCleanup) => {
-    const src = typeof srcRef === 'function' ? srcRef() : srcRef?.value ?? srcRef
+    const src = toValue(srcRef)
 
     if (!src) {
       loadingStatus.value = 'error'
-      return
+      return NOOP
     }
 
     let isMounted = true
@@ -34,13 +37,11 @@ export function useImageLoadingStatus(
     image.onload = updateStatus('loaded')
     image.onerror = updateStatus('error')
 
-    if (options.referrerPolicy) {
-      image.referrerPolicy = options.referrerPolicy
+    if (referrerPolicy) {
+      image.referrerPolicy = referrerPolicy
     }
 
-    if (options.crossOrigin !== undefined) {
-      image.crossOrigin = options.crossOrigin
-    }
+    image.crossOrigin = crossOrigin ?? ''
 
     image.src = src
 
