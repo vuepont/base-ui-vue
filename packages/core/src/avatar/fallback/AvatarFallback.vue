@@ -32,12 +32,16 @@ const { imageLoadingStatus } = useAvatarRootContext()
 const delayPassed = ref(props.delay === undefined)
 const timeout = useTimeout()
 
-watchEffect(() => {
+watchEffect((onCleanup) => {
   if (props.delay !== undefined) {
     timeout.start(props.delay, () => {
       delayPassed.value = true
     })
   }
+
+  onCleanup(() => {
+    timeout.clear()
+  })
 })
 
 const state = computed<AvatarFallbackState>(() => ({

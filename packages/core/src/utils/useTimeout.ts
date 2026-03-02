@@ -1,28 +1,35 @@
 import { onUnmounted } from 'vue'
 
+type TimeoutId = number
+
+const EMPTY = 0 as TimeoutId
+
 export class Timeout {
-  currentId: number = 0
+  currentId: TimeoutId = EMPTY
 
   static create() {
     return new Timeout()
   }
 
+  /**
+   * Executes `fn` after `delay`, clearing any previously scheduled call.
+   */
   start(delay: number, fn: () => void) {
     this.clear()
     this.currentId = window.setTimeout(() => {
-      this.currentId = 0
+      this.currentId = EMPTY
       fn()
     }, delay)
   }
 
   isStarted() {
-    return this.currentId !== 0
+    return this.currentId !== EMPTY
   }
 
   clear = () => {
-    if (this.currentId !== 0) {
+    if (this.currentId !== EMPTY) {
       window.clearTimeout(this.currentId)
-      this.currentId = 0
+      this.currentId = EMPTY
     }
   }
 }
