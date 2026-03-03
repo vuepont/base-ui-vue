@@ -2,7 +2,7 @@
 
 # Repository Guidelines
 
-This repository is a Vue 3 port of Base UI. Keep guidance practical, executable, and aligned with current monorepo scripts.
+This repository contains the source code and documentation for Base UI Vue, a Vue 3 port of Base UI.
 
 ## Project structure
 
