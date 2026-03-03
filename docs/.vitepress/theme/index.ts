@@ -1,10 +1,8 @@
 import type { Theme } from 'vitepress'
-import { AvatarFallback, AvatarImage, AvatarRoot, Button } from 'base-ui-vue'
 import DefaultTheme from 'vitepress/theme'
 import { h } from 'vue'
 import ComponentPreview from '../components/ComponentPreview.vue'
 import './style.css'
-
 import './tailwind.css'
 
 const regex = /\/(\w+)\.vue/
@@ -16,17 +14,9 @@ export default {
     return h(DefaultTheme.Layout, null, {})
   },
   enhanceApp({ app }) {
-    for (const path in baseModules) {
-      app.component(
-        path.match(regex)?.[1] ?? '',
-        (baseModules[path] as any)?.default,
-      )
-    }
+    for (const path in baseModules)
+      app.component(path.match(regex)?.[1] ?? '', (baseModules[path] as any)?.default)
 
     app.component('ComponentPreview', ComponentPreview)
-    app.component('BaseUIButton', Button)
-    app.component('AvatarRoot', AvatarRoot)
-    app.component('AvatarImage', AvatarImage)
-    app.component('AvatarFallback', AvatarFallback)
   },
 } satisfies Theme
