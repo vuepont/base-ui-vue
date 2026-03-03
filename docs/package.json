@@ -9,10 +9,13 @@
     "docs:preview": "vitepress preview"
   },
   "dependencies": {
-    "base-ui-vue": "workspace:*",
+    "@vueuse/core": "^14.2.1",
+    "base-ui-vue": "link:../packages/core",
     "vue": "^3.5.27"
   },
   "devDependencies": {
+    "@tailwindcss/vite": "^4.2.1",
+    "tailwindcss": "^4.2.1",
     "vitepress": "2.0.0-alpha.16"
   }
 }
