@@ -55,6 +55,7 @@ export default defineConfig({
         items: [
           { text: 'Introduction', link: '/docs/components/' },
           { text: 'Button', link: '/docs/components/button' },
+          { text: 'Collapsible', link: '/docs/components/collapsible' },
         ],
       },
     ],

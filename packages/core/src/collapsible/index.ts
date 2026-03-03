@@ -1,0 +1,6 @@
+export type * from './collapsible.types'
+export { default as CollapsiblePanel } from './panel/CollapsiblePanel.vue'
+export { default as CollapsibleRoot } from './root/CollapsibleRoot.vue'
+export { collapsibleRootContextKey, useCollapsibleRootContext } from './root/CollapsibleRootContext'
+export type { CollapsibleRootContext } from './root/CollapsibleRootContext'
+export { default as CollapsibleTrigger } from './trigger/CollapsibleTrigger.vue'
