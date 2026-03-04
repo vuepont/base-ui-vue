@@ -51,11 +51,9 @@ For buttons that enter a loading state after being clicked, specify the `focusab
 
 <ComponentPreview name="ButtonFocusableDisabled" />
 
-## API Reference
+## API reference
 
-### Props
-
-| Name                      | Type                                           | Default     | Description                                                                                             |
+| Prop                      | Type                                           | Default     | Description                                                                                             |
 | ------------------------- | ---------------------------------------------- | ----------- | ------------------------------------------------------------------------------------------------------- |
 | `as`                      | `string \| Component`                          | `'button'`  | The element or component to use for the root node.                                                      |
 | `disabled`                | `boolean`                                      | `false`     | Whether the button should ignore user interaction.                                                      |
@@ -63,8 +61,6 @@ For buttons that enter a loading state after being clicked, specify the `focusab
 | `native-button`           | `boolean`                                      | `undefined` | Whether the component renders a native `<button>` element. If `undefined`, it is inferred from `as`.    |
 | `class`                   | `string \| ((state: State) => string)`         | `undefined` | CSS class applied to the element, or a function that returns a class based on the component's state.    |
 | `style`                   | `StyleValue \| ((state: State) => StyleValue)` | `undefined` | Style applied to the element, or a function that returns a style object based on the component's state. |
-
-### Data attributes
 
 | Attribute       | Description                          |
 | --------------- | ------------------------------------ |
