@@ -6,7 +6,7 @@ A collapsible panel controlled by a button.
 
 ## Anatomy
 
-Import the components and assemble them:
+Import the component and assemble its parts:
 
 ```vue title="Anatomy"
 <script setup>
@@ -62,15 +62,13 @@ function handleOpenChange(value, details) {
 </template>
 ```
 
-## API Reference
+## API reference
 
-### CollapsibleRoot
+### Root
 
 Groups all parts of the collapsible. Renders a `<div>` element.
 
-#### Props / Events
-
-| Name           | Type                                           | Default     | Description                                                                                             |
+| Prop           | Type                                           | Default     | Description                                                                                             |
 | -------------- | ---------------------------------------------- | ----------- | ------------------------------------------------------------------------------------------------------- |
 | `as`           | `string \| Component`                          | `'div'`     | The element or component to use for the root node.                                                      |
 | `open`         | `boolean`                                      | `undefined` | Whether the collapsible panel is currently open (controlled).                                           |
@@ -79,19 +77,15 @@ Groups all parts of the collapsible. Renders a `<div>` element.
 | `class`        | `string \| ((state: State) => string)`         | `undefined` | CSS class applied to the element, or a function that returns a class based on the component's state.    |
 | `style`        | `StyleValue \| ((state: State) => StyleValue)` | `undefined` | Style applied to the element, or a function that returns a style object based on the component's state. |
 
-#### Events
-
-| Name          | Payload                                       | Description                                      |
+| Emits         | Payload                                       | Description                                      |
 | ------------- | --------------------------------------------- | ------------------------------------------------ |
 | `open-change` | `(open: boolean, details: EventDetails)`      | Emitted when the panel is opened or closed.      |
 
-### CollapsibleTrigger
+### Trigger
 
 A button that opens and closes the collapsible panel. Renders a `<button>` element.
 
-#### Props
-
-| Name            | Type                                           | Default     | Description                                                                                             |
+| Prop            | Type                                           | Default     | Description                                                                                             |
 | --------------- | ---------------------------------------------- | ----------- | ------------------------------------------------------------------------------------------------------- |
 | `as`            | `string \| Component`                          | `'button'`  | The element or component to use for the root node.                                                      |
 | `disabled`      | `boolean`                                      | `undefined` | Whether the trigger should ignore user interaction. When undefined, inherits from CollapsibleRoot.       |
@@ -99,19 +93,15 @@ A button that opens and closes the collapsible panel. Renders a `<button>` eleme
 | `class`         | `string \| ((state: State) => string)`         | `undefined` | CSS class applied to the element, or a function that returns a class based on the component's state.    |
 | `style`         | `StyleValue \| ((state: State) => StyleValue)` | `undefined` | Style applied to the element, or a function that returns a style object based on the component's state. |
 
-#### Data attributes
-
 | Attribute         | Description                                   |
 | ----------------- | --------------------------------------------- |
 | `data-panel-open` | Present when the collapsible panel is open.   |
 
-### CollapsiblePanel
+### Panel
 
 A panel with the collapsible contents. Renders a `<div>` element.
 
-#### Props
-
-| Name               | Type                                           | Default     | Description                                                                                                                           |
+| Prop               | Type                                           | Default     | Description                                                                                                                           |
 | ------------------ | ---------------------------------------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------- |
 | `as`               | `string \| Component`                          | `'div'`     | The element or component to use for the root node.                                                                                    |
 | `id`               | `string`                                       | `undefined` | The `id` attribute of the panel element. When set, overrides the auto-generated panel id.                                             |
@@ -120,8 +110,6 @@ A panel with the collapsible contents. Renders a `<div>` element.
 | `class`            | `string \| ((state: State) => string)`         | `undefined` | CSS class applied to the element, or a function that returns a class based on the component's state.                                  |
 | `style`            | `StyleValue \| ((state: State) => StyleValue)` | `undefined` | Style applied to the element, or a function that returns a style object based on the component's state.                               |
 
-#### Data attributes
-
 | Attribute             | Description                              |
 | --------------------- | ---------------------------------------- |
 | `data-open`           | Present when the collapsible panel is open.   |
@@ -129,9 +117,7 @@ A panel with the collapsible contents. Renders a `<div>` element.
 | `data-starting-style` | Present when the panel is animating in.  |
 | `data-ending-style`   | Present when the panel is animating out. |
 
-#### CSS variables
-
-| Variable                     | Description                        |
+| CSS Variable                 | Description                        |
 | ---------------------------- | ---------------------------------- |
 | `--collapsible-panel-height` | The collapsible panel's height.    |
 | `--collapsible-panel-width`  | The collapsible panel's width.     |
