@@ -54,6 +54,7 @@ export default defineConfig({
         text: 'Components',
         items: [
           { text: 'Introduction', link: '/docs/components/' },
+          { text: 'Accordion', link: '/docs/components/accordion' },
           { text: 'Avatar', link: '/docs/components/avatar' },
           { text: 'Button', link: '/docs/components/button' },
           { text: 'Collapsible', link: '/docs/components/collapsible' },

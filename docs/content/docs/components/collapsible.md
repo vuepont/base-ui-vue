@@ -77,7 +77,7 @@ Groups all parts of the collapsible. Renders a `<div>` element.
 | `class`        | `string \| ((state: State) => string)`         | `undefined` | CSS class applied to the element, or a function that returns a class based on the component's state.    |
 | `style`        | `StyleValue \| ((state: State) => StyleValue)` | `undefined` | Style applied to the element, or a function that returns a style object based on the component's state. |
 
-| Emits         | Payload                                       | Description                                      |
+| Emits         |  Type                                         | Description                                      |
 | ------------- | --------------------------------------------- | ------------------------------------------------ |
 | `open-change` | `(open: boolean, details: EventDetails)`      | Emitted when the panel is opened or closed.      |
 
