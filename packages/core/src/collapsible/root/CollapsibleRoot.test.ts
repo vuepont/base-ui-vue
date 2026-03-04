@@ -8,12 +8,14 @@ import CollapsibleRoot from './CollapsibleRoot.vue'
 
 const PANEL_CONTENT = 'This is panel content'
 
-function renderCollapsible(options: {
-  defaultOpen?: boolean
-  open?: boolean
-  disabled?: boolean
-  panelId?: string
-} = {}) {
+function renderCollapsible(
+  options: {
+    defaultOpen?: boolean
+    open?: boolean
+    disabled?: boolean
+    panelId?: string
+  } = {},
+) {
   const { defaultOpen, open, disabled, panelId } = options
 
   return render(
@@ -51,7 +53,9 @@ describe('<CollapsibleRoot />', () => {
 
       expect(trigger).toHaveAttribute('aria-expanded', 'true')
       expect(trigger).toHaveAttribute('aria-controls')
-      expect(panel.getAttribute('id')).toBe(trigger.getAttribute('aria-controls'))
+      expect(panel.getAttribute('id')).toBe(
+        trigger.getAttribute('aria-controls'),
+      )
     })
 
     it('references manual panel id in trigger aria-controls', async () => {
@@ -135,6 +139,7 @@ describe('<CollapsibleRoot />', () => {
 
       expect(trigger).toHaveAttribute('aria-expanded', 'false')
       expect(trigger).not.toHaveAttribute('aria-controls')
+      expect(trigger).not.toHaveAttribute('data-panel-open')
       expect(screen.queryByText(PANEL_CONTENT)).toBeNull()
     })
 
@@ -178,6 +183,7 @@ describe('<CollapsibleRoot />', () => {
 
       expect(trigger).toHaveAttribute('aria-expanded', 'false')
       expect(trigger).not.toHaveAttribute('aria-controls')
+      expect(trigger).not.toHaveAttribute('data-panel-open')
       expect(screen.queryByText(PANEL_CONTENT)).toBeNull()
     })
   })

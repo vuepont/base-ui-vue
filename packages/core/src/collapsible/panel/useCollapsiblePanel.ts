@@ -1,9 +1,9 @@
 /* eslint-disable node/prefer-global/process */
 import type { Ref } from 'vue'
 import type { CollapsibleChangeEventDetails } from '../collapsible.types'
-import type { AnimationType, Dimensions } from '../root/CollapsibleRootContext'
+import type { AnimationType, Dimensions } from '../root/useCollapsibleRoot'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
-import { createChangeEventDetails } from '../../utils/createChangeEventDetails'
+import { createChangeEventDetails } from '../../utils/createBaseUIEventDetails'
 import { REASONS } from '../../utils/reasons'
 import { AnimationFrame, useAnimationFrame } from '../../utils/useAnimationFrame'
 import { useMergedRefs } from '../../utils/useMergedRefs'

@@ -1,26 +1,104 @@
 import type { Ref } from 'vue'
+import type { TransitionStatus } from '../../utils/useTransitionStatus'
 import type { CollapsibleChangeEventDetails, CollapsibleRootState } from '../collapsible.types'
-import type { AnimationType, CollapsibleRootContext, Dimensions } from './CollapsibleRootContext'
 import { computed, ref, shallowRef, watch } from 'vue'
-import { createChangeEventDetails } from '../../utils/createChangeEventDetails'
+import { createChangeEventDetails } from '../../utils/createBaseUIEventDetails'
 import { REASONS } from '../../utils/reasons'
 import { useAnimationsFinished } from '../../utils/useAnimationsFinished'
 import { useBaseUiId } from '../../utils/useBaseUiId'
 import { useControllableState } from '../../utils/useControllableState'
 import { useTransitionStatus } from '../../utils/useTransitionStatus'
 
+export type AnimationType = 'css-transition' | 'css-animation' | 'none' | null
+
+export interface Dimensions {
+  height: number | undefined
+  width: number | undefined
+}
+
+export interface UseCollapsibleRootReturnValue {
+  abortControllerRef: Ref<AbortController | null>
+  animationTypeRef: Ref<AnimationType>
+  disabled: Ref<boolean>
+  handleTrigger: (event: MouseEvent | KeyboardEvent) => void
+  /**
+   * The height of the panel.
+   */
+  height: Ref<number | undefined>
+  /**
+   * Whether the collapsible panel is currently mounted.
+   */
+  mounted: Ref<boolean>
+  /**
+   * Whether the collapsible panel is currently open.
+   */
+  open: Ref<boolean>
+  panelId: Ref<string | undefined>
+  panelRef: Ref<HTMLElement | null>
+  runOnceAnimationsFinish: (
+    fn: () => void,
+    signal?: AbortSignal | null,
+  ) => void
+  setDimensions: (dims: Dimensions) => void
+  setHiddenUntilFound: (next: boolean) => void
+  setKeepMounted: (next: boolean) => void
+  setMounted: (next: boolean) => void
+  setOpen: (next: boolean) => void
+  setPanelIdState: (id: string | undefined) => void
+  setVisible: (next: boolean) => void
+  transitionDimensionRef: Ref<'width' | 'height' | null>
+  transitionStatus: Ref<TransitionStatus>
+  /**
+   * The visible state of the panel used to determine the `[hidden]` attribute
+   * only when CSS keyframe animations are used.
+   */
+  visible: Ref<boolean>
+  /**
+   * The width of the panel.
+   */
+  width: Ref<number | undefined>
+
+  keepMounted: Ref<boolean>
+  hiddenUntilFound: Ref<boolean>
+  state: Ref<CollapsibleRootState>
+  onOpenChange: (open: boolean, details: CollapsibleChangeEventDetails) => void
+}
+
 export interface UseCollapsibleRootParameters {
+  /**
+   * Whether the collapsible panel is currently open.
+   *
+   * To render an uncontrolled collapsible, use the `defaultOpen` prop instead.
+   */
   open?: () => boolean | undefined
   isOpenControlled?: () => boolean
+  /**
+   * Whether the collapsible panel is initially open.
+   *
+   * To render a controlled collapsible, use the `open` prop instead.
+   * @default false
+   */
   defaultOpen?: boolean
+  /**
+   * Event handler called when the panel is opened or closed.
+   */
   onOpenChange: (open: boolean, details: CollapsibleChangeEventDetails) => void
+  /**
+   * Whether the component should ignore user interaction.
+   * @default false
+   */
   disabled: () => boolean
 }
 
 export function useCollapsibleRoot(
   parameters: UseCollapsibleRootParameters,
-): CollapsibleRootContext {
-  const { open: openParam, defaultOpen = false, onOpenChange, disabled: disabledGetter } = parameters
+): UseCollapsibleRootReturnValue {
+  const {
+    open: openParam,
+    defaultOpen = false,
+    onOpenChange,
+    disabled: disabledGetter,
+  } = parameters
 
   const isControlled = computed(() => {
     if (parameters.isOpenControlled) {
@@ -85,7 +163,10 @@ export function useCollapsibleRoot(
     }
 
     if (!hiddenUntilFound.value && !keepMounted.value) {
-      if (animationTypeRef.value != null && animationTypeRef.value !== 'css-animation') {
+      if (
+        animationTypeRef.value != null
+        && animationTypeRef.value !== 'css-animation'
+      ) {
         if (!mounted.value && nextOpen) {
           setMounted(true)
         }
@@ -109,11 +190,20 @@ export function useCollapsibleRoot(
   }
 
   // Unmount immediately for controlled mode with no animations
-  watch(open, (isOpen) => {
-    if (isControlled.value && animationTypeRef.value === 'none' && !keepMounted.value && !isOpen) {
-      setMounted(false)
-    }
-  }, { flush: 'sync' })
+  watch(
+    open,
+    (isOpen) => {
+      if (
+        isControlled.value
+        && animationTypeRef.value === 'none'
+        && !keepMounted.value
+        && !isOpen
+      ) {
+        setMounted(false)
+      }
+    },
+    { flush: 'sync' },
+  )
 
   const state = computed<CollapsibleRootState>(() => ({
     open: open.value,
@@ -149,7 +239,7 @@ export function useCollapsibleRoot(
     setHiddenUntilFound(next: boolean) {
       hiddenUntilFound.value = next
     },
-    setPanelId(id: string | undefined) {
+    setPanelIdState(id: string | undefined) {
       panelIdState.value = id
     },
     animationTypeRef,

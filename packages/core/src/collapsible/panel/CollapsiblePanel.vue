@@ -38,7 +38,7 @@ watch(
 
 watch(
   () => props.id,
-  id => ctx.setPanelId(id),
+  id => ctx.setPanelIdState(id),
   { immediate: true, flush: 'sync' },
 )
 
