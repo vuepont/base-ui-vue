@@ -1,81 +1,104 @@
-import type { Ref } from 'vue'
-import { ref, watch } from 'vue'
+import type { MaybeRefOrGetter } from 'vue'
+import { computed, ref, toValue, watchEffect } from 'vue'
+import { AnimationFrame } from './useAnimationFrame'
 
 export type TransitionStatus = 'starting' | 'ending' | 'idle' | undefined
 
-export interface UseTransitionStatusReturnValue {
-  mounted: Ref<boolean>
-  setMounted: (next: boolean) => void
-  transitionStatus: Ref<TransitionStatus>
-}
-
 /**
- * Provides a transition status string for CSS animations.
- * Port of React Base UI's `useTransitionStatus`.
- *
- * @param open - Reactive ref indicating whether the element is open.
- * @param enableIdleState - Enables the `'idle'` state between `'starting'` and `'ending'`.
- * @param deferEndingState - Defers `'ending'` by one animation frame to avoid conflicts.
+ * Provides a status string for CSS animations.
+ * @param openRef - a boolean that determines if the element is open.
+ * @param enableIdleStateRef - a boolean that enables the `'idle'` state between `'starting'` and `'ending'`
+ * @param deferEndingStateRef - a boolean that defers the `'ending'` state.
  */
 export function useTransitionStatus(
-  open: Ref<boolean>,
-  enableIdleState = false,
-  deferEndingState = false,
-): UseTransitionStatusReturnValue {
+  openRef: MaybeRefOrGetter<boolean>,
+  enableIdleStateRef: MaybeRefOrGetter<boolean> = false,
+  deferEndingStateRef: MaybeRefOrGetter<boolean> = false,
+) {
+  const open = computed(() => toValue(openRef))
+  const enableIdleState = computed(() => toValue(enableIdleStateRef))
+  const deferEndingState = computed(() => toValue(deferEndingStateRef))
+
   const transitionStatus = ref<TransitionStatus>(
-    open.value && enableIdleState ? 'idle' : undefined,
+    open.value && enableIdleState.value ? 'idle' : undefined,
   )
   const mounted = ref(open.value)
 
-  watch(
-    open,
-    (isOpen) => {
-      if (isOpen) {
-        mounted.value = true
-        transitionStatus.value = 'starting'
+  watchEffect(() => {
+    if (open.value && !mounted.value) {
+      mounted.value = true
+      transitionStatus.value = 'starting'
+    }
 
-        if (enableIdleState) {
-          requestAnimationFrame(() => {
-            transitionStatus.value = 'idle'
-          })
-        }
-        else {
-          requestAnimationFrame(() => {
-            transitionStatus.value = undefined
-          })
-        }
-      }
-      else {
-        if (deferEndingState) {
-          requestAnimationFrame(() => {
-            transitionStatus.value = 'ending'
-          })
-        }
-        else {
-          transitionStatus.value = 'ending'
-        }
-      }
-    },
-    { flush: 'sync' },
-  )
+    if (
+      !open.value
+      && mounted.value
+      && transitionStatus.value !== 'ending'
+      && !deferEndingState.value
+    ) {
+      transitionStatus.value = 'ending'
+    }
 
-  watch(
-    transitionStatus,
-    (status) => {
-      if (!open.value && !mounted.value && status === 'ending') {
-        transitionStatus.value = undefined
-      }
-    },
-    { flush: 'sync' },
-  )
+    if (!open.value && !mounted.value && transitionStatus.value === 'ending') {
+      transitionStatus.value = undefined
+    }
+  })
 
-  function setMounted(next: boolean) {
-    mounted.value = next
-  }
+  watchEffect((onCleanup) => {
+    if (
+      !open.value
+      && mounted.value
+      && transitionStatus.value !== 'ending'
+      && deferEndingState.value
+    ) {
+      const frame = AnimationFrame.request(() => {
+        transitionStatus.value = 'ending'
+      })
+
+      onCleanup(() => {
+        AnimationFrame.cancel(frame)
+      })
+    }
+  })
+
+  watchEffect((onCleanup) => {
+    if (!open.value || enableIdleState.value) {
+      return
+    }
+
+    const frame = AnimationFrame.request(() => {
+      // Avoid `flushSync` here due to Firefox.
+      transitionStatus.value = undefined
+    })
+
+    onCleanup(() => {
+      AnimationFrame.cancel(frame)
+    })
+  })
+
+  watchEffect((onCleanup) => {
+    if (!open.value || !enableIdleState.value) {
+      return
+    }
+
+    if (open.value && mounted.value && transitionStatus.value !== 'idle') {
+      transitionStatus.value = 'starting'
+    }
+
+    const frame = AnimationFrame.request(() => {
+      transitionStatus.value = 'idle'
+    })
+
+    onCleanup(() => {
+      AnimationFrame.cancel(frame)
+    })
+  })
 
   return {
     mounted,
-    setMounted,
+    setMounted(value: boolean) {
+      mounted.value = value
+    },
     transitionStatus,
   }
 }
