@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import type { CollapsibleTriggerProps } from '../collapsible.types'
+import type { StateAttributesMapping } from '../../utils/getStateAttributesProps'
+import type { CollapsibleRootState, CollapsibleTriggerProps } from '../collapsible.types'
 import { computed, useAttrs } from 'vue'
 import { useButton } from '../../use-button'
 import { triggerOpenStateMapping } from '../../utils/collapsibleOpenStateMapping'
 import { getStateAttributesProps } from '../../utils/getStateAttributesProps'
-import { transitionStatusMapping } from '../../utils/transitionStatusMapping'
+import { transitionStatusMapping } from '../../utils/stateAttributesMapping'
 import { useCollapsibleRootContext } from '../root/CollapsibleRootContext'
 
 defineOptions({
@@ -17,7 +18,7 @@ const props = withDefaults(defineProps<CollapsibleTriggerProps>(), {
   nativeButton: true,
 })
 
-const triggerStateAttributesMapping = {
+const triggerStateAttributesMapping: StateAttributesMapping<CollapsibleRootState> = {
   ...triggerOpenStateMapping,
   ...transitionStatusMapping,
 }
