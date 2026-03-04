@@ -42,6 +42,9 @@ describe('<CollapsiblePanel />', () => {
       await user.click(trigger)
 
       expect(trigger).toHaveAttribute('aria-expanded', 'true')
+      expect(trigger.getAttribute('aria-controls')).toBe(
+        screen.queryByText(PANEL_CONTENT)?.getAttribute('id'),
+      )
       expect(screen.queryByText(PANEL_CONTENT)).toBeVisible()
       expect(screen.queryByText(PANEL_CONTENT)).toHaveAttribute('data-open')
       expect(trigger).toHaveAttribute('data-panel-open')
@@ -49,6 +52,7 @@ describe('<CollapsiblePanel />', () => {
       await user.click(trigger)
 
       expect(trigger).toHaveAttribute('aria-expanded', 'false')
+      expect(trigger.getAttribute('aria-controls')).toBeNull()
       expect(screen.queryByText(PANEL_CONTENT)).not.toBeVisible()
       expect(screen.queryByText(PANEL_CONTENT)).toHaveAttribute('data-closed')
     })
@@ -66,7 +70,11 @@ describe('<CollapsiblePanel />', () => {
 
         render(
           defineComponent({
-            components: { CollapsibleRoot, CollapsibleTrigger, CollapsiblePanel },
+            components: {
+              CollapsibleRoot,
+              CollapsibleTrigger,
+              CollapsiblePanel,
+            },
             setup() {
               return { handleOpenChange }
             },

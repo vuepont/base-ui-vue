@@ -2,6 +2,8 @@
 import type { CollapsiblePanelProps, CollapsiblePanelState } from '../collapsible.types'
 import { computed, useAttrs, watch } from 'vue'
 import { getStateAttributesProps } from '../../utils/getStateAttributesProps'
+import { useOpenChangeComplete } from '../../utils/useOpenChangeComplete'
+import { warn } from '../../utils/warn'
 import { useCollapsibleRootContext } from '../root/CollapsibleRootContext'
 import { collapsibleStateAttributesMapping } from '../root/stateAttributesMapping'
 import { CollapsiblePanelCssVars } from './CollapsiblePanelCssVars'
@@ -40,6 +42,20 @@ watch(
   { immediate: true, flush: 'sync' },
 )
 
+if (process.env.NODE_ENV !== 'production') {
+  watch(
+    [() => props.hiddenUntilFound, () => props.keepMounted] as const,
+    ([hiddenUntilFound, keepMounted]) => {
+      if (hiddenUntilFound && keepMounted === false) {
+        warn(
+          'The `:keep-mounted="false"` prop on a Collapsible will be ignored when using `hidden-until-found` since it requires the Panel to remain mounted even when closed.',
+        )
+      }
+    },
+    { immediate: true },
+  )
+}
+
 const { hidden, panelRef } = useCollapsiblePanel({
   abortControllerRef: ctx.abortControllerRef,
   animationTypeRef: ctx.animationTypeRef,
@@ -59,6 +75,17 @@ const { hidden, panelRef } = useCollapsiblePanel({
   transitionDimensionRef: ctx.transitionDimensionRef,
   visible: ctx.visible,
   width: ctx.width,
+})
+
+useOpenChangeComplete({
+  open: computed(() => ctx.open.value && ctx.transitionStatus.value === 'idle'),
+  ref: ctx.panelRef,
+  onComplete() {
+    if (!ctx.open.value) {
+      return
+    }
+    ctx.setDimensions({ height: undefined, width: undefined })
+  },
 })
 
 const panelState = computed<CollapsiblePanelState>(() => ({
@@ -93,12 +120,7 @@ const mergedProps = computed(() => {
 </script>
 
 <template>
-  <component
-    :is="props.as"
-    v-if="shouldRender"
-    :ref="panelRef"
-    v-bind="mergedProps"
-  >
+  <component :is="props.as" v-if="shouldRender" :ref="panelRef" v-bind="mergedProps">
     <slot />
   </component>
 </template>
