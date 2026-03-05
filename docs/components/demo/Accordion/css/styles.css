@@ -8,7 +8,7 @@
   color: var(--color-gray-900);
 }
 
-.Item {
+.Accordion .Item {
   border-bottom: 1px solid var(--color-gray-200);
 }
 
@@ -16,7 +16,7 @@
   margin: 0;
 }
 
-.Trigger {
+.Accordion .Trigger {
   box-sizing: border-box;
   position: relative;
   display: flex;
@@ -48,7 +48,7 @@
   }
 }
 
-.TriggerIcon {
+.Accordion .TriggerIcon {
   box-sizing: border-box;
   flex-shrink: 0;
   width: 0.75rem;
@@ -61,7 +61,7 @@
   }
 }
 
-.Panel {
+.Accordion .Panel {
   box-sizing: border-box;
   height: var(--accordion-panel-height);
   overflow: hidden;
@@ -76,6 +76,6 @@
   }
 }
 
-.Content {
+.Accordion .Content {
   padding: 0.75rem;
 }
