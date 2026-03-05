@@ -8,7 +8,10 @@ export interface AccordionRootContext<Value = any> {
   accordionItemRefs: Ref<Array<HTMLElement | null>>
   direction: TextDirection
   disabled: Ref<boolean>
-  handleValueChange: (newValue: AccordionValue<Value>[number], nextOpen: boolean) => void
+  handleValueChange: (
+    newValue: AccordionValue<Value>[number],
+    nextOpen: boolean,
+  ) => void
   hiddenUntilFound: Ref<boolean>
   keepMounted: Ref<boolean>
   loopFocus: Ref<boolean>
@@ -21,11 +24,13 @@ export const accordionRootContextKey = Symbol(
   'AccordionRootContext',
 ) as InjectionKey<AccordionRootContext>
 
-export function useAccordionRootContext<Value = any>(): AccordionRootContext<Value> {
+export function useAccordionRootContext<
+  Value = any,
+>(): AccordionRootContext<Value> {
   const context = inject<AccordionRootContext<Value>>(accordionRootContextKey)
   if (context === undefined) {
     throw new Error(
-      'Base UI: AccordionRootContext is missing. Accordion parts must be placed within <AccordionRoot>.',
+      'Base UI Vue: AccordionRootContext is missing. Accordion parts must be placed within <AccordionRoot>.',
     )
   }
   return context

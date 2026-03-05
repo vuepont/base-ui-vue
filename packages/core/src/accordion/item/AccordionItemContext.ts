@@ -17,7 +17,7 @@ export function useAccordionItemContext(): AccordionItemContext {
   const context = inject(accordionItemContextKey)
   if (context === undefined) {
     throw new Error(
-      'Base UI: AccordionItemContext is missing. Accordion parts must be placed within <AccordionItem>.',
+      'Base UI Vue: AccordionItemContext is missing. Accordion parts must be placed within <AccordionItem>.',
     )
   }
   return context

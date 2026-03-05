@@ -8,17 +8,25 @@ import AccordionPanel from '../panel/AccordionPanel.vue'
 import AccordionTrigger from '../trigger/AccordionTrigger.vue'
 import AccordionRoot from './AccordionRoot.vue'
 
-function renderAccordion(options: {
-  defaultValue?: any[]
-  value?: any[]
-  disabled?: boolean
-  multiple?: boolean
-} = {}) {
+function renderAccordion(
+  options: {
+    defaultValue?: any[]
+    value?: any[]
+    disabled?: boolean
+    multiple?: boolean
+  } = {},
+) {
   const { defaultValue, value, disabled, multiple } = options
 
   return render(
     defineComponent({
-      components: { AccordionRoot, AccordionItem, AccordionHeader, AccordionTrigger, AccordionPanel },
+      components: {
+        AccordionRoot,
+        AccordionItem,
+        AccordionHeader,
+        AccordionTrigger,
+        AccordionPanel,
+      },
       setup() {
         const rootProps: Record<string, unknown> = {
           defaultValue,
@@ -144,7 +152,13 @@ describe('<AccordionRoot />', () => {
       const handleValueChange = vi.fn()
 
       const App = defineComponent({
-        components: { AccordionRoot, AccordionItem, AccordionHeader, AccordionTrigger, AccordionPanel },
+        components: {
+          AccordionRoot,
+          AccordionItem,
+          AccordionHeader,
+          AccordionTrigger,
+          AccordionPanel,
+        },
         setup() {
           return { handleValueChange }
         },
@@ -177,7 +191,13 @@ describe('<AccordionRoot />', () => {
       const user = userEvent.setup()
 
       const App = defineComponent({
-        components: { AccordionRoot, AccordionItem, AccordionHeader, AccordionTrigger, AccordionPanel },
+        components: {
+          AccordionRoot,
+          AccordionItem,
+          AccordionHeader,
+          AccordionTrigger,
+          AccordionPanel,
+        },
         setup() {
           const value = ref<string[]>([])
           function handleValueChange(newValue: string[]) {
@@ -210,6 +230,153 @@ describe('<AccordionRoot />', () => {
       await user.click(screen.getByRole('button', { name: 'Trigger 1' }))
 
       expect(screen.queryByText('Panel 1')).not.toBeNull()
+    })
+  })
+
+  describe('keyboard interactions', () => {
+    it('arrow keys should not put focus on disabled accordion items', async () => {
+      const user = userEvent.setup()
+
+      const App = defineComponent({
+        components: {
+          AccordionRoot,
+          AccordionItem,
+          AccordionHeader,
+          AccordionTrigger,
+          AccordionPanel,
+        },
+        template: `
+          <AccordionRoot>
+            <AccordionItem value="item-1">
+              <AccordionHeader>
+                <AccordionTrigger>Trigger 1</AccordionTrigger>
+              </AccordionHeader>
+              <AccordionPanel>Panel 1</AccordionPanel>
+            </AccordionItem>
+            <AccordionItem value="item-2" disabled>
+              <AccordionHeader>
+                <AccordionTrigger>Trigger 2</AccordionTrigger>
+              </AccordionHeader>
+              <AccordionPanel>Panel 2</AccordionPanel>
+            </AccordionItem>
+            <AccordionItem value="item-3">
+              <AccordionHeader>
+                <AccordionTrigger>Trigger 3</AccordionTrigger>
+              </AccordionHeader>
+              <AccordionPanel>Panel 3</AccordionPanel>
+            </AccordionItem>
+          </AccordionRoot>
+        `,
+      })
+
+      render(App)
+
+      const trigger1 = screen.getByRole('button', { name: 'Trigger 1' })
+      const trigger3 = screen.getByRole('button', { name: 'Trigger 3' })
+
+      trigger1.focus()
+      expect(trigger1).toHaveFocus()
+
+      await user.keyboard('[ArrowDown]')
+      expect(trigger3).toHaveFocus()
+
+      await user.keyboard('[ArrowUp]')
+      expect(trigger1).toHaveFocus()
+    })
+
+    it('does not affect composite keys on interactive elements in the panel', async () => {
+      const user = userEvent.setup()
+      const App = defineComponent({
+        components: {
+          AccordionRoot,
+          AccordionItem,
+          AccordionHeader,
+          AccordionTrigger,
+          AccordionPanel,
+        },
+        template: `
+          <AccordionRoot :default-value="['item-1']">
+            <AccordionItem value="item-1">
+              <AccordionHeader>
+                <AccordionTrigger>Trigger 1</AccordionTrigger>
+              </AccordionHeader>
+              <AccordionPanel>
+                <input type="text" defaultValue="abcd" />
+              </AccordionPanel>
+            </AccordionItem>
+            <AccordionItem value="item-2">
+              <AccordionHeader>
+                <AccordionTrigger>Trigger 2</AccordionTrigger>
+              </AccordionHeader>
+              <AccordionPanel>Panel 2</AccordionPanel>
+            </AccordionItem>
+          </AccordionRoot>
+        `,
+      })
+
+      render(App)
+
+      const input = screen.getByRole('textbox') as HTMLInputElement
+
+      await user.keyboard('[Tab]')
+      await user.keyboard('[Tab]')
+      expect(input).toHaveFocus()
+
+      input.setSelectionRange(0, 4)
+      expect(input.selectionStart).toBe(0)
+      expect(input.selectionEnd).toBe(4)
+
+      await user.keyboard('[ArrowLeft]')
+      expect(input.selectionStart).toBe(0)
+      expect(input.selectionEnd).toBe(0)
+    })
+  })
+
+  describe('prop: disabled', () => {
+    it('can disable one accordion item', async () => {
+      const App = defineComponent({
+        components: {
+          AccordionRoot,
+          AccordionItem,
+          AccordionHeader,
+          AccordionTrigger,
+          AccordionPanel,
+        },
+        template: `
+          <AccordionRoot :default-value="['item-1']">
+            <AccordionItem data-testid="item1" value="item-1" disabled>
+              <AccordionHeader>
+                <AccordionTrigger>Trigger 1</AccordionTrigger>
+              </AccordionHeader>
+              <AccordionPanel>Panel 1</AccordionPanel>
+            </AccordionItem>
+            <AccordionItem data-testid="item2" value="item-2">
+              <AccordionHeader>
+                <AccordionTrigger>Trigger 2</AccordionTrigger>
+              </AccordionHeader>
+              <AccordionPanel>Panel 2</AccordionPanel>
+            </AccordionItem>
+          </AccordionRoot>
+        `,
+      })
+
+      render(App)
+
+      await nextTick()
+
+      const item1 = screen.getByTestId('item1')
+      const panel1 = screen.queryByText('Panel 1')
+      const triggers = screen.getAllByRole('button')
+      const trigger1 = triggers[0]
+      const trigger2 = triggers[1]
+      const item2 = screen.getByTestId('item2')
+
+      expect(item1).toHaveAttribute('data-disabled')
+      expect(trigger1).toHaveAttribute('data-disabled')
+      expect(panel1).toHaveAttribute('data-disabled')
+
+      expect(item2).not.toHaveAttribute('data-disabled')
+      expect(trigger2).not.toHaveAttribute('data-disabled')
     })
   })
 })

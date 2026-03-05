@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { AccordionTriggerProps } from '../accordion.types'
-import { computed, useAttrs, watch } from 'vue'
+import { computed, onBeforeUnmount, useAttrs, watch } from 'vue'
 import { useCollapsibleRootContext } from '../../collapsible/root/CollapsibleRootContext'
 import {
   ARROW_DOWN,
@@ -51,6 +51,10 @@ watch(
   },
   { immediate: true },
 )
+
+onBeforeUnmount(() => {
+  itemCtx.setTriggerId(undefined)
+})
 
 const SUPPORTED_KEYS = new Set([ARROW_DOWN, ARROW_UP, ARROW_RIGHT, ARROW_LEFT, HOME, END])
 
@@ -154,7 +158,7 @@ function handleKeyDown(event: KeyboardEvent) {
 
 const mergedProps = computed(() => {
   const stateAttributes = getStateAttributesProps(
-    { open: collapsibleCtx.open.value },
+    itemCtx.state.value,
     triggerOpenStateMapping,
   )
 

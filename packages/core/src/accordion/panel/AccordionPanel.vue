@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import type { AccordionPanelProps, AccordionPanelState } from '../accordion.types'
-import { computed, useAttrs, watch, watchEffect } from 'vue'
+import { computed, onBeforeUnmount, useAttrs, watch, watchEffect } from 'vue'
 import { useCollapsiblePanel } from '../../collapsible/panel/useCollapsiblePanel'
 import { useCollapsibleRootContext } from '../../collapsible/root/CollapsibleRootContext'
-import { error } from '../../utils/error'
 import { getStateAttributesProps } from '../../utils/getStateAttributesProps'
 import { useOpenChangeComplete } from '../../utils/useOpenChangeComplete'
+import { warn } from '../../utils/warn'
 import { useAccordionItemContext } from '../item/AccordionItemContext'
 import { accordionStateAttributesMapping } from '../item/stateAttributesMapping'
 import { useAccordionRootContext } from '../root/AccordionRootContext'
@@ -32,8 +32,8 @@ const keepMounted = computed(() => rootCtx.keepMounted.value || props.keepMounte
 if (process.env.NODE_ENV !== 'production') {
   watchEffect(() => {
     if (keepMounted.value === false && hiddenUntilFound.value) {
-      error(
-        'The `keepMounted={false}` prop on a AccordionPanel will be ignored when using `hiddenUntilFound` on the Panel or the Root since it requires the panel to remain mounted when closed.',
+      warn(
+        'The `:keepMounted="false"` prop on a AccordionPanel will be ignored when using `hiddenUntilFound` on the Panel or the Root since it requires the panel to remain mounted when closed.',
       )
     }
   })
@@ -43,11 +43,15 @@ watch(
   () => props.id,
   (id) => {
     if (id) {
-      collapsibleCtx.setPanelId(id)
+      collapsibleCtx.setPanelIdState(id)
     }
   },
   { immediate: true, flush: 'sync' },
 )
+
+onBeforeUnmount(() => {
+  collapsibleCtx.setPanelIdState(undefined)
+})
 
 watch(
   hiddenUntilFound,
@@ -127,12 +131,7 @@ const mergedProps = computed(() => {
 </script>
 
 <template>
-  <component
-    :is="props.as"
-    v-if="shouldRender"
-    :ref="panelRef"
-    v-bind="mergedProps"
-  >
+  <component :is="props.as" v-if="shouldRender" :ref="panelRef" v-bind="mergedProps">
     <slot />
   </component>
 </template>

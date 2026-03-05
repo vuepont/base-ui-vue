@@ -5,10 +5,10 @@ import { computed, getCurrentInstance, provide, ref, useAttrs, watchEffect } fro
 import CompositeList from '../../composite/list/CompositeList.vue'
 import { useDirection } from '../../direction-provider/DirectionContext'
 import { createChangeEventDetails } from '../../utils/createBaseUIEventDetails'
-import { error } from '../../utils/error'
 import { getStateAttributesProps } from '../../utils/getStateAttributesProps'
 import { REASONS } from '../../utils/reasons'
 import { useControllableState } from '../../utils/useControllableState'
+import { warn } from '../../utils/warn'
 import { accordionRootContextKey } from './AccordionRootContext'
 import { rootStateAttributesMapping } from './stateAttributesMapping'
 
@@ -38,8 +38,8 @@ const instance = getCurrentInstance()
 if (process.env.NODE_ENV !== 'production') {
   watchEffect(() => {
     if (props.hiddenUntilFound && props.keepMounted === false) {
-      error(
-        'The `keepMounted={false}` prop on a AccordionRoot will be ignored when using `hiddenUntilFound` since it requires Panels to remain mounted when closed.',
+      warn(
+        'The `:keepMounted="false"` prop on a AccordionRoot will be ignored when using `hiddenUntilFound` since it requires Panels to remain mounted when closed.',
       )
     }
   })

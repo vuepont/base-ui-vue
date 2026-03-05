@@ -8,16 +8,24 @@ import AccordionPanel from '../panel/AccordionPanel.vue'
 import AccordionRoot from '../root/AccordionRoot.vue'
 import AccordionTrigger from './AccordionTrigger.vue'
 
-function renderAccordion(options: {
-  orientation?: 'horizontal' | 'vertical'
-  loopFocus?: boolean
-  disabled?: boolean
-} = {}) {
+function renderAccordion(
+  options: {
+    orientation?: 'horizontal' | 'vertical'
+    loopFocus?: boolean
+    disabled?: boolean
+  } = {},
+) {
   const { orientation, loopFocus, disabled } = options
 
   return render(
     defineComponent({
-      components: { AccordionRoot, AccordionItem, AccordionHeader, AccordionTrigger, AccordionPanel },
+      components: {
+        AccordionRoot,
+        AccordionItem,
+        AccordionHeader,
+        AccordionTrigger,
+        AccordionPanel,
+      },
       setup() {
         return { orientation, loopFocus, disabled }
       },
@@ -200,5 +208,32 @@ describe('<AccordionTrigger />', () => {
 
       expect(trigger1).toHaveFocus()
     })
+  })
+
+  it('keeps a non-native trigger tabbable', async () => {
+    const App = defineComponent({
+      components: {
+        AccordionRoot,
+        AccordionItem,
+        AccordionHeader,
+        AccordionTrigger,
+        AccordionPanel,
+      },
+      template: `
+        <AccordionRoot>
+          <AccordionItem value="item-1">
+            <AccordionHeader>
+              <AccordionTrigger :native-button="false" as="span">Trigger</AccordionTrigger>
+            </AccordionHeader>
+            <AccordionPanel>Panel</AccordionPanel>
+          </AccordionItem>
+        </AccordionRoot>
+      `,
+    })
+
+    render(App)
+
+    const trigger = screen.getByRole('button', { name: 'Trigger' })
+    expect(trigger).toHaveAttribute('tabindex', '0')
   })
 })
