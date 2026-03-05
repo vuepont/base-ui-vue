@@ -1,4 +1,4 @@
-import type { BaseUIChangeEventDetails } from '../utils/createChangeEventDetails'
+import type { BaseUIChangeEventDetails } from '../utils/createBaseUIEventDetails'
 import type * as REASONS from '../utils/reasons'
 import type { BaseUIComponentProps, NativeButtonProps, Orientation } from '../utils/types'
 import type { TransitionStatus } from '../utils/useTransitionStatus'

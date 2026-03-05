@@ -4,7 +4,7 @@ import type { AccordionRootChangeEventDetails, AccordionRootProps, AccordionRoot
 import { computed, getCurrentInstance, provide, ref, useAttrs, watchEffect } from 'vue'
 import CompositeList from '../../composite/list/CompositeList.vue'
 import { useDirection } from '../../direction-provider/DirectionContext'
-import { createChangeEventDetails } from '../../utils/createChangeEventDetails'
+import { createChangeEventDetails } from '../../utils/createBaseUIEventDetails'
 import { error } from '../../utils/error'
 import { getStateAttributesProps } from '../../utils/getStateAttributesProps'
 import { REASONS } from '../../utils/reasons'
