@@ -3,6 +3,8 @@ import type { BaseUIEvent, HTMLProps } from '../types'
 
 export type { BaseUIEvent, HTMLProps }
 
+export type Orientation = 'horizontal' | 'vertical'
+
 /**
  * Props shared by all Base UI Vue components.
  */
