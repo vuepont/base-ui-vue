@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import type { FormValidationMode } from '../../form/FormRootContext'
+import type { FormValidationMode } from '../../form/FormContext'
 import type { LabelableContext } from '../../labelable-provider/LabelableContext'
 import type { BaseUIComponentProps } from '../../utils/types'
 import type { FieldRootContext } from './FieldRootContext'
 import { computed, provide, ref, useAttrs } from 'vue'
 import { useFieldsetRootContext } from '../../fieldset/root/FieldsetRootContext'
-import { useFormRootContext } from '../../form/FormRootContext'
+import { useFormContext } from '../../form/FormContext'
 import { labelableContextKey, useLabelableContext } from '../../labelable-provider/LabelableContext'
 import { getStateAttributesProps } from '../../utils/getStateAttributesProps'
 import { DEFAULT_VALIDITY_STATE, fieldValidityMapping } from '../utils/constants'
@@ -106,7 +106,7 @@ const attrs = useAttrs()
 const {
   validationMode: formValidationMode,
   submitAttempted,
-} = useFormRootContext()
+} = useFormContext()
 
 const fieldsetContext = useFieldsetRootContext(true)
 
@@ -186,7 +186,7 @@ function setFocused(value: boolean) {
   focused.value = value
 }
 
-const { errors: formErrors } = useFormRootContext()
+const { errors: formErrors } = useFormContext()
 
 const hasFormError = computed(() => {
   const n = props.name

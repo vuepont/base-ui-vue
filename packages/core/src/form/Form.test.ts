@@ -5,24 +5,24 @@ import { defineComponent, nextTick, ref } from 'vue'
 import FieldControl from '../field/control/FieldControl.vue'
 import FieldError from '../field/error/FieldError.vue'
 import FieldRoot from '../field/root/FieldRoot.vue'
-import FormRoot from './FormRoot.vue'
+import Form from './Form.vue'
 
 function createApp(options: {
   template: string
   setup?: () => Record<string, any>
 }) {
   return defineComponent({
-    components: { FormRoot, FieldRoot, FieldControl, FieldError },
+    components: { Form, FieldRoot, FieldControl, FieldError },
     setup: options.setup,
     template: options.template,
   })
 }
 
-describe('<FormRoot />', () => {
+describe('<Form />', () => {
   it('renders a form element', () => {
     render(
       createApp({
-        template: '<FormRoot data-testid="form" />',
+        template: '<Form data-testid="form" />',
       }),
     )
     expect(screen.getByTestId('form').tagName).toBe('FORM')
@@ -34,13 +34,13 @@ describe('<FormRoot />', () => {
     render(
       createApp({
         template: `
-          <FormRoot>
+          <Form>
             <FieldRoot>
               <FieldControl required />
               <FieldError data-testid="error" />
             </FieldRoot>
             <button type="submit">Submit</button>
-          </FormRoot>
+          </Form>
         `,
       }),
     )
@@ -55,7 +55,7 @@ describe('<FormRoot />', () => {
     it('should disable native validation if set to true (default)', () => {
       render(
         createApp({
-          template: '<FormRoot data-testid="form" />',
+          template: '<Form data-testid="form" />',
         }),
       )
       expect(screen.getByTestId('form')).toHaveAttribute('novalidate')
@@ -64,7 +64,7 @@ describe('<FormRoot />', () => {
     it('should enable native validation if set to false', () => {
       render(
         createApp({
-          template: '<FormRoot :no-validate="false" data-testid="form" />',
+          template: '<Form :no-validate="false" data-testid="form" />',
         }),
       )
       expect(screen.getByTestId('form')).not.toHaveAttribute('novalidate')
@@ -76,13 +76,13 @@ describe('<FormRoot />', () => {
     const submitSpy = vi.fn()
 
     const App = defineComponent({
-      components: { FormRoot, FieldRoot, FieldControl },
+      components: { Form, FieldRoot, FieldControl },
       setup() {
         const showEmail = ref(true)
         return { showEmail, submitSpy }
       },
       template: `
-        <FormRoot @form-submit="submitSpy">
+        <Form @form-submit="submitSpy">
           <FieldRoot name="name">
             <FieldControl default-value="Alice" />
           </FieldRoot>
@@ -91,7 +91,7 @@ describe('<FormRoot />', () => {
             <FieldControl default-value="" required data-testid="email" />
           </FieldRoot>
           <button type="submit">Submit</button>
-        </FormRoot>
+        </Form>
       `,
     })
 
@@ -118,12 +118,12 @@ describe('<FormRoot />', () => {
             return { errors: { foo: 'bar' } }
           },
           template: `
-            <FormRoot :errors="errors">
+            <Form :errors="errors">
               <FieldRoot name="foo">
                 <FieldControl />
                 <FieldError data-testid="error" />
               </FieldRoot>
-            </FormRoot>
+            </Form>
           `,
         }),
       )
@@ -138,12 +138,12 @@ describe('<FormRoot />', () => {
       render(
         createApp({
           template: `
-            <FormRoot>
+            <Form>
               <FieldRoot name="foo">
                 <FieldControl />
                 <FieldError data-testid="error" />
               </FieldRoot>
-            </FormRoot>
+            </Form>
           `,
         }),
       )
@@ -172,7 +172,7 @@ describe('<FormRoot />', () => {
           return { errors, onFormSubmit }
         },
         template: `
-          <FormRoot :errors="errors" @form-submit="onFormSubmit">
+          <Form :errors="errors" @form-submit="onFormSubmit">
             <FieldRoot name="name">
               <FieldControl data-testid="name" />
               <FieldError data-testid="name-error" />
@@ -182,7 +182,7 @@ describe('<FormRoot />', () => {
               <FieldError data-testid="age-error" />
             </FieldRoot>
             <button type="submit">Submit</button>
-          </FormRoot>
+          </Form>
         `,
       })
 
@@ -213,7 +213,7 @@ describe('<FormRoot />', () => {
       render(
         createApp({
           template: `
-            <FormRoot>
+            <Form>
               <FieldRoot name="name">
                 <FieldControl required data-testid="name" />
               </FieldRoot>
@@ -221,7 +221,7 @@ describe('<FormRoot />', () => {
                 <FieldControl required data-testid="age" />
               </FieldRoot>
               <button type="submit">Submit</button>
-            </FormRoot>
+            </Form>
           `,
         }),
       )
@@ -250,7 +250,7 @@ describe('<FormRoot />', () => {
       })
 
       const App = defineComponent({
-        components: { FormRoot, FieldRoot, FieldControl, FieldError },
+        components: { Form, FieldRoot, FieldControl, FieldError },
         setup() {
           const errors = ref<Record<string, string>>({})
 
@@ -268,13 +268,13 @@ describe('<FormRoot />', () => {
           return { errors, onFormSubmit, validateSpy }
         },
         template: `
-          <FormRoot :errors="errors" @form-submit="onFormSubmit">
+          <Form :errors="errors" @form-submit="onFormSubmit">
             <FieldRoot name="name" :validate="validateSpy">
               <FieldControl data-testid="name" />
               <FieldError data-testid="name-error" />
             </FieldRoot>
             <button type="submit">Submit</button>
-          </FormRoot>
+          </Form>
         `,
       })
 
@@ -309,12 +309,12 @@ describe('<FormRoot />', () => {
           return { validateSpy }
         },
         template: `
-          <FormRoot :errors="{ name: 'server error' }">
+          <Form :errors="{ name: 'server error' }">
             <FieldRoot name="name" invalid :validate="validateSpy" validation-mode="onChange">
               <FieldControl data-testid="name" />
               <FieldError data-testid="name-error" />
             </FieldRoot>
-          </FormRoot>
+          </Form>
         `,
       })
 
@@ -342,12 +342,12 @@ describe('<FormRoot />', () => {
           return { validateSpy }
         },
         template: `
-          <FormRoot :errors="{ name: 'server error' }">
+          <Form :errors="{ name: 'server error' }">
             <FieldRoot name="name" invalid :validate="validateSpy" validation-mode="onBlur">
               <FieldControl data-testid="name" />
               <FieldError data-testid="name-error" />
             </FieldRoot>
-          </FormRoot>
+          </Form>
         `,
       })
 
@@ -383,13 +383,13 @@ describe('<FormRoot />', () => {
           return { submitSpy, validateSpy }
         },
         template: `
-          <FormRoot @submit="submitSpy">
+          <Form @submit="submitSpy">
             <FieldRoot name="name" invalid :validate="validateSpy" validation-mode="onChange">
               <FieldControl data-testid="name" />
               <FieldError data-testid="name-error" />
             </FieldRoot>
             <button type="submit">submit</button>
-          </FormRoot>
+          </Form>
         `,
       }),
     )
@@ -419,12 +419,12 @@ describe('<FormRoot />', () => {
             return { submitSpy }
           },
           template: `
-            <FormRoot @form-submit="submitSpy">
+            <Form @form-submit="submitSpy">
               <FieldRoot name="username">
                 <FieldControl default-value="alice132" />
               </FieldRoot>
               <button type="submit">submit</button>
-            </FormRoot>
+            </Form>
           `,
         }),
       )
@@ -448,13 +448,13 @@ describe('<FormRoot />', () => {
             return { submitSpy }
           },
           template: `
-            <FormRoot @form-submit="submitSpy">
+            <Form @form-submit="submitSpy">
               <FieldRoot name="username">
                 <FieldControl default-value="" required />
                 <FieldError data-testid="error" />
               </FieldRoot>
               <button type="submit">submit</button>
-            </FormRoot>
+            </Form>
           `,
         }),
       )

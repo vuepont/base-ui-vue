@@ -16,6 +16,10 @@ export function useImageLoadingStatus(
   const loadingStatus = ref<ImageLoadingStatus>('idle')
 
   watchEffect((onCleanup) => {
+    if (typeof document === 'undefined') {
+      return NOOP
+    }
+
     const src = toValue(srcRef)
 
     if (!src) {

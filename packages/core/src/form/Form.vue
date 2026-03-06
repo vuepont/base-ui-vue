@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import type { BaseUIComponentProps } from '../utils/types'
-import type { FormErrors, FormField, FormRootContext, FormValidationMode } from './FormRootContext'
+import type { FormContext, FormErrors, FormField, FormValidationMode } from './FormContext'
 import { computed, provide, ref, shallowRef, useAttrs, watch } from 'vue'
 import { EMPTY_OBJECT } from '../utils/empty'
-import { formRootContextKey } from './FormRootContext'
+import { formContextKey } from './FormContext'
 
 export interface FormActions {
   validate: (fieldName?: string) => void
@@ -11,7 +11,7 @@ export interface FormActions {
 
 export interface FormState {}
 
-export interface FormRootProps extends BaseUIComponentProps<FormState> {
+export interface FormProps extends BaseUIComponentProps<FormState> {
   /**
    * Determines when the form should be validated.
    *
@@ -35,11 +35,11 @@ export interface FormRootProps extends BaseUIComponentProps<FormState> {
 }
 
 defineOptions({
-  name: 'FormRoot',
+  name: 'BaseUIForm',
   inheritAttrs: false,
 })
 
-const props = withDefaults(defineProps<FormRootProps>(), {
+const props = withDefaults(defineProps<FormProps>(), {
   as: 'form',
   validationMode: 'onSubmit',
   noValidate: true,
@@ -118,7 +118,7 @@ function clearErrors(name: string | undefined) {
 
 const validationModeRef = computed(() => props.validationMode)
 
-const contextValue: FormRootContext = {
+const contextValue: FormContext = {
   formRef,
   validationMode: validationModeRef,
   errors: internalErrors,
@@ -126,7 +126,7 @@ const contextValue: FormRootContext = {
   submitAttempted: submitAttemptedRef,
 }
 
-provide(formRootContextKey, contextValue)
+provide(formContextKey, contextValue)
 
 function handleSubmit(event: Event) {
   submitAttemptedRef.value = true

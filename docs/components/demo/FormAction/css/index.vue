@@ -12,43 +12,43 @@ import './styles.css'
 const errors = ref<Record<string, string | string[]>>({})
 const loading = ref(false)
 
-async function submitForm(value: string) {
+async function submitForm(username: string): Promise<{ errors: Record<string, string | string[]> }> {
   await new Promise(resolve => setTimeout(resolve, 1000))
 
   try {
-    const url = new URL(value)
-    if (url.hostname.endsWith('example.com')) {
-      return { error: 'The example domain is not allowed' }
+    if (username === 'admin') {
+      return { errors: { username: '\'admin\' is reserved for system use' } }
+    }
+
+    if (Math.random() <= 0.5) {
+      return { errors: { username: `${username} is unavailable` } }
     }
   }
   catch {
-    return { error: 'This is not a valid URL' }
+    return { errors: { username: 'A server error has occurred' } }
   }
 
-  return { success: true }
+  return { errors: {} }
 }
 
 async function handleFormSubmit(formValues: Record<string, unknown>) {
-  const value = String(formValues.url ?? '')
   loading.value = true
-  const response = await submitForm(value)
-  errors.value = response.error ? { url: response.error } : {}
+  const response = await submitForm(String(formValues.username ?? ''))
+  errors.value = response.errors
   loading.value = false
 }
 </script>
 
 <template>
   <Form class="Form" :errors="errors" @form-submit="handleFormSubmit">
-    <FieldRoot name="url" class="Field">
+    <FieldRoot name="username" class="Field">
       <FieldLabel class="Label">
-        Homepage
+        Username
       </FieldLabel>
       <FieldControl
-        type="url"
         required
-        default-value="https://example.com"
-        placeholder="https://example.com"
-        pattern="https?://.*"
+        default-value="admin"
+        placeholder="e.g. alice132"
         class="Input"
       />
       <FieldError class="Error" />

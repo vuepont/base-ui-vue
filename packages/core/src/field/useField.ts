@@ -1,6 +1,6 @@
 import type { Ref } from 'vue'
 import { onUnmounted, watchEffect } from 'vue'
-import { useFormRootContext } from '../form/FormRootContext'
+import { useFormContext } from '../form/FormContext'
 import { useFieldRootContext } from './root/FieldRootContext'
 import { getCombinedFieldValidityData } from './utils/getCombinedFieldValidityData'
 
@@ -17,7 +17,7 @@ export interface UseFieldParameters {
 export function useField(params: UseFieldParameters) {
   const { enabled, value, id, name, controlRef, commit } = params
 
-  const { formRef } = useFormRootContext()
+  const { formRef } = useFormContext()
   const { invalid, markedDirtyRef, validityData, setValidityData } = useFieldRootContext()
 
   const getValue = params.getValue ?? (() => value.value)

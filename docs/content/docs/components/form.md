@@ -10,21 +10,27 @@ Form is composed together with [Field](/docs/components/field). Import the compo
 
 ```vue title="Anatomy"
 <script setup>
-import { FieldControl, FieldError, FieldLabel, FieldRoot, FormRoot } from 'base-ui-vue'
+import { FieldControl, FieldError, FieldLabel, FieldRoot, Form } from 'base-ui-vue'
 </script>
 
 <template>
-  <FormRoot>
+  <Form>
     <FieldRoot>
       <FieldLabel />
       <FieldControl />
       <FieldError />
     </FieldRoot>
-  </FormRoot>
+  </Form>
 </template>
 ```
 
 ## Examples
+
+### Submit with an async action
+
+Use the `errors` prop to display validation errors returned from asynchronous submissions (for example, a server response). Keys must match each field's `name`.
+
+<ComponentPreview name="FormAction" />
 
 ### Submit form values as a JavaScript object
 
@@ -46,37 +52,41 @@ async function handleFormSubmit(formValues) {
 </script>
 
 <template>
-  <FormRoot @form-submit="handleFormSubmit">
+  <Form @form-submit="handleFormSubmit">
     <!-- fields -->
-  </FormRoot>
+  </Form>
 </template>
 ```
 
 ### Server-side errors
 
-Pass errors from external sources (e.g. API responses) via the `errors` prop on `<FormRoot>`. Keys must match the `name` prop on `<FieldRoot>`.
+Pass errors from external sources (e.g. API responses) via the `errors` prop on `<Form>`. Keys must match the `name` prop on `<FieldRoot>`.
 
 ```vue
-<FormRoot :errors="{ email: 'Email already taken.' }">
+<Form :errors="{ email: 'Email already taken.' }">
   <FieldRoot name="email">
     <FieldLabel>Email</FieldLabel>
     <FieldControl />
     <FieldError />
   </FieldRoot>
-</FormRoot>
+</Form>
 ```
+
+### Using with Zod
+
+When parsing with `schema.safeParse()`, map `z.flattenError(result.error).fieldErrors` to `<Form :errors="...">` for field-level errors.
+
+<ComponentPreview name="FormZod" />
 
 ### Validation mode
 
-Control when validation runs via the `validationMode` prop (on `<FormRoot>` or `<FieldRoot>`):
+Control when validation runs via the `validationMode` prop (on `<Form>` or `<FieldRoot>`):
 
 - `onSubmit` (default) -- validates on submit; re-validates on change after the first submission.
 - `onBlur` -- validates when a control loses focus.
 - `onChange` -- validates on every change.
 
 ## API reference
-
-### FormRoot
 
 The form root element. Renders a `<form>` element.
 

@@ -1,10 +1,10 @@
-export { default as FormRoot } from './FormRoot.vue'
-export type { FormActions, FormRootProps, FormState } from './FormRoot.vue'
+export { default as Form } from './Form.vue'
+export type { FormActions, FormProps, FormState } from './Form.vue'
 
-export { formRootContextKey, useFormRootContext } from './FormRootContext'
+export { formContextKey, useFormContext } from './FormContext'
 export type {
+  FormContext,
   FormErrors,
   FormField,
-  FormRootContext,
   FormValidationMode,
-} from './FormRootContext'
+} from './FormContext'

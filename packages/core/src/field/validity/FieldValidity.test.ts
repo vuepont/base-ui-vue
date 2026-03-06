@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/vue'
 import { describe, expect, it, vi } from 'vitest'
 import { defineComponent, nextTick } from 'vue'
-import FormRoot from '../../form/FormRoot.vue'
+import Form from '../../form/Form.vue'
 import FieldControl from '../control/FieldControl.vue'
 import FieldRoot from '../root/FieldRoot.vue'
 import FieldValidity from './FieldValidity.vue'
@@ -11,7 +11,7 @@ function createApp(options: {
   setup?: () => Record<string, any>
 }) {
   return defineComponent({
-    components: { FormRoot, FieldRoot, FieldControl, FieldValidity },
+    components: { Form, FieldRoot, FieldControl, FieldValidity },
     setup: options.setup,
     template: options.template,
   })
@@ -28,7 +28,7 @@ describe('<FieldValidity />', () => {
             return { handleValidity }
           },
           template: `
-            <FormRoot>
+            <Form>
               <FieldRoot>
                 <FieldControl required />
                 <FieldValidity v-slot="slotProps">
@@ -36,7 +36,7 @@ describe('<FieldValidity />', () => {
                 </FieldValidity>
               </FieldRoot>
               <button type="submit">submit</button>
-            </FormRoot>
+            </Form>
           `,
         }),
       )

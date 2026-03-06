@@ -1,5 +1,11 @@
 <script setup lang="ts">
-import { FieldControl, FieldDescription, FieldError, FieldLabel, FieldRoot } from 'base-ui-vue'
+import {
+  FieldControl,
+  FieldDescription,
+  FieldError,
+  FieldLabel,
+  FieldRoot,
+} from 'base-ui-vue'
 import './styles.css'
 </script>
 

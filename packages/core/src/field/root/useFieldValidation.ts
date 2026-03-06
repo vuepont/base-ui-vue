@@ -1,7 +1,7 @@
 import type { Ref } from 'vue'
 import type { FieldRootState, FieldValidityData } from './FieldRoot.vue'
 import { ref } from 'vue'
-import { useFormRootContext } from '../../form/FormRootContext'
+import { useFormContext } from '../../form/FormContext'
 import { useTimeout } from '../../utils/useTimeout'
 import { DEFAULT_VALIDITY_STATE } from '../utils/constants'
 import { getCombinedFieldValidityData } from '../utils/getCombinedFieldValidityData'
@@ -53,7 +53,7 @@ export interface UseFieldValidationReturnValue {
 export function useFieldValidation(
   params: UseFieldValidationParameters,
 ): UseFieldValidationReturnValue {
-  const { formRef, clearErrors } = useFormRootContext()
+  const { formRef, clearErrors } = useFormContext()
 
   const {
     controlId,

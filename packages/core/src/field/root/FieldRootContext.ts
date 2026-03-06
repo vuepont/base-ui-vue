@@ -1,5 +1,5 @@
 import type { InjectionKey, Ref } from 'vue'
-import type { FormValidationMode } from '../../form/FormRootContext'
+import type { FormValidationMode } from '../../form/FormContext'
 import type { FieldRootState, FieldValidityData } from './FieldRoot.vue'
 import type { UseFieldValidationReturnValue } from './useFieldValidation'
 import { inject, ref } from 'vue'

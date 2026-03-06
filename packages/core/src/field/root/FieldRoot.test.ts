@@ -2,7 +2,7 @@ import userEvent from '@testing-library/user-event'
 import { fireEvent, render, screen } from '@testing-library/vue'
 import { describe, expect, it, vi } from 'vitest'
 import { defineComponent, nextTick } from 'vue'
-import FormRoot from '../../form/FormRoot.vue'
+import Form from '../../form/Form.vue'
 import FieldControl from '../control/FieldControl.vue'
 import FieldDescription from '../description/FieldDescription.vue'
 import FieldError from '../error/FieldError.vue'
@@ -14,7 +14,7 @@ function createApp(options: {
   setup?: () => Record<string, any>
 }) {
   return defineComponent({
-    components: { FormRoot, FieldRoot, FieldControl, FieldLabel, FieldError, FieldDescription },
+    components: { Form, FieldRoot, FieldControl, FieldLabel, FieldError, FieldDescription },
     setup: options.setup,
     template: options.template,
   })
@@ -173,12 +173,12 @@ describe('<FieldRoot />', () => {
             return { validate: () => 'error' }
           },
           template: `
-            <FormRoot>
+            <Form>
               <FieldRoot :validate="validate">
                 <FieldControl data-testid="control" />
               </FieldRoot>
               <button type="submit">submit</button>
-            </FormRoot>
+            </Form>
           `,
         }),
       )
@@ -201,7 +201,7 @@ describe('<FieldRoot />', () => {
             return { validateSpy }
           },
           template: `
-            <FormRoot>
+            <Form>
               <FieldRoot name="first" :validate="validateSpy">
                 <FieldControl default-value="John" />
               </FieldRoot>
@@ -209,7 +209,7 @@ describe('<FieldRoot />', () => {
                 <FieldControl default-value="Doe" />
               </FieldRoot>
               <button type="submit">submit</button>
-            </FormRoot>
+            </Form>
           `,
         }),
       )
@@ -235,13 +235,13 @@ describe('<FieldRoot />', () => {
               return { validate: () => 'error' }
             },
             template: `
-              <FormRoot>
+              <Form>
                 <FieldRoot :validate="validate">
                   <FieldControl />
                   <FieldError data-testid="error" />
                 </FieldRoot>
                 <button type="submit">submit</button>
-              </FormRoot>
+              </Form>
             `,
           }),
         )
@@ -266,13 +266,13 @@ describe('<FieldRoot />', () => {
               return { validateSpy }
             },
             template: `
-              <FormRoot>
+              <Form>
                 <FieldRoot :validate="validateSpy">
                   <FieldControl data-testid="control" />
                   <FieldError data-testid="error" />
                 </FieldRoot>
                 <button type="submit">submit</button>
-              </FormRoot>
+              </Form>
             `,
           }),
         )

@@ -36,7 +36,7 @@ export interface FormField {
   getValue: () => unknown
 }
 
-export interface FormRootContext {
+export interface FormContext {
   errors: Ref<FormErrors>
   clearErrors: (name: string | undefined) => void
   formRef: ShallowRef<{ fields: Map<string, FormField> }>
@@ -44,9 +44,9 @@ export interface FormRootContext {
   submitAttempted: Ref<boolean>
 }
 
-export const formRootContextKey: InjectionKey<FormRootContext> = Symbol('FormRootContext')
+export const formContextKey: InjectionKey<FormContext> = Symbol('FormContext')
 
-const defaultContext: FormRootContext = {
+const defaultContext: FormContext = {
   errors: { value: EMPTY_OBJECT as FormErrors } as Ref<FormErrors>,
   clearErrors: NOOP,
   formRef: { value: { fields: new Map() } } as ShallowRef<{ fields: Map<string, FormField> }>,
@@ -54,6 +54,6 @@ const defaultContext: FormRootContext = {
   submitAttempted: { value: false } as Ref<boolean>,
 }
 
-export function useFormRootContext(): FormRootContext {
-  return inject(formRootContextKey, defaultContext)
+export function useFormContext(): FormContext {
+  return inject(formContextKey, defaultContext)
 }

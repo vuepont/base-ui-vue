@@ -2,7 +2,7 @@ import userEvent from '@testing-library/user-event'
 import { fireEvent, render, screen } from '@testing-library/vue'
 import { describe, expect, it } from 'vitest'
 import { defineComponent, nextTick } from 'vue'
-import FormRoot from '../../form/FormRoot.vue'
+import Form from '../../form/Form.vue'
 import FieldControl from '../control/FieldControl.vue'
 import FieldRoot from '../root/FieldRoot.vue'
 import FieldError from './FieldError.vue'
@@ -12,7 +12,7 @@ function createApp(options: {
   setup?: () => Record<string, any>
 }) {
   return defineComponent({
-    components: { FormRoot, FieldRoot, FieldControl, FieldError },
+    components: { Form, FieldRoot, FieldControl, FieldError },
     setup: options.setup,
     template: options.template,
   })
@@ -45,13 +45,13 @@ describe('<FieldError />', () => {
     render(
       createApp({
         template: `
-          <FormRoot>
+          <Form>
             <FieldRoot>
               <FieldControl required />
               <FieldError>Message</FieldError>
             </FieldRoot>
             <button type="submit">submit</button>
-          </FormRoot>
+          </Form>
         `,
       }),
     )
@@ -71,13 +71,13 @@ describe('<FieldError />', () => {
       render(
         createApp({
           template: `
-            <FormRoot>
+            <Form>
               <FieldRoot>
                 <FieldControl required :minlength="2" />
                 <FieldError match="valueMissing">Message</FieldError>
               </FieldRoot>
               <button type="submit">submit</button>
-            </FormRoot>
+            </Form>
           `,
         }),
       )
@@ -109,13 +109,13 @@ describe('<FieldError />', () => {
             return { validate: () => 'error' }
           },
           template: `
-            <FormRoot>
+            <Form>
               <FieldRoot :validate="validate">
                 <FieldControl />
                 <FieldError match="customError">Message</FieldError>
               </FieldRoot>
               <button type="submit">submit</button>
-            </FormRoot>
+            </Form>
           `,
         }),
       )

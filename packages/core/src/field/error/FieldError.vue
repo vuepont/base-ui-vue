@@ -3,7 +3,7 @@ import type { BaseUIComponentProps } from '../../utils/types'
 import type { TransitionStatus } from '../../utils/useTransitionStatus'
 import type { FieldRootState } from '../root/FieldRoot.vue'
 import { computed, onUnmounted, ref, useAttrs, watch } from 'vue'
-import { useFormRootContext } from '../../form/FormRootContext'
+import { useFormContext } from '../../form/FormContext'
 import { useLabelableContext } from '../../labelable-provider/LabelableContext'
 import { getStateAttributesProps } from '../../utils/getStateAttributesProps'
 import { transitionStatusMapping } from '../../utils/stateAttributesMapping'
@@ -50,7 +50,7 @@ const id = useBaseUiId(props.id)
 
 const { validityData, state: fieldState, name } = useFieldRootContext(false)
 const { setMessageIds } = useLabelableContext()
-const { errors } = useFormRootContext()
+const { errors } = useFormContext()
 
 const formError = computed(() => {
   const n = name.value

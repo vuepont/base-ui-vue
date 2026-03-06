@@ -11,7 +11,8 @@
   "dependencies": {
     "@vueuse/core": "^14.2.1",
     "base-ui-vue": "link:../packages/core",
-    "vue": "^3.5.27"
+    "vue": "^3.5.27",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.2.1",
