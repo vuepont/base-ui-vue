@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { VNode } from 'vue'
+import { CollapsiblePanel, CollapsibleRoot, CollapsibleTrigger } from 'base-ui-vue'
 import { computed, ref, useSlots, watch } from 'vue'
 
 const props = defineProps<{
@@ -66,7 +67,7 @@ const currentSource = computed(() => {
   return sources.value[currentTab.value] ?? ''
 })
 
-const showCode = ref(false)
+const open = ref(false)
 
 const copySuccess = ref(false)
 
@@ -99,8 +100,8 @@ function onVariantChange(event: Event) {
 </script>
 
 <template>
-  <div class="demo-code-root">
-    <div v-show="showCode" class="demo-toolbar">
+  <CollapsibleRoot class="demo-code-root" :default-open="false" @open-change="(val) => open = val">
+    <div v-show="open" class="demo-toolbar">
       <div class="demo-tabs">
         <button
           v-for="tabName in tabNames"
@@ -146,22 +147,20 @@ function onVariantChange(event: Event) {
       </div>
     </div>
 
-    <div v-show="showCode" :key="modelValue" class="demo-code-viewport">
-      <template v-for="(block, index) in codeBlocks" :key="index">
-        <div v-show="currentTab === tabNames[index]" class="demo-source">
-          <component :is="block" />
-        </div>
-      </template>
-    </div>
+    <CollapsiblePanel keep-mounted>
+      <div :key="modelValue" class="demo-code-viewport">
+        <template v-for="(block, index) in codeBlocks" :key="index">
+          <div v-show="currentTab === tabNames[index]" class="demo-source">
+            <component :is="block" />
+          </div>
+        </template>
+      </div>
+    </CollapsiblePanel>
 
-    <button
-      class="demo-toggle-btn"
-      :data-open="showCode ? '' : undefined"
-      @click="showCode = !showCode"
-    >
-      {{ showCode ? 'Hide code' : 'Show code' }}
-    </button>
-  </div>
+    <CollapsibleTrigger class="demo-toggle-btn">
+      {{ open ? 'Hide code' : 'Show code' }}
+    </CollapsibleTrigger>
+  </CollapsibleRoot>
 </template>
 
 <style scoped>
