@@ -20,6 +20,12 @@ export interface FieldsetLegendProps extends BaseUIComponentProps<FieldsetLegend
   id?: string
 }
 
+/**
+ * An accessible label that is automatically associated with the fieldset.
+ * Renders a \`<div>\` element.
+ *
+ * Documentation: [Base UI Vue Fieldset](https://baseui-vue.com/components/fieldset)
+ */
 defineOptions({
   name: 'FieldsetLegend',
   inheritAttrs: false,

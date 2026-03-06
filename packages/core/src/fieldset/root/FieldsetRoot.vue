@@ -19,6 +19,12 @@ export interface FieldsetRootProps extends BaseUIComponentProps<FieldsetRootStat
   disabled?: boolean
 }
 
+/**
+ * Groups a shared legend with related controls.
+ * Renders a \`<fieldset>\` element.
+ *
+ * Documentation: [Base UI Vue Fieldset](https://baseui-vue.com/components/fieldset)
+ */
 defineOptions({
   name: 'FieldsetRoot',
   inheritAttrs: false,
