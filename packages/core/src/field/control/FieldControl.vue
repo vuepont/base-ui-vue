@@ -54,6 +54,7 @@ const {
   disabled: fieldDisabled,
   setTouched,
   setDirty,
+  markedDirtyRef,
   validityData,
   setFocused,
   setFilled,
@@ -144,6 +145,7 @@ function handleKeydown(event: KeyboardEvent) {
   const target = event.target as HTMLInputElement
   if (target.tagName === 'INPUT' && event.key === 'Enter') {
     setTouched(true)
+    markedDirtyRef.value = true
     validation.commit(target.value)
   }
 }

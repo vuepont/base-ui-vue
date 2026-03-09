@@ -157,5 +157,27 @@ describe('<FieldControl />', () => {
       expect(screen.queryByTestId('error')).not.toBeNull()
       expect(screen.getByTestId('error').textContent).toBe('Custom error message')
     })
+
+    it('shows valueMissing error when pressing Enter on an empty required input', async () => {
+      const user = userEvent.setup()
+
+      render(
+        createApp({
+          template: `
+            <FieldRoot>
+              <FieldControl required data-testid="input" />
+              <FieldError data-testid="error" match="valueMissing">Required message</FieldError>
+            </FieldRoot>
+          `,
+        }),
+      )
+
+      const input = screen.getByTestId('input')
+      await user.click(input)
+      await user.keyboard('{Enter}')
+
+      expect(screen.queryByTestId('error')).not.toBeNull()
+      expect(screen.getByTestId('error').textContent).toBe('Required message')
+    })
   })
 })
