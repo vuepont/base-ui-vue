@@ -32,7 +32,7 @@ export interface FieldValidityData {
   initialValue: unknown
 }
 
-export interface FieldRootActions {
+export interface FieldRootExpose {
   validate: () => void
 }
 
@@ -260,6 +260,16 @@ const contextValue: FieldRootContext = {
 }
 
 provide(fieldRootContextKey, contextValue)
+
+function handleImperativeValidate() {
+  markedDirtyRef.value = true
+  const currentValue = validation.inputRef.value?.value ?? validityData.value.value
+  void validation.commit(currentValue)
+}
+
+defineExpose<FieldRootExpose>({
+  validate: handleImperativeValidate,
+})
 
 const mergedProps = computed(() => {
   const stateAttributes = getStateAttributesProps(state.value, fieldValidityMapping)

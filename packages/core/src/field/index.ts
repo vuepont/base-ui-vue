@@ -18,7 +18,7 @@ export { default as FieldLabel } from './label/FieldLabel.vue'
 export type { FieldLabelProps, FieldLabelState } from './label/FieldLabel.vue'
 
 export { default as FieldRoot } from './root/FieldRoot.vue'
-export type { FieldRootActions, FieldRootProps, FieldRootState, FieldValidityData } from './root/FieldRoot.vue'
+export type { FieldRootExpose, FieldRootProps, FieldRootState, FieldValidityData } from './root/FieldRoot.vue'
 
 export { fieldRootContextKey, useFieldRootContext } from './root/FieldRootContext'
 export type { FieldRootContext } from './root/FieldRootContext'

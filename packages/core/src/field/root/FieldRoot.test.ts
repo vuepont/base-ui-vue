@@ -1,7 +1,7 @@
 import userEvent from '@testing-library/user-event'
 import { fireEvent, render, screen } from '@testing-library/vue'
 import { describe, expect, it, vi } from 'vitest'
-import { defineComponent, nextTick } from 'vue'
+import { defineComponent, nextTick, ref } from 'vue'
 import Form from '../../form/Form.vue'
 import FieldControl from '../control/FieldControl.vue'
 import FieldDescription from '../description/FieldDescription.vue'
@@ -658,6 +658,39 @@ describe('<FieldRoot />', () => {
       await user.click(screen.getByTestId('btn'))
       await user.click(input)
       expect(input).toHaveValue('changed')
+    })
+  })
+  describe('component ref', () => {
+    it('validates the field when the `validate` action is called', async () => {
+      const user = userEvent.setup()
+
+      render(
+        createApp({
+          setup() {
+            const fieldRef = ref<{ validate: () => void } | null>(null)
+            const handleValidate = () => fieldRef.value?.validate()
+            return { fieldRef, handleValidate }
+          },
+          template: `
+            <div>
+              <FieldRoot ref="fieldRef" name="username">
+                <FieldControl default-value="" required />
+                <FieldError data-testid="error" />
+              </FieldRoot>
+              <button type="button" @click="handleValidate">
+                validate
+              </button>
+            </div>
+          `,
+        }),
+      )
+
+      expect(screen.queryByTestId('error')).toBeNull()
+
+      await user.click(screen.getByText('validate'))
+      await nextTick()
+
+      expect(screen.queryByTestId('error')).not.toBeNull()
     })
   })
 })
