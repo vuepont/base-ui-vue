@@ -8,6 +8,12 @@ export type { FieldDescriptionProps, FieldDescriptionState } from './description
 export { default as FieldError } from './error/FieldError.vue'
 export type { FieldErrorProps, FieldErrorState } from './error/FieldError.vue'
 
+export { default as FieldItem } from './item/FieldItem.vue'
+export type { FieldItemProps, FieldItemState } from './item/FieldItem.vue'
+
+export { fieldItemContextKey, useFieldItemContext } from './item/FieldItemContext'
+export type { FieldItemContext } from './item/FieldItemContext'
+
 export { default as FieldLabel } from './label/FieldLabel.vue'
 export type { FieldLabelProps, FieldLabelState } from './label/FieldLabel.vue'
 

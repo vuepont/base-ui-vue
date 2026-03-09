@@ -14,6 +14,7 @@ import {
   FieldControl,
   FieldDescription,
   FieldError,
+  FieldItem,
   FieldLabel,
   FieldRoot,
   FieldValidity,
@@ -25,7 +26,9 @@ import {
     <FieldLabel />
     <FieldControl />
     <FieldDescription />
+    <FieldItem />
     <FieldError />
+    <FieldValidity />
   </FieldRoot>
 </template>
 ```
@@ -34,87 +37,150 @@ import {
 
 ### Root
 
-Groups a label, control, description, and error for a single field. Renders a `<div>` element.
+Groups all parts of the field. Renders a `<div>` element.
 
-| Prop                     | Type                                                                | Default      | Description                                                                                             |
-| ------------------------ | ------------------------------------------------------------------- | ------------ | ------------------------------------------------------------------------------------------------------- |
-| `as`                     | `string \| Component`                                               | `'div'`      | The element or component to use for the root node.                                                      |
-| `name`                   | `string`                                                            | --           | Identifies the field when the form is submitted.                                                        |
-| `disabled`               | `boolean`                                                           | `false`      | Whether the component should ignore user interaction.                                                   |
-| `validate`               | `(value, formValues) => string \| string[] \| null \| Promise<...>` | --           | A function for custom validation.                                                                       |
-| `validationMode`         | `'onSubmit' \| 'onBlur' \| 'onChange'`                              | inherited    | Overrides the form-level validation mode.                                                               |
-| `validationDebounceTime` | `number`                                                            | `0`          | Debounce interval (ms) for `onChange` validation.                                                       |
-| `invalid`                | `boolean`                                                           | --           | Controlled invalid state.                                                                               |
-| `dirty`                  | `boolean`                                                           | --           | Controlled dirty state.                                                                                 |
-| `touched`                | `boolean`                                                           | --           | Controlled touched state.                                                                               |
-| `class`                  | `string \| ((state: State) => string)`                              | --           | CSS class applied to the element, or a function that returns a class based on the component's state.    |
-| `style`                  | `StyleValue \| ((state: State) => StyleValue)`                      | --           | Style applied to the element, or a function that returns a style object based on the component's state. |
+| Prop                     | Type                                                                | Default      | Description                                                                                                                         |
+| ------------------------ | ------------------------------------------------------------------- | ------------ | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `as`                     | `string \| Component`                                               | `'div'`      | The element or component to use for the root node.                                                                                  |
+| `name`                   | `string`                                                            | --           | Identifies the field when a form is submitted. Takes precedence over the `name` prop on `<FieldControl>`.                          |
+| `disabled`               | `boolean`                                                           | `false`      | Whether the component should ignore user interaction. Takes precedence over the `disabled` prop on `<FieldControl>`.               |
+| `invalid`                | `boolean`                                                           | --           | Whether the field is invalid. Useful when the field state is controlled by an external library.                                    |
+| `dirty`                  | `boolean`                                                           | --           | Whether the field's value has been changed from its initial value. Useful when the field state is controlled by an external library. |
+| `touched`                | `boolean`                                                           | --           | Whether the field has been touched. Useful when the field state is controlled by an external library.                              |
+| `validate`               | `(value, formValues) => string \| string[] \| null \| Promise<...>` | --           | A function for custom validation. Return a string or array of strings for invalid values, or `null` for valid values.              |
+| `validationMode`         | `'onSubmit' \| 'onBlur' \| 'onChange'`                              | `'onSubmit'` | Determines when the field should be validated. Takes precedence over the `validationMode` prop on `<Form>`.                        |
+| `validationDebounceTime` | `number`                                                            | `0`          | How long to wait between `validate` callbacks if `validationMode="onChange"` is used. Specified in milliseconds.                 |
+| `class`                  | `string \| ((state: State) => string)`                              | --           | CSS class applied to the element, or a function that returns a class based on the component's state.                               |
+| `style`                  | `StyleValue \| ((state: State) => StyleValue)`                      | --           | Style applied to the element, or a function that returns a style object based on the component's state.                            |
 
-| Attribute       | Description                         |
-| --------------- | ----------------------------------- |
-| `data-disabled` | Present when the field is disabled. |
-| `data-touched`  | Present when the field is touched.  |
-| `data-dirty`    | Present when the field is dirty.    |
-| `data-valid`    | Present when the field is valid.    |
-| `data-invalid`  | Present when the field is invalid.  |
-| `data-filled`   | Present when the field has a value. |
-| `data-focused`  | Present when the field has focus.   |
-
-### Label
-
-An accessible label associated with the field control. Renders a `<label>` element.
-
-| Prop | Type                  | Default   | Description                         |
-| ---- | --------------------- | --------- | ----------------------------------- |
-| `as` | `string \| Component` | `'label'` | The element or component to render. |
-| `id` | `string`              | auto      | Overrides the auto-generated id.    |
+| Attribute       | Description                                  |
+| --------------- | -------------------------------------------- |
+| `data-disabled` | Present when the field is disabled.          |
+| `data-valid`    | Present when the field is valid.             |
+| `data-invalid`  | Present when the field is invalid.           |
+| `data-dirty`    | Present when the field's value has changed.  |
+| `data-touched`  | Present when the field has been touched.     |
+| `data-filled`   | Present when the field is filled.            |
+| `data-focused`  | Present when the field control is focused.   |
 
 ### Control
 
-The input control for the field. Renders an `<input>` element.
+The form control to label and validate. Renders an `<input>` element.
 
-| Prop           | Type                  | Default   | Description                              |
-| -------------- | --------------------- | --------- | ---------------------------------------- |
-| `as`           | `string \| Component` | `'input'` | The element or component to render.      |
-| `id`           | `string`              | auto      | Overrides the auto-generated control id. |
-| `defaultValue` | `string`              | `''`      | The initial uncontrolled value.          |
-| `value`        | `string`              | --        | The controlled value.                    |
-| `disabled`     | `boolean`             | `false`   | Whether the control is disabled.         |
+| Prop           | Type                  | Default   | Description |
+| -------------- | --------------------- | --------- | ----------- |
+| `as`           | `string \| Component` | `'input'` | The element or component to render. |
+| `id`           | `string`              | auto      | The `id` attribute of the control element. |
+| `name`         | `string`              | --        | Identifies the control when a form is submitted. |
+| `value`        | `string`              | --        | The controlled value. |
+| `defaultValue` | `string`              | `''`      | The initial uncontrolled value. |
+| `disabled`     | `boolean`             | `false`   | Whether the component should ignore user interaction. |
+| `autofocus`    | `boolean`             | `false`   | Whether the control should receive focus on mount. |
+| `type`         | `string`              | --        | The type of the input. |
+| `required`     | `boolean`             | --        | Whether the control is required. |
+| `pattern`      | `string`              | --        | Pattern the value must match to be valid. |
+| `minlength`    | `number`              | --        | Minimum number of characters allowed. |
+| `maxlength`    | `number`              | --        | Maximum number of characters allowed. |
+| `min`          | `string \| number`    | --        | Minimum allowed value. |
+| `max`          | `string \| number`    | --        | Maximum allowed value. |
+| `step`         | `string \| number`    | --        | Granularity that the value must adhere to. |
+| `placeholder`  | `string`              | --        | Placeholder text for the control. |
+| `class`        | `string \| ((state: State) => string)` | -- | CSS class applied to the element, or a function that returns a class based on the component's state. |
+| `style`        | `StyleValue \| ((state: State) => StyleValue)` | -- | Style applied to the element, or a function that returns a style object based on the component's state. |
 
-Standard HTML input attributes (`type`, `required`, `pattern`, `minlength`, `maxlength`, `min`, `max`, `step`, `placeholder`) are also accepted.
+| Event         | Payload                  | Description |
+| ------------- | ------------------------ | ----------- |
+| `valueChange` | `(value: string, event)` | Fired when the `value` changes. Use when controlled. |
 
-| Event         | Payload                  | Description                             |
-| ------------- | ------------------------ | --------------------------------------- |
-| `valueChange` | `(value: string, event)` | Emitted when the control value changes. |
+| Attribute       | Description                                  |
+| --------------- | -------------------------------------------- |
+| `data-disabled` | Present when the field is disabled.          |
+| `data-valid`    | Present when the field is in valid state.    |
+| `data-invalid`  | Present when the field is in invalid state.  |
+| `data-dirty`    | Present when the field's value has changed.  |
+| `data-touched`  | Present when the field has been touched.     |
+| `data-filled`   | Present when the field is filled.            |
+| `data-focused`  | Present when the field control is focused.   |
+
+### Label
+
+An accessible label that is automatically associated with the field control. Renders a `<label>` element.
+
+| Prop          | Type                  | Default   | Description |
+| ------------- | --------------------- | --------- | ----------- |
+| `as`          | `string \| Component` | `'label'` | The element or component to render. |
+| `id`          | `string`              | auto      | The `id` attribute of the label element. |
+| `nativeLabel` | `boolean`             | `true`    | Whether the component renders a native `<label>` element. Set to `false` when rendering a non-label element. |
+| `class`       | `string \| ((state: State) => string)` | -- | CSS class applied to the element, or a function that returns a class based on the component's state. |
+| `style`       | `StyleValue \| ((state: State) => StyleValue)` | -- | Style applied to the element, or a function that returns a style object based on the component's state. |
+
+| Attribute       | Description                                  |
+| --------------- | -------------------------------------------- |
+| `data-disabled` | Present when the field is disabled.          |
+| `data-valid`    | Present when the field is in valid state.    |
+| `data-invalid`  | Present when the field is in invalid state.  |
+| `data-dirty`    | Present when the field's value has changed.  |
+| `data-touched`  | Present when the field has been touched.     |
+| `data-filled`   | Present when the field is filled.            |
+| `data-focused`  | Present when the field control is focused.   |
 
 ### Description
 
-Supplementary text linked to the control via `aria-describedby`. Renders a `<p>` element.
+A paragraph with additional information about the field. Renders a `<p>` element.
 
-| Prop | Type                  | Default | Description                         |
-| ---- | --------------------- | ------- | ----------------------------------- |
-| `as` | `string \| Component` | `'p'`   | The element or component to render. |
-| `id` | `string`              | auto    | Overrides the auto-generated id.    |
+| Prop    | Type                  | Default | Description |
+| ------- | --------------------- | ------- | ----------- |
+| `as`    | `string \| Component` | `'p'`   | The element or component to render. |
+| `id`    | `string`              | auto    | The `id` attribute of the description element. |
+| `class` | `string \| ((state: State) => string)` | -- | CSS class applied to the element, or a function that returns a class based on the component's state. |
+| `style` | `StyleValue \| ((state: State) => StyleValue)` | -- | Style applied to the element, or a function that returns a style object based on the component's state. |
+
+| Attribute       | Description                                  |
+| --------------- | -------------------------------------------- |
+| `data-disabled` | Present when the field is disabled.          |
+| `data-valid`    | Present when the field is in valid state.    |
+| `data-invalid`  | Present when the field is in invalid state.  |
+| `data-dirty`    | Present when the field's value has changed.  |
+| `data-touched`  | Present when the field has been touched.     |
+| `data-filled`   | Present when the field is filled.            |
+| `data-focused`  | Present when the field control is focused.   |
 
 ### Error
 
-Displays validation error messages. Only renders when the field is invalid. Renders a `<div>` element.
+An error message displayed if the field control fails validation. Renders a `<div>` element.
 
-| Prop    | Type                                     | Default | Description                                                                |
-| ------- | ---------------------------------------- | ------- | -------------------------------------------------------------------------- |
-| `as`    | `string \| Component`                    | `'div'` | The element or component to render.                                        |
-| `match` | `string \| (value, validity) => boolean` | --      | Filters which validity state or custom condition causes the error to show. |
+| Prop    | Type                                     | Default | Description |
+| ------- | ---------------------------------------- | ------- | ----------- |
+| `as`    | `string \| Component`                    | `'div'` | The element or component to render. |
+| `id`    | `string`                                  | auto    | The `id` attribute of the error element. |
+| `match` | `boolean \| keyof ValidityState`         | --      | Determines whether to show the error message according to the field's `ValidityState`. Specifying `true` will always show the error message and lets external libraries control the visibility. |
+| `class` | `string \| ((state: State) => string)`   | --      | CSS class applied to the element, or a function that returns a class based on the component's state. |
+| `style` | `StyleValue \| ((state: State) => StyleValue)` | -- | Style applied to the element, or a function that returns a style object based on the component's state. |
+
+| Attribute             | Description                                  |
+| --------------------- | -------------------------------------------- |
+| `data-disabled`       | Present when the field is disabled.          |
+| `data-valid`          | Present when the field is in valid state.    |
+| `data-invalid`        | Present when the field is in invalid state.  |
+| `data-dirty`          | Present when the field's value has changed.  |
+| `data-touched`        | Present when the field has been touched.     |
+| `data-filled`         | Present when the field is filled.            |
+| `data-focused`        | Present when the field control is focused.   |
+| `data-starting-style` | Present when the error message is animating in. |
+| `data-ending-style`   | Present when the error message is animating out. |
 
 ### Validity
 
-A renderless component that exposes detailed validity data via a scoped slot.
+Used to display a custom message based on the field's validity.
 
-| Slot prop  | Type               | Description                    |
-| ---------- | ------------------ | ------------------------------ |
-| `validity` | `ValidityState`    | The field's validity state.    |
-| `error`    | `string`           | The first error message.       |
-| `errors`   | `string[]`         | All error messages.            |
-| `value`    | `unknown`          | The current field value.       |
+| Slot prop          | Type               | Description |
+| ------------------ | ------------------ | ----------- |
+| `validity`         | `ValidityState`    | The field validity state. |
+| `error`            | `string`           | The first error message. |
+| `errors`           | `string[]`         | All error messages. |
+| `value`            | `unknown`          | The current field value. |
+| `initialValue`     | `unknown`          | The initial field value. |
+| `transitionStatus` | `TransitionStatus` | The current transition status for the invalid state. |
 
 ```vue
 <FieldValidity v-slot="{ validity, error }">
@@ -127,9 +193,23 @@ A renderless component that exposes detailed validity data via a scoped slot.
 </FieldValidity>
 ```
 
-## Accessibility
+### Item
 
-- `<FieldLabel>` is automatically associated with the control via `aria-labelledby`.
-- `<FieldDescription>` is linked via `aria-describedby`.
-- `<FieldControl>` receives `aria-invalid` when the field is in an invalid state.
-- `<FieldError>` content is included in the control's `aria-describedby` for screen reader announcement.
+Groups individual items in a checkbox group or radio group with a label and description. Renders a `<div>` element.
+
+| Prop       | Type                                           | Default | Description |
+| ---------- | ---------------------------------------------- | ------- | ----------- |
+| `as`       | `string \| Component`                          | `'div'` | The element or component to use for the item node. |
+| `disabled` | `boolean`                                      | `false` | Whether the wrapped control should ignore user interaction. The `disabled` prop on `<FieldRoot>` takes precedence over this. |
+| `class`    | `string \| ((state: State) => string)`         | --      | CSS class applied to the element, or a function that returns a class based on the component's state. |
+| `style`    | `StyleValue \| ((state: State) => StyleValue)` | --      | Style applied to the element, or a function that returns a style object based on the component's state. |
+
+| Attribute       | Description                                  |
+| --------------- | -------------------------------------------- |
+| `data-disabled` | Present when the field is disabled.          |
+| `data-valid`    | Present when the field is valid.             |
+| `data-invalid`  | Present when the field is invalid.           |
+| `data-dirty`    | Present when the field's value has changed.  |
+| `data-touched`  | Present when the field has been touched.     |
+| `data-filled`   | Present when the field is filled.            |
+| `data-focused`  | Present when the field control is focused.   |
