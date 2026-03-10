@@ -1,5 +1,5 @@
 import type { InjectionKey, Ref } from 'vue'
-import { inject } from 'vue'
+import { inject, shallowReadonly, shallowRef } from 'vue'
 import { NOOP } from '../utils/empty'
 
 export interface LabelableContext {
@@ -7,21 +7,21 @@ export interface LabelableContext {
    * The `id` of the labelable element.
    * When `null` the association is implicit.
    */
-  controlId: Ref<string | null | undefined>
+  controlId: Readonly<Ref<string | null | undefined>>
   setControlId: (id: string | null | undefined) => void
-  labelId: Ref<string | undefined>
+  labelId: Readonly<Ref<string | undefined>>
   setLabelId: (id: string | undefined) => void
-  messageIds: Ref<string[]>
+  messageIds: Readonly<Ref<string[]>>
   setMessageIds: (updater: (ids: string[]) => string[]) => void
   getDescriptionProps: () => Record<string, string | undefined>
 }
 
 const defaultContext: LabelableContext = {
-  controlId: { value: undefined } as Ref<string | null | undefined>,
+  controlId: shallowReadonly(shallowRef<string | null | undefined>(undefined)),
   setControlId: NOOP,
-  labelId: { value: undefined } as Ref<string | undefined>,
+  labelId: shallowReadonly(shallowRef<string | undefined>(undefined)),
   setLabelId: NOOP,
-  messageIds: { value: [] } as unknown as Ref<string[]>,
+  messageIds: shallowReadonly(shallowRef<string[]>([])),
   setMessageIds: NOOP,
   getDescriptionProps: () => ({}),
 }

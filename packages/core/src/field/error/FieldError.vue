@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { StateAttributesMapping } from '../../utils/getStateAttributesProps'
 import type { BaseUIComponentProps } from '../../utils/types'
 import type { TransitionStatus } from '../../utils/useTransitionStatus'
 import type { FieldRootState } from '../root/FieldRoot.vue'
@@ -22,11 +23,6 @@ const props = withDefaults(defineProps<FieldErrorProps>(), {
   as: 'div',
 })
 
-const stateAttributesMapping = {
-  ...fieldValidityMapping,
-  ...transitionStatusMapping,
-}
-
 export interface FieldErrorState extends FieldRootState {
   transitionStatus: TransitionStatus
 }
@@ -42,6 +38,11 @@ export interface FieldErrorProps extends BaseUIComponentProps<FieldErrorState> {
    * (show when field is invalid).
    */
   match?: boolean | keyof ValidityState
+}
+
+const stateAttributesMapping: StateAttributesMapping<FieldErrorState> = {
+  ...fieldValidityMapping,
+  ...transitionStatusMapping,
 }
 
 const attrs = useAttrs()
@@ -117,7 +118,7 @@ const state = computed<FieldErrorState>(() => ({
 }))
 
 const mergedProps = computed(() => {
-  const stateAttributes = getStateAttributesProps(state.value, stateAttributesMapping as any)
+  const stateAttributes = getStateAttributesProps(state.value, stateAttributesMapping)
   return {
     ...attrs,
     id,
@@ -127,28 +128,20 @@ const mergedProps = computed(() => {
     ...stateAttributes,
   }
 })
-
-const errorContent = computed(() => {
-  const msg = errorMessage.value
-  if (Array.isArray(msg)) {
-    return msg
-  }
-  return msg
-})
 </script>
 
 <template>
   <component :is="props.as" v-if="mounted" v-bind="mergedProps">
     <slot v-if="$slots.default" />
-    <template v-else-if="Array.isArray(errorContent)">
+    <template v-else-if="Array.isArray(errorMessage)">
       <ul>
-        <li v-for="message in errorContent" :key="message">
+        <li v-for="message in errorMessage" :key="message">
           {{ message }}
         </li>
       </ul>
     </template>
     <template v-else>
-      {{ errorContent }}
+      {{ errorMessage }}
     </template>
   </component>
 </template>

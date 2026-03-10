@@ -1,4 +1,4 @@
-export enum FieldControlDataAttributes {
+export enum FieldDescriptionDataAttributes {
   /**
    * Present when the field is disabled.
    */

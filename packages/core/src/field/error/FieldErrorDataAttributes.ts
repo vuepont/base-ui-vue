@@ -1,4 +1,4 @@
-export enum FieldControlDataAttributes {
+export enum FieldErrorDataAttributes {
   /**
    * Present when the field is disabled.
    */
@@ -27,4 +27,12 @@ export enum FieldControlDataAttributes {
    * Present when the field control is focused.
    */
   focused = 'data-focused',
+  /**
+   * Present when the error message is animating in.
+   */
+  startingStyle = 'data-starting-style',
+  /**
+   * Present when the error message is animating out.
+   */
+  endingStyle = 'data-ending-style',
 }

@@ -1,4 +1,4 @@
-import { computed, onUnmounted } from 'vue'
+import { computed, watchEffect } from 'vue'
 import { useBaseUiId } from '../utils/useBaseUiId'
 import { useLabelableContext } from './LabelableContext'
 
@@ -13,12 +13,17 @@ export function useLabelableId(params: UseLabelableIdParameters = {}) {
   const defaultId = useBaseUiId(id)
   const resolvedId = id ?? defaultId
 
-  if (resolvedId) {
-    setControlId(resolvedId)
-  }
+  watchEffect((onCleanup) => {
+    if (!resolvedId) {
+      setControlId(undefined)
+      return
+    }
 
-  onUnmounted(() => {
-    setControlId(undefined)
+    setControlId(resolvedId)
+
+    onCleanup(() => {
+      setControlId(undefined)
+    })
   })
 
   return computed(() => controlId.value ?? defaultId)

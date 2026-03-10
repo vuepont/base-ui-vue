@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import type { BaseUIComponentProps } from '../../utils/types'
 import type { FieldRootState } from '../root/FieldRoot.vue'
-import { computed, ref, useAttrs, watchEffect } from 'vue'
+import { computed, ref, shallowRef, useAttrs, useTemplateRef, watchEffect } from 'vue'
 import { useLabelableContext } from '../../labelable-provider/LabelableContext'
+import { useAriaLabelledBy } from '../../labelable-provider/useAriaLabelledBy'
 import { useLabelableId } from '../../labelable-provider/useLabelableId'
 import { getStateAttributesProps } from '../../utils/getStateAttributesProps'
 import { useFieldRootContext } from '../root/FieldRootContext'
@@ -70,12 +71,10 @@ const state = computed<FieldControlState>(() => ({
   disabled: disabled.value,
 }))
 
-const { labelId } = useLabelableContext()
-
 const controlId = useLabelableId({ id: props.id })
 
 const isControlled = computed(() => props.value !== undefined)
-const internalValue = ref(props.defaultValue ?? '')
+const internalValue = shallowRef(props.defaultValue ?? '')
 
 const currentValue = computed(() => {
   if (isControlled.value)
@@ -84,12 +83,40 @@ const currentValue = computed(() => {
 })
 
 const inputElementRef = ref<HTMLElement | null>(null)
+const templateRef = useTemplateRef<unknown>('control')
 
-function setInputRef(el: any) {
-  const element = (el?.$el ?? el) as HTMLElement | null
-  inputElementRef.value = element
-  validation.inputRef.value = element as HTMLInputElement | null
+function isHTMLElement(value: unknown): value is HTMLElement {
+  return typeof HTMLElement !== 'undefined' && value instanceof HTMLElement
 }
+
+function resolveHTMLElement(value: unknown): HTMLElement | null {
+  if (isHTMLElement(value)) {
+    return value
+  }
+  if (value && typeof value === 'object' && '$el' in value) {
+    const el = (value as { $el?: unknown }).$el
+    if (isHTMLElement(el)) {
+      return el
+    }
+  }
+  return null
+}
+
+const { labelId } = useLabelableContext()
+const ariaLabelledByAttr = computed(() => attrs['aria-labelledby'] as string | undefined)
+const ariaLabelledBy = useAriaLabelledBy({
+  ariaLabelledBy: ariaLabelledByAttr,
+  labelId,
+  labelSourceRef: inputElementRef,
+  enableFallback: true,
+  labelSourceId: controlId.value ?? undefined,
+})
+
+watchEffect(() => {
+  const element = resolveHTMLElement(templateRef.value)
+  inputElementRef.value = element
+  validation.setInputRef(element as HTMLInputElement | null)
+})
 
 useField({
   id: controlId,
@@ -159,7 +186,7 @@ const mergedProps = computed(() => {
     'id': controlId.value,
     'disabled': disabled.value,
     'name': name.value,
-    'aria-labelledby': labelId.value,
+    'aria-labelledby': ariaLabelledBy.value,
     'autofocus': props.autofocus || undefined,
     'type': props.type,
     'required': props.required,
@@ -191,7 +218,7 @@ const mergedProps = computed(() => {
 <template>
   <component
     :is="props.as"
-    :ref="setInputRef"
+    ref="control"
     v-bind="mergedProps"
     @input="handleInputCombined"
     @focus="handleFocus"

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { BaseUIComponentProps } from '../../utils/types'
 import type { FieldRootState } from '../root/FieldRoot.vue'
-import { computed, onMounted, onUnmounted, ref, useAttrs } from 'vue'
+import { computed, ref, useAttrs, watchEffect } from 'vue'
 import { useLabelableContext } from '../../labelable-provider/LabelableContext'
 import { getStateAttributesProps } from '../../utils/getStateAttributesProps'
 import { useBaseUiId } from '../../utils/useBaseUiId'
@@ -43,12 +43,10 @@ const labelId = computed(() => props.id ?? contextLabelId.value ?? generatedLabe
 
 const labelRef = ref<HTMLElement | null>(null)
 
-onMounted(() => {
-  setLabelId(labelId.value)
-})
-
-onUnmounted(() => {
-  setLabelId(undefined)
+watchEffect((onCleanup) => {
+  const id = labelId.value
+  setLabelId(id)
+  onCleanup(() => setLabelId(undefined))
 })
 
 function handleInteraction(event: MouseEvent) {

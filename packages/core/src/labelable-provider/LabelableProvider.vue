@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { LabelableContext } from './LabelableContext'
-import { computed, provide, ref } from 'vue'
+import { provide, ref } from 'vue'
 import { labelableContextKey, useLabelableContext } from './LabelableContext'
 
 export interface LabelableProviderProps {
@@ -30,14 +30,12 @@ function setMessageIds(updater: (ids: string[]) => string[]) {
   messageIds.value = updater(messageIds.value)
 }
 
-const getDescriptionProps = computed(() => {
-  return () => {
-    const parentIds = parent.messageIds.value
-    const allIds = parentIds.concat(messageIds.value)
-    const describedBy = allIds.join(' ') || undefined
-    return { 'aria-describedby': describedBy }
-  }
-}).value
+function getDescriptionProps() {
+  const parentIds = parent.messageIds.value
+  const allIds = parentIds.concat(messageIds.value)
+  const describedBy = allIds.join(' ') || undefined
+  return { 'aria-describedby': describedBy }
+}
 
 const contextValue: LabelableContext = {
   controlId,

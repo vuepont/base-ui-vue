@@ -1,5 +1,5 @@
 import type { Ref } from 'vue'
-import { onUnmounted, watchEffect } from 'vue'
+import { watchEffect } from 'vue'
 import { useFormContext } from '../form/FormContext'
 import { useFieldRootContext } from './root/FieldRootContext'
 import { getCombinedFieldValidityData } from './utils/getCombinedFieldValidityData'
@@ -37,7 +37,7 @@ export function useField(params: UseFieldParameters) {
     }
   })
 
-  watchEffect(() => {
+  watchEffect((onCleanup) => {
     if (enabled && !enabled.value) {
       return
     }
@@ -47,12 +47,14 @@ export function useField(params: UseFieldParameters) {
       return
     }
 
-    formRef.value.fields.set(currentId, {
+    const fields = formRef.value.fields
+
+    fields.set(currentId, {
       getValue,
       name: name?.value,
       controlRef,
-      validityData: getCombinedFieldValidityData(validityData.value, invalid),
-      validate(_flushSync = true) {
+      validityData: getCombinedFieldValidityData(validityData.value, invalid.value),
+      validate() {
         let nextValue = value.value
         if (nextValue === undefined) {
           nextValue = getValue()
@@ -63,12 +65,9 @@ export function useField(params: UseFieldParameters) {
         commit(nextValue)
       },
     })
-  })
 
-  onUnmounted(() => {
-    const currentId = id.value
-    if (currentId) {
-      formRef.value.fields.delete(currentId)
-    }
+    onCleanup(() => {
+      fields.delete(currentId)
+    })
   })
 }

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { BaseUIComponentProps } from '../../utils/types'
 import type { FieldRootState } from '../root/FieldRoot.vue'
-import { computed, onMounted, onUnmounted, useAttrs } from 'vue'
+import { computed, useAttrs, watchEffect } from 'vue'
 import { useLabelableContext } from '../../labelable-provider/LabelableContext'
 import { getStateAttributesProps } from '../../utils/getStateAttributesProps'
 import { useBaseUiId } from '../../utils/useBaseUiId'
@@ -28,20 +28,17 @@ const props = withDefaults(defineProps<FieldDescriptionProps>(), {
 
 const attrs = useAttrs()
 
-const id = useBaseUiId(props.id)
+const generatedId = useBaseUiId(undefined)
+const id = computed(() => props.id ?? generatedId)
 
 const fieldRootContext = useFieldRootContext(false)
 const { setMessageIds } = useLabelableContext()
 
-onMounted(() => {
-  if (id) {
-    setMessageIds(ids => ids.concat(id))
-  }
-})
-
-onUnmounted(() => {
-  if (id) {
-    setMessageIds(ids => ids.filter(item => item !== id))
+watchEffect((onCleanup) => {
+  const currentId = id.value
+  if (currentId) {
+    setMessageIds(ids => ids.concat(currentId))
+    onCleanup(() => setMessageIds(ids => ids.filter(item => item !== currentId)))
   }
 })
 
@@ -49,7 +46,7 @@ const mergedProps = computed(() => {
   const stateAttributes = getStateAttributesProps(fieldRootContext.state.value, fieldValidityMapping)
   return {
     ...attrs,
-    id,
+    id: id.value,
     class: typeof props.class === 'function' ? props.class(fieldRootContext.state.value) : props.class,
     style: typeof props.style === 'function' ? props.style(fieldRootContext.state.value) : props.style,
     ...stateAttributes,

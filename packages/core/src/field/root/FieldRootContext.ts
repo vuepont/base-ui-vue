@@ -2,32 +2,32 @@ import type { InjectionKey, Ref } from 'vue'
 import type { FormValidationMode } from '../../form/FormContext'
 import type { FieldRootState, FieldValidityData } from './FieldRoot.vue'
 import type { UseFieldValidationReturnValue } from './useFieldValidation'
-import { inject, ref } from 'vue'
+import { inject, ref, shallowReadonly, shallowRef } from 'vue'
 import { NOOP } from '../../utils/empty'
 import { DEFAULT_FIELD_ROOT_STATE, DEFAULT_VALIDITY_STATE } from '../utils/constants'
 
 export interface FieldRootContext {
-  invalid: boolean | undefined
-  name: Ref<string | undefined>
-  validityData: Ref<FieldValidityData>
+  invalid: Readonly<Ref<boolean | undefined>>
+  name: Readonly<Ref<string | undefined>>
+  validityData: Readonly<Ref<FieldValidityData>>
   setValidityData: (data: FieldValidityData) => void
-  disabled: Ref<boolean>
-  touched: Ref<boolean>
+  disabled: Readonly<Ref<boolean>>
+  touched: Readonly<Ref<boolean>>
   setTouched: (value: boolean) => void
-  dirty: Ref<boolean>
+  dirty: Readonly<Ref<boolean>>
   setDirty: (value: boolean) => void
-  filled: Ref<boolean>
+  filled: Readonly<Ref<boolean>>
   setFilled: (value: boolean) => void
-  focused: Ref<boolean>
+  focused: Readonly<Ref<boolean>>
   setFocused: (value: boolean) => void
   validate: (
     value: unknown,
     formValues: Record<string, unknown>,
   ) => string | string[] | null | Promise<string | string[] | null>
-  validationMode: Ref<FormValidationMode>
-  validationDebounceTime: Ref<number>
+  validationMode: Readonly<Ref<FormValidationMode>>
+  validationDebounceTime: Readonly<Ref<number>>
   shouldValidateOnChange: () => boolean
-  state: Ref<FieldRootState>
+  state: Readonly<Ref<FieldRootState>>
   markedDirtyRef: Ref<boolean>
   validation: UseFieldValidationReturnValue
 }
@@ -36,12 +36,13 @@ function createDefaultContext(): FieldRootContext {
   const defaultValidation: UseFieldValidationReturnValue = {
     getValidationProps: () => ({}),
     getInputValidationProps: () => ({}),
-    inputRef: ref<HTMLInputElement | null>(null),
+    inputRef: shallowReadonly(shallowRef<HTMLInputElement | null>(null)),
+    setInputRef: () => {},
     commit: async () => {},
   }
 
   return {
-    invalid: undefined,
+    invalid: ref(undefined),
     name: ref<string | undefined>(undefined),
     validityData: ref<FieldValidityData>({
       state: { ...DEFAULT_VALIDITY_STATE },

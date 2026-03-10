@@ -74,7 +74,6 @@ An accessible label that is automatically associated with the field control. Ren
 | Prop          | Type                  | Default   | Description |
 | ------------- | --------------------- | --------- | ----------- |
 | `as`          | `string \| Component` | `'label'` | The element or component to render. |
-| `id`          | `string`              | auto      | The `id` attribute of the label element. |
 | `nativeLabel` | `boolean`             | `true`    | Whether the component renders a native `<label>` element. Set to `false` when rendering a non-label element. |
 | `class`       | `string \| ((state: State) => string)` | -- | CSS class applied to the element, or a function that returns a class based on the component's state. |
 | `style`       | `StyleValue \| ((state: State) => StyleValue)` | -- | Style applied to the element, or a function that returns a style object based on the component's state. |
@@ -93,30 +92,18 @@ An accessible label that is automatically associated with the field control. Ren
 
 The form control to label and validate. Renders an `<input>` element.
 
+You can omit this part and use any Base UI input component instead. For example, `Input`, `Checkbox`, or `Select`, among others, will work with Field out of the box.
+
 | Prop           | Type                  | Default   | Description |
 | -------------- | --------------------- | --------- | ----------- |
 | `as`           | `string \| Component` | `'input'` | The element or component to render. |
-| `id`           | `string`              | auto      | The `id` attribute of the control element. |
-| `name`         | `string`              | --        | Identifies the control when a form is submitted. |
-| `value`        | `string`              | --        | The controlled value. |
 | `defaultValue` | `string`              | `''`      | The initial uncontrolled value. |
-| `disabled`     | `boolean`             | `false`   | Whether the component should ignore user interaction. |
-| `autofocus`    | `boolean`             | `false`   | Whether the control should receive focus on mount. |
-| `type`         | `string`              | --        | The type of the input. |
-| `required`     | `boolean`             | --        | Whether the control is required. |
-| `pattern`      | `string`              | --        | Pattern the value must match to be valid. |
-| `minlength`    | `number`              | --        | Minimum number of characters allowed. |
-| `maxlength`    | `number`              | --        | Maximum number of characters allowed. |
-| `min`          | `string \| number`    | --        | Minimum allowed value. |
-| `max`          | `string \| number`    | --        | Maximum allowed value. |
-| `step`         | `string \| number`    | --        | Granularity that the value must adhere to. |
-| `placeholder`  | `string`              | --        | Placeholder text for the control. |
 | `class`        | `string \| ((state: State) => string)` | -- | CSS class applied to the element, or a function that returns a class based on the component's state. |
 | `style`        | `StyleValue \| ((state: State) => StyleValue)` | -- | Style applied to the element, or a function that returns a style object based on the component's state. |
 
-| Emits         | Type                  | Description |
+| Emits         | Type                     | Description |
 | ------------- | ------------------------ | ----------- |
-| `valueChange` | `(value: string, event)` | Fired when the `value` changes. Use when controlled. |
+| `valueChange` | `(value: string, event: Event)` | Fired when the `value` changes. Use when controlled. |
 
 | Attribute       | Description                                  |
 | --------------- | -------------------------------------------- |
@@ -135,7 +122,6 @@ A paragraph with additional information about the field. Renders a `<p>` element
 | Prop    | Type                  | Default | Description |
 | ------- | --------------------- | ------- | ----------- |
 | `as`    | `string \| Component` | `'p'`   | The element or component to render. |
-| `id`    | `string`              | auto    | The `id` attribute of the description element. |
 | `class` | `string \| ((state: State) => string)` | -- | CSS class applied to the element, or a function that returns a class based on the component's state. |
 | `style` | `StyleValue \| ((state: State) => StyleValue)` | -- | Style applied to the element, or a function that returns a style object based on the component's state. |
 
@@ -160,16 +146,6 @@ Groups individual items in a checkbox group or radio group with a label and desc
 | `class`    | `string \| ((state: State) => string)`         | --      | CSS class applied to the element, or a function that returns a class based on the component's state. |
 | `style`    | `StyleValue \| ((state: State) => StyleValue)` | --      | Style applied to the element, or a function that returns a style object based on the component's state. |
 
-| Attribute       | Description                                  |
-| --------------- | -------------------------------------------- |
-| `data-disabled` | Present when the field is disabled.          |
-| `data-valid`    | Present when the field is valid.             |
-| `data-invalid`  | Present when the field is invalid.           |
-| `data-dirty`    | Present when the field's value has changed.  |
-| `data-touched`  | Present when the field has been touched.     |
-| `data-filled`   | Present when the field is filled.            |
-| `data-focused`  | Present when the field control is focused.   |
-
 ### Error
 
 An error message displayed if the field control fails validation. Renders a `<div>` element.
@@ -177,7 +153,6 @@ An error message displayed if the field control fails validation. Renders a `<di
 | Prop    | Type                                     | Default | Description |
 | ------- | ---------------------------------------- | ------- | ----------- |
 | `as`    | `string \| Component`                    | `'div'` | The element or component to render. |
-| `id`    | `string`                                  | auto    | The `id` attribute of the error element. |
 | `match` | `boolean \| keyof ValidityState`         | --      | Determines whether to show the error message according to the field's `ValidityState`. Specifying `true` will always show the error message and lets external libraries control the visibility. |
 | `class` | `string \| ((state: State) => string)`   | --      | CSS class applied to the element, or a function that returns a class based on the component's state. |
 | `style` | `StyleValue \| ((state: State) => StyleValue)` | -- | Style applied to the element, or a function that returns a style object based on the component's state. |
@@ -191,14 +166,12 @@ An error message displayed if the field control fails validation. Renders a `<di
 | `data-touched`        | Present when the field has been touched.     |
 | `data-filled`         | Present when the field is filled.            |
 | `data-focused`        | Present when the field control is focused.   |
-| `data-starting-style` | Present when the error message is animating in. |
-| `data-ending-style`   | Present when the error message is animating out. |
 
 ### Validity
 
 Used to display a custom message based on the field's validity.
 
-| Slot prop          | Type               | Description |
+| Slots              | Type               | Description |
 | ------------------ | ------------------ | ----------- |
 | `validity`         | `ValidityState`    | The field validity state. |
 | `error`            | `string`           | The first error message. |
@@ -206,14 +179,3 @@ Used to display a custom message based on the field's validity.
 | `value`            | `unknown`          | The current field value. |
 | `initialValue`     | `unknown`          | The initial field value. |
 | `transitionStatus` | `TransitionStatus` | The current transition status for the invalid state. |
-
-```vue
-<FieldValidity v-slot="{ validity, error }">
-  <p v-if="validity.valueMissing">
-    This field is required.
-  </p>
-  <p v-else-if="error">
-    {{ error }}
-  </p>
-</FieldValidity>
-```

@@ -1,6 +1,6 @@
 import type { Ref } from 'vue'
 import type { FieldRootState, FieldValidityData } from './FieldRoot.vue'
-import { ref } from 'vue'
+import { shallowReadonly, shallowRef } from 'vue'
 import { useFormContext } from '../../form/FormContext'
 import { useTimeout } from '../../utils/useTimeout'
 import { DEFAULT_VALIDITY_STATE } from '../utils/constants'
@@ -43,10 +43,20 @@ export interface UseFieldValidationParameters {
   shouldValidateOnChange: () => boolean
 }
 
+export interface FieldValidationProps {
+  'aria-describedby'?: string
+  'aria-invalid'?: true
+}
+
+export interface FieldInputValidationProps extends FieldValidationProps {
+  onInput?: (event: Event) => void
+}
+
 export interface UseFieldValidationReturnValue {
-  getValidationProps: () => Record<string, any>
-  getInputValidationProps: () => Record<string, any>
-  inputRef: Ref<HTMLInputElement | null>
+  getValidationProps: () => FieldValidationProps
+  getInputValidationProps: () => FieldInputValidationProps
+  inputRef: Readonly<Ref<HTMLInputElement | null>>
+  setInputRef: (element: HTMLInputElement | null) => void
   commit: (value: unknown, revalidate?: boolean) => Promise<void>
 }
 
@@ -70,7 +80,11 @@ export function useFieldValidation(
   } = params
 
   const timeout = useTimeout()
-  const inputRef = ref<HTMLInputElement | null>(null)
+  const inputRef = shallowRef<HTMLInputElement | null>(null)
+
+  function setInputRef(element: HTMLInputElement | null) {
+    inputRef.value = element
+  }
 
   async function commit(value: unknown, revalidate = false) {
     const element = inputRef.value
@@ -234,13 +248,13 @@ export function useFieldValidation(
     setValidityData(nextValidityData)
   }
 
-  function getValidationProps() {
+  function getValidationProps(): FieldValidationProps {
     const descProps = getDescriptionProps()
     const ariaInvalid = state.value.valid === false ? { 'aria-invalid': true as const } : {}
     return { ...descProps, ...ariaInvalid }
   }
 
-  function getInputValidationProps() {
+  function getInputValidationProps(): FieldInputValidationProps {
     return {
       onInput(event: Event) {
         const target = event.target as HTMLInputElement
@@ -277,7 +291,8 @@ export function useFieldValidation(
   return {
     getValidationProps,
     getInputValidationProps,
-    inputRef,
+    inputRef: shallowReadonly(inputRef),
+    setInputRef,
     commit,
   }
 }

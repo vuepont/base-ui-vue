@@ -1,6 +1,6 @@
 import type { StateAttributesMapping } from '../../utils/getStateAttributesProps'
 import type { FieldRootState, FieldValidityData } from '../root/FieldRoot.vue'
-import { FieldControlDataAttributes } from '../control/FieldControlDataAttributes'
+import { FieldRootDataAttributes } from '../root/FieldRootDataAttributes'
 
 export const DEFAULT_VALIDITY_STATE: FieldValidityData['state'] = {
   badInput: false,
@@ -32,14 +32,14 @@ export const DEFAULT_FIELD_ROOT_STATE: FieldRootState = {
   ...DEFAULT_FIELD_STATE_ATTRIBUTES,
 }
 
-export const fieldValidityMapping: StateAttributesMapping<{ valid: boolean | null }> = {
+export const fieldValidityMapping: StateAttributesMapping<Pick<FieldRootState, 'valid'>> = {
   valid(value: boolean | null): Record<string, string> | null {
     if (value === null) {
       return null
     }
     if (value) {
-      return { [FieldControlDataAttributes.valid]: '' }
+      return { [FieldRootDataAttributes.valid]: '' }
     }
-    return { [FieldControlDataAttributes.invalid]: '' }
+    return { [FieldRootDataAttributes.invalid]: '' }
   },
 }

@@ -3,14 +3,16 @@ import type { FormValidationMode } from '../../form/FormContext'
 import type { LabelableContext } from '../../labelable-provider/LabelableContext'
 import type { BaseUIComponentProps } from '../../utils/types'
 import type { FieldRootContext } from './FieldRootContext'
-import { computed, provide, ref, useAttrs } from 'vue'
+import { computed, provide, ref, shallowReadonly, useAttrs } from 'vue'
 import { useFieldsetRootContext } from '../../fieldset/root/FieldsetRootContext'
 import { useFormContext } from '../../form/FormContext'
 import { labelableContextKey, useLabelableContext } from '../../labelable-provider/LabelableContext'
 import { getStateAttributesProps } from '../../utils/getStateAttributesProps'
-import { DEFAULT_VALIDITY_STATE, fieldValidityMapping } from '../utils/constants'
+import { fieldValidityMapping } from '../utils/constants'
 import { fieldRootContextKey } from './FieldRootContext'
+import { useFieldRootState } from './useFieldRootState'
 import { useFieldValidation } from './useFieldValidation'
+import { useFieldValidity } from './useFieldValidity'
 
 export interface FieldValidityData {
   state: {
@@ -155,37 +157,6 @@ const labelableContext: LabelableContext = {
 
 provide(labelableContextKey, labelableContext)
 
-const touchedState = ref(false)
-const dirtyState = ref(false)
-const filled = ref(false)
-const focused = ref(false)
-const markedDirtyRef = ref(false)
-
-const touched = computed(() => props.touched ?? touchedState.value)
-const dirty = computed(() => props.dirty ?? dirtyState.value)
-
-function setDirty(value: boolean) {
-  if (props.dirty !== undefined)
-    return
-  if (value)
-    markedDirtyRef.value = true
-  dirtyState.value = value
-}
-
-function setTouched(value: boolean) {
-  if (props.touched !== undefined)
-    return
-  touchedState.value = value
-}
-
-function setFilled(value: boolean) {
-  filled.value = value
-}
-
-function setFocused(value: boolean) {
-  focused.value = value
-}
-
 const { errors: formErrors } = useFormContext()
 
 const hasFormError = computed(() => {
@@ -194,32 +165,33 @@ const hasFormError = computed(() => {
 })
 const invalid = computed(() => props.invalid === true || hasFormError.value)
 
-const validityData = ref<FieldValidityData>({
-  state: { ...DEFAULT_VALIDITY_STATE },
-  error: '',
-  errors: [],
-  value: null,
-  initialValue: null,
-})
+const { validityData, setValidityData, valid } = useFieldValidity({ invalid })
 
-function setValidityData(data: FieldValidityData) {
-  validityData.value = data
-}
-
-const valid = computed(() => !invalid.value && validityData.value.state.valid)
-
-function shouldValidateOnChange() {
+const shouldValidateOnChange = computed(() => {
   return validationModeRef.value === 'onChange'
     || (validationModeRef.value === 'onSubmit' && submitAttempted.value)
-}
+})
+
+const {
+  touched,
+  dirty,
+  filled,
+  focused,
+  setTouched,
+  setDirty,
+  setFilled,
+  setFocused,
+  markedDirtyRef,
+  stateWithoutValidity,
+} = useFieldRootState({
+  disabled,
+  touchedProp: computed(() => props.touched),
+  dirtyProp: computed(() => props.dirty),
+})
 
 const state = computed<FieldRootState>(() => ({
-  disabled: disabled.value,
-  touched: touched.value,
-  dirty: dirty.value,
   valid: valid.value,
-  filled: filled.value,
-  focused: focused.value,
+  ...stateWithoutValidity.value,
 }))
 
 const validation = useFieldValidation({
@@ -233,13 +205,13 @@ const validation = useFieldValidation({
   markedDirtyRef,
   state,
   name: nameRef,
-  shouldValidateOnChange,
+  shouldValidateOnChange: () => shouldValidateOnChange.value,
 })
 
 const contextValue: FieldRootContext = {
-  get invalid() { return invalid.value },
+  invalid,
   name: nameRef,
-  validityData,
+  validityData: shallowReadonly(validityData),
   setValidityData,
   disabled,
   touched,
@@ -253,7 +225,7 @@ const contextValue: FieldRootContext = {
   validate: (value, formValues) => validateFn.value(value, formValues),
   validationMode: validationModeRef,
   validationDebounceTime: validationDebounceTimeRef,
-  shouldValidateOnChange,
+  shouldValidateOnChange: () => shouldValidateOnChange.value,
   state,
   markedDirtyRef,
   validation,

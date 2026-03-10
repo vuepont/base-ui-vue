@@ -18,7 +18,7 @@ defineOptions({
 const { validityData, invalid } = useFieldRootContext(false)
 
 const combinedFieldValidityData = computed(() =>
-  getCombinedFieldValidityData(validityData.value, invalid),
+  getCombinedFieldValidityData(validityData.value, invalid.value),
 )
 
 const isInvalid = computed(() => combinedFieldValidityData.value.state.valid === false)

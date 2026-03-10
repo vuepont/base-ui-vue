@@ -30,7 +30,7 @@ export interface FormFieldValidityData {
 
 export interface FormField {
   name: string | undefined
-  validate: (flushSync?: boolean) => void
+  validate: () => void
   validityData: FormFieldValidityData
   controlRef: { value: HTMLElement | null }
   getValue: () => unknown
