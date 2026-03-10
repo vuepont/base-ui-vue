@@ -114,7 +114,7 @@ describe('mergeProps', () => {
     expect(mergedProps.style).toBeUndefined()
   })
 
-  it('merges classes with rightmost first', () => {
+  it('merges classes natively (leftmost first)', () => {
     const theirProps = {
       class: 'external-class',
     }
@@ -123,7 +123,7 @@ describe('mergeProps', () => {
     }
     const mergedProps = mergeProps(ourProps, theirProps)
 
-    expect(mergedProps.class).toBe('external-class internal-class')
+    expect(mergedProps.class).toBe('internal-class external-class')
   })
 
   it('merges multiple classes', () => {
@@ -139,7 +139,7 @@ describe('mergeProps', () => {
       },
     )
 
-    expect(mergedProps.class).toBe('class-3 class-2 class-1')
+    expect(mergedProps.class).toBe('class-1 class-2 class-3')
   })
 
   it('merges classes with undefined', () => {

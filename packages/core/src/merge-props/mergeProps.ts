@@ -1,4 +1,5 @@
 import type { BaseUIEvent } from '../utils/types'
+import { mergeProps as vueMergeProps } from 'vue'
 
 export function makeEventPreventable<T extends Event>(
   event: T,
@@ -43,69 +44,49 @@ function isEventHandler(key: string, value: unknown) {
     key.startsWith('on')
     && key.charCodeAt(2) >= 65
     && key.charCodeAt(2) <= 90
-    && (typeof value === 'function' || typeof value === 'undefined')
+    && (typeof value === 'function'
+      || Array.isArray(value)
+      || typeof value === 'undefined')
   )
-}
-
-function mergeEventHandlers(
-  ourHandler: ((...args: any[]) => void) | undefined,
-  theirHandler: ((...args: any[]) => void) | undefined,
-) {
-  if (!theirHandler)
-    return ourHandler
-  if (!ourHandler)
-    return theirHandler
-
-  return (event: unknown) => {
-    if (event != null && typeof event === 'object') {
-      const baseUIEvent = makeEventPreventable(event as Event)
-
-      ourHandler(baseUIEvent)
-
-      if (!baseUIEvent.baseUIHandlerPrevented) {
-        theirHandler(baseUIEvent)
-      }
-    }
-    else {
-      ourHandler(event)
-      theirHandler(event)
-    }
-
-    return undefined
-  }
 }
 
 /**
  * Merges multiple sets of props.
  * Follows the Base UI Vue pattern: rightmost takes precedence, except for:
  * - Event handlers: Merged, leftmost (internal) executes first, can prevent rightmost.
- * - class: Concatenated.
- * - style: Merged.
+ * - class: Concatenated natively by Vue.
+ * - style: Merged natively by Vue.
  */
-export function mergeProps(...args: (Record<string, any> | undefined)[]) {
-  const merged: Record<string, any> = {}
+export function mergeProps(
+  ...args: (Record<string, any> | undefined)[]
+): Record<string, any> {
+  const merged = vueMergeProps(...(args as any))
 
-  for (const props of args) {
-    if (!props)
-      continue
+  for (const propName in merged) {
+    if (isEventHandler(propName, merged[propName])) {
+      const handlers = merged[propName]
+      if (Array.isArray(handlers)) {
+        // Flatten the handlers array in case Vue returns nested arrays
+        const flatHandlers = handlers.flat(Infinity).filter(Boolean) as ((
+          ...args: any[]
+        ) => void)[]
 
-    for (const propName in props) {
-      const value = props[propName]
-
-      switch (propName) {
-        case 'style':
-          merged[propName] = mergeObjects(merged.style, value)
-          break
-        case 'class':
-          merged.class = mergeClasses(merged.class, value)
-          break
-        default:
-          if (isEventHandler(propName, value)) {
-            merged[propName] = mergeEventHandlers(merged[propName], value)
+        merged[propName] = (event: unknown) => {
+          if (event != null && typeof event === 'object') {
+            const baseUIEvent = makeEventPreventable(event as Event)
+            for (const handler of flatHandlers) {
+              handler(baseUIEvent)
+              if (baseUIEvent.baseUIHandlerPrevented) {
+                break
+              }
+            }
           }
           else {
-            merged[propName] = value
+            for (const handler of flatHandlers) {
+              handler(event)
+            }
           }
+        }
       }
     }
   }

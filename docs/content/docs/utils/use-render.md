@@ -1,8 +1,6 @@
 # useRender
 
-<Subtitle>Composable for enabling renderless mode in custom components.</Subtitle>
-
-<Meta name="description" content="Composable for enabling renderless mode in custom components." />
+Composable for enabling renderless mode in custom components.
 
 The `useRender` composable lets you build custom components that can change their rendered tag using an `as` prop, and provides a renderless mode to let consumers completely override the default rendered element.
 
