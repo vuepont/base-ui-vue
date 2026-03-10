@@ -1,0 +1,73 @@
+ WARN  Unsupported engine: wanted: {"node":">=22.18.0"} (current: {"node":"v22.14.0","pnpm":"10.30.3"})
+
+> base-ui-vue@0.0.0 build /Users/peoray/Documents/code/oss/base-ui/vue
+> pnpm run --filter base-ui-vue build && pnpm run --filter plugins build
+
+.                                        |  WARN  Unsupported engine: wanted: {"node":">=22.18.0"} (current: {"node":"v22.14.0","pnpm":"10.30.3"})
+Scope: 2 of 4 workspace projects
+packages/core build$ pnpm type-check && pnpm build-only
+packages/core build: ../..                                    |  WARN  Unsupported engine: wanted: {"node":">=22.18.0"} (current: {"node":"v22.14.0","pnpm":"10.30.3"})
+packages/core build: > base-ui-vue@0.0.0 type-check /Users/peoray/Documents/code/oss/base-ui/vue/packages/core
+packages/core build: > vue-tsc -p tsconfig.check.json --noEmit
+packages/core build: ../..                                    |  WARN  Unsupported engine: wanted: {"node":">=22.18.0"} (current: {"node":"v22.14.0","pnpm":"10.30.3"})
+packages/core build: > base-ui-vue@0.0.0 build-only /Users/peoray/Documents/code/oss/base-ui/vue/packages/core
+packages/core build: > tsdown && tsx scripts/postbuild.ts
+packages/core build: [34mℹ[39m tsdown [2mv0.20.3[22m powered by rolldown [2mv1.0.0-rc.3[22m
+packages/core build: [34mℹ[39m config file: [4m/Users/peoray/Documents/code/oss/base-ui/vue/packages/core/tsdown.config.ts[24m (unrun)
+packages/core build: [34mℹ[39m entry: [34msrc/index.ts[39m
+packages/core build: [34mℹ[39m tsconfig: [34mtsconfig.app.json[39m
+packages/core build: [34mℹ[39m Using Vite config: [4m/Users/peoray/Documents/code/oss/base-ui/vue/packages/core/vite.config.ts[24m
+packages/core build: [34mℹ[39m Build start
+packages/core build: [34mℹ[39m Cleaning 44 files
+packages/core build:  WARN  advancedChunks option is deprecated, please use codeSplitting instead.
+packages/core build:  WARN  advancedChunks option is deprecated, please use codeSplitting instead.
+packages/core build:  WARN  advancedChunks option is deprecated, please use codeSplitting instead.
+packages/core build: [34mℹ[39m [33m[CJS][39m [2mdist/[22mindex.d.cts.map  [2m14.27 kB[22m [2m│ gzip: 3.01 kB[22m
+packages/core build: [34mℹ[39m [33m[CJS][39m [2mdist/[22m[32m[1mindex.d.cts[22m[39m      [2m37.66 kB[22m [2m│ gzip: 7.04 kB[22m
+packages/core build: [34mℹ[39m [33m[CJS][39m 2 files, total: 51.94 kB
+packages/core build: [34mℹ[39m [33m[CJS][39m [2mdist/[22m[1mindex.cjs[22m                                    [2m  2.57 kB[22m [2m│ gzip:  0.54 kB[22m
+packages/core build: [34mℹ[39m [33m[CJS][39m [2mdist/[22mindex2.cjs.map                               [2m141.64 kB[22m [2m│ gzip: 24.59 kB[22m
+packages/core build: [34mℹ[39m [33m[CJS][39m [2mdist/[22mindex2.cjs                                   [2m 65.96 kB[22m [2m│ gzip: 12.23 kB[22m
+packages/core build: [34mℹ[39m [33m[CJS][39m [2mdist/[22mbutton/Button.cjs.map                        [2m 33.70 kB[22m [2m│ gzip:  9.30 kB[22m
+packages/core build: [34mℹ[39m [33m[CJS][39m [2mdist/[22mimage/AvatarImage.cjs.map                    [2m 24.07 kB[22m [2m│ gzip:  6.25 kB[22m
+packages/core build: [34mℹ[39m [33m[CJS][39m [2mdist/[22mbutton/Button.cjs                            [2m 15.88 kB[22m [2m│ gzip:  4.45 kB[22m
+packages/core build: [34mℹ[39m [33m[CJS][39m [2mdist/[22mimage/AvatarImage.cjs                        [2m 12.26 kB[22m [2m│ gzip:  3.43 kB[22m
+packages/core build: [34mℹ[39m [33m[CJS][39m [2mdist/[22mheader/AccordionHeader.cjs.map               [2m  8.11 kB[22m [2m│ gzip:  2.06 kB[22m
+packages/core build: [34mℹ[39m [33m[CJS][39m [2mdist/[22mcomposite/composite.cjs.map                  [2m  7.55 kB[22m [2m│ gzip:  1.84 kB[22m
+packages/core build: [34mℹ[39m [33m[CJS][39m [2mdist/[22mfallback/AvatarFallback.cjs.map              [2m  7.45 kB[22m [2m│ gzip:  2.04 kB[22m
+packages/core build: [34mℹ[39m [33m[CJS][39m [2mdist/[22mheader/AccordionHeader.cjs                   [2m  6.74 kB[22m [2m│ gzip:  1.63 kB[22m
+packages/core build: [34mℹ[39m [33m[CJS][39m [2mdist/[22mfallback/AvatarFallback.cjs                  [2m  4.26 kB[22m [2m│ gzip:  1.48 kB[22m
+packages/core build: [34mℹ[39m [33m[CJS][39m [2mdist/[22mcomposite/composite.cjs                      [2m  1.25 kB[22m [2m│ gzip:  0.42 kB[22m
+packages/core build: [34mℹ[39m [33m[CJS][39m [2mdist/[22mdirection-provider/DirectionContext.cjs.map  [2m  0.90 kB[22m [2m│ gzip:  0.45 kB[22m
+packages/core build: [34mℹ[39m [33m[CJS][39m [2mdist/[22mimage/AvatarImageDataAttributes.cjs          [2m  0.71 kB[22m [2m│ gzip:  0.31 kB[22m
+packages/core build: [34mℹ[39m [33m[CJS][39m [2mdist/[22mimage/AvatarImageDataAttributes.cjs.map      [2m  0.50 kB[22m [2m│ gzip:  0.26 kB[22m
+packages/core build: [34mℹ[39m [33m[CJS][39m [2mdist/[22mdirection-provider/DirectionContext.cjs      [2m  0.44 kB[22m [2m│ gzip:  0.28 kB[22m
+packages/core build: [34mℹ[39m [33m[CJS][39m 17 files, total: 333.99 kB
+packages/core build: [32m✔[39m Build complete in [32m1552ms[39m
+packages/core build: [34mℹ[39m [34m[ESM][39m [2mdist/[22m[1mindex.js[22m                                    [2m  1.81 kB[22m [2m│ gzip:  0.44 kB[22m
+packages/core build: [34mℹ[39m [34m[ESM][39m [2mdist/[22mindex2.js.map                               [2m142.30 kB[22m [2m│ gzip: 24.50 kB[22m
+packages/core build: [34mℹ[39m [34m[ESM][39m [2mdist/[22mindex2.js                                   [2m 60.12 kB[22m [2m│ gzip: 12.06 kB[22m
+packages/core build: [34mℹ[39m [34m[ESM][39m [2mdist/[22mbutton/Button.js.map                        [2m 33.90 kB[22m [2m│ gzip:  9.30 kB[22m
+packages/core build: [34mℹ[39m [34m[ESM][39m [2mdist/[22mimage/AvatarImage.js.map                    [2m 24.16 kB[22m [2m│ gzip:  6.25 kB[22m
+packages/core build: [34mℹ[39m [34m[ESM][39m [2mdist/[22mbutton/Button.js                            [2m 14.48 kB[22m [2m│ gzip:  4.35 kB[22m
+packages/core build: [34mℹ[39m [34m[ESM][39m [2mdist/[22mindex.d.ts.map                              [2m 14.27 kB[22m [2m│ gzip:  3.01 kB[22m
+packages/core build: [34mℹ[39m [34m[ESM][39m [2mdist/[22mimage/AvatarImage.js                        [2m 11.24 kB[22m [2m│ gzip:  3.34 kB[22m
+packages/core build: [34mℹ[39m [34m[ESM][39m [2mdist/[22mheader/AccordionHeader.js.map               [2m  8.17 kB[22m [2m│ gzip:  2.08 kB[22m
+packages/core build: [34mℹ[39m [34m[ESM][39m [2mdist/[22mcomposite/composite.js.map                  [2m  7.55 kB[22m [2m│ gzip:  1.84 kB[22m
+packages/core build: [34mℹ[39m [34m[ESM][39m [2mdist/[22mfallback/AvatarFallback.js.map              [2m  7.51 kB[22m [2m│ gzip:  2.05 kB[22m
+packages/core build: [34mℹ[39m [34m[ESM][39m [2mdist/[22mheader/AccordionHeader.js                   [2m  5.62 kB[22m [2m│ gzip:  1.54 kB[22m
+packages/core build: [34mℹ[39m [34m[ESM][39m [2mdist/[22mfallback/AvatarFallback.js                  [2m  3.76 kB[22m [2m│ gzip:  1.41 kB[22m
+packages/core build: [34mℹ[39m [34m[ESM][39m [2mdist/[22mdirection-provider/DirectionContext.js.map  [2m  0.90 kB[22m [2m│ gzip:  0.45 kB[22m
+packages/core build: [34mℹ[39m [34m[ESM][39m [2mdist/[22mcomposite/composite.js                      [2m  0.62 kB[22m [2m│ gzip:  0.32 kB[22m
+packages/core build: [34mℹ[39m [34m[ESM][39m [2mdist/[22mimage/AvatarImageDataAttributes.js          [2m  0.60 kB[22m [2m│ gzip:  0.26 kB[22m
+packages/core build: [34mℹ[39m [34m[ESM][39m [2mdist/[22mimage/AvatarImageDataAttributes.js.map      [2m  0.50 kB[22m [2m│ gzip:  0.26 kB[22m
+packages/core build: [34mℹ[39m [34m[ESM][39m [2mdist/[22mdirection-provider/DirectionContext.js      [2m  0.34 kB[22m [2m│ gzip:  0.22 kB[22m
+packages/core build: [34mℹ[39m [34m[ESM][39m [2mdist/[22m[32m[1mindex.d.ts[22m[39m                                  [2m 37.74 kB[22m [2m│ gzip:  7.04 kB[22m
+packages/core build: [34mℹ[39m [34m[ESM][39m 19 files, total: 375.60 kB
+packages/core build: [32m✔[39m Build complete in [32m1556ms[39m
+packages/core build: Done
+.                                        |  WARN  Unsupported engine: wanted: {"node":">=22.18.0"} (current: {"node":"v22.14.0","pnpm":"10.30.3"})
+
+> plugins@0.0.0 build /Users/peoray/Documents/code/oss/base-ui/vue/packages/plugins
+> unbuild
+
