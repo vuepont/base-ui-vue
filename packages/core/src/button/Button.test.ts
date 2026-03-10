@@ -1,6 +1,8 @@
 import userEvent from '@testing-library/user-event'
 import { mount } from '@vue/test-utils'
 import { describe, expect, it, vi } from 'vitest'
+import { defineComponent } from 'vue'
+import { Slot } from '../utils/slot'
 import { Button } from './index'
 
 describe('<Button />', () => {
@@ -146,5 +148,48 @@ describe('<Button />', () => {
 
       wrapper.unmount()
     })
+  })
+
+  it('supports renderless mode and forwards the internal ref callback', async () => {
+    const user = userEvent.setup()
+    const handleClick = vi.fn()
+
+    const TestComponent = defineComponent({
+      components: { Button },
+      setup() {
+        return { Slot, handleClick }
+      },
+      template: `
+        <Button
+          :as="Slot"
+          :disabled="true"
+          :focusable-when-disabled="true"
+          v-slot="{ props, state, ref }"
+        >
+          <span v-bind="props" :ref="ref" data-testid="renderless-button">
+            {{ state.disabled ? 'disabled' : 'enabled' }}
+          </span>
+        </Button>
+      `,
+    })
+
+    const wrapper = mount(TestComponent, {
+      attrs: {
+        onClick: handleClick,
+      },
+      attachTo: document.body,
+    })
+
+    const button = wrapper.get('[data-testid="renderless-button"]')
+      .element as HTMLElement
+
+    expect(button.getAttribute('aria-disabled')).toBe('true')
+    expect(button.getAttribute('tabindex')).toBe('0')
+    expect(button.textContent).toBe('disabled')
+
+    await user.click(button)
+    expect(handleClick).not.toHaveBeenCalled()
+
+    wrapper.unmount()
   })
 })

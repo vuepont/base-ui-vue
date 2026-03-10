@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import type { BaseUIComponentProps } from '../../utils/types'
 import { computed, onBeforeUnmount, useAttrs } from 'vue'
-import { getStateAttributesProps } from '../../utils/getStateAttributesProps'
 import { useBaseUiId } from '../../utils/useBaseUiId'
+import { useRenderElement } from '../../utils/useRenderElement'
 import { useFieldsetRootContext } from '../root/FieldsetRootContext'
 
 export interface FieldsetLegendState {
@@ -51,20 +51,20 @@ const state = computed<FieldsetLegendState>(() => ({
   disabled: disabled.value,
 }))
 
-const mergedProps = computed(() => {
-  const stateAttributes = getStateAttributesProps(state.value)
-  return {
+const { tag, mergedProps, renderless } = useRenderElement({
+  componentProps: props,
+  state,
+  props: computed(() => ({
     ...attrs,
     id,
-    class: typeof props.class === 'function' ? props.class(state.value) : props.class,
-    style: typeof props.style === 'function' ? props.style(state.value) : props.style,
-    ...stateAttributes,
-  }
+  })),
+  defaultTagName: 'div',
 })
 </script>
 
 <template>
-  <component :is="props.as" v-bind="mergedProps">
-    <slot />
+  <slot v-if="renderless" :props="mergedProps" :state="state" />
+  <component :is="tag" v-else v-bind="mergedProps">
+    <slot :state="state" />
   </component>
 </template>

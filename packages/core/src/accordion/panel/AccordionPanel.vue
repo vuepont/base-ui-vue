@@ -3,8 +3,8 @@ import type { AccordionPanelProps, AccordionPanelState } from '../accordion.type
 import { computed, onBeforeUnmount, useAttrs, watch, watchEffect } from 'vue'
 import { useCollapsiblePanel } from '../../collapsible/panel/useCollapsiblePanel'
 import { useCollapsibleRootContext } from '../../collapsible/root/CollapsibleRootContext'
-import { getStateAttributesProps } from '../../utils/getStateAttributesProps'
 import { useOpenChangeComplete } from '../../utils/useOpenChangeComplete'
+import { useRenderElement } from '../../utils/useRenderElement'
 import { warn } from '../../utils/warn'
 import { useAccordionItemContext } from '../item/AccordionItemContext'
 import { accordionStateAttributesMapping } from '../item/stateAttributesMapping'
@@ -106,8 +106,7 @@ const shouldRender = computed(() =>
   keepMounted.value || hiddenUntilFound.value || collapsibleCtx.mounted.value,
 )
 
-const mergedProps = computed(() => {
-  const stateAttributes = getStateAttributesProps(panelState.value, accordionStateAttributesMapping)
+const panelProps = computed(() => {
   const heightVal = collapsibleCtx.height.value
   const widthVal = collapsibleCtx.width.value
 
@@ -117,21 +116,33 @@ const mergedProps = computed(() => {
     'aria-labelledby': itemCtx.triggerId.value,
     'role': 'region',
     'hidden': hiddenUntilFound.value ? undefined : (hidden.value ? true : undefined),
-    'class': typeof props.class === 'function' ? props.class(panelState.value) : props.class,
     'style': [
-      typeof props.style === 'function' ? props.style(panelState.value) : props.style,
       {
         [AccordionPanelCssVars.accordionPanelHeight]: heightVal === undefined ? 'auto' : `${heightVal}px`,
         [AccordionPanelCssVars.accordionPanelWidth]: widthVal === undefined ? 'auto' : `${widthVal}px`,
       },
     ],
-    ...stateAttributes,
   }
+})
+
+const {
+  tag,
+  mergedProps,
+  renderless,
+  ref: renderRef,
+} = useRenderElement({
+  componentProps: props,
+  state: panelState,
+  props: panelProps,
+  stateAttributesMapping: accordionStateAttributesMapping,
+  defaultTagName: 'div',
+  ref: panelRef,
 })
 </script>
 
 <template>
-  <component :is="props.as" v-if="shouldRender" :ref="panelRef" v-bind="mergedProps">
-    <slot />
+  <slot v-if="renderless && shouldRender" :ref="renderRef" :props="mergedProps" :state="panelState" />
+  <component :is="tag" v-else-if="shouldRender" :ref="renderRef" v-bind="mergedProps">
+    <slot :state="panelState" />
   </component>
 </template>

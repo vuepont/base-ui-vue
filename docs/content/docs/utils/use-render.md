@@ -1,0 +1,216 @@
+# useRender
+
+<Subtitle>Composable for enabling renderless mode in custom components.</Subtitle>
+
+<Meta name="description" content="Composable for enabling renderless mode in custom components." />
+
+The `useRender` composable lets you build custom components that can change their rendered tag using an `as` prop, and provides a renderless mode to let consumers completely override the default rendered element.
+
+## Examples
+
+The `as` prop for a custom component (like `CustomText`) lets consumers use it to replace the default rendered `p` element with a different tag or component.
+
+<ComponentPreview name="UseRenderBasic" />
+
+The renderless version (by passing the `Slot` sentinel) enables more control of how props are spread, and also passes the internal `state` of a component.
+
+<ComponentPreview name="UseRenderRenderless" />
+
+## Merging props
+
+The `mergeProps` utility merges two or more sets of Vue props and attributes together. It safely merges three types of props:
+
+1. Event handlers, so that all are invoked
+2. `class` bindings (natively normalizing strings, arrays, and objects)
+3. `style` bindings (natively normalizing strings, arrays, and objects)
+
+`mergeProps` merges objects from left to right, so that subsequent objects' properties in the arguments overwrite previous ones. Merging props is useful when creating custom components, as well as inside the scoped slot payload of any Base UI component.
+
+```vue title="Using mergeProps internally"
+<script setup lang="ts">
+import { mergeProps, useRender } from 'base-ui-vue'
+
+defineOptions({ inheritAttrs: false })
+const props = defineProps<{ as?: any }>()
+
+const element = useRender({
+  defaultTagName: 'button',
+  ...props,
+  props: mergeProps({
+    class: 'Button',
+  }),
+})
+</script>
+
+<template>
+  <component :is="element.tag" v-bind="element.renderProps">
+    <slot />
+  </component>
+</template>
+```
+
+## Merging refs
+
+When building custom components, you often need to control a ref internally while still letting external consumers pass their own.
+
+In Vue, template refs and callback refs are natively bound via the `:ref` attribute. When passing `ref` to `useRender`, the composable automatically wraps it with an internal `useMergedRefs` utility so it resolves to the actual DOM element whether it's rendered normally or within a renderless slot.
+
+```vue title="Merging Refs"
+<script setup lang="ts">
+import { useRender } from 'base-ui-vue'
+import { ref } from 'vue'
+
+defineOptions({ inheritAttrs: false })
+const props = defineProps<{ as?: any }>()
+
+const internalRef = ref<HTMLElement | null>(null)
+
+const element = useRender({
+  defaultTagName: 'p',
+  ...props,
+  ref: internalRef,
+})
+</script>
+
+<template>
+  <slot
+    v-if="element.renderless"
+    :ref="element.ref"
+    :props="element.renderProps"
+    :state="element.state"
+  />
+  <component
+    :is="element.tag"
+    v-else
+    v-bind="element.renderProps"
+    :ref="element.ref"
+  >
+    <slot />
+  </component>
+</template>
+```
+
+If a consumer uses the `Slot` renderless mode, they MUST bind the `ref` provided in the scoped slot to their own element for your internal ref to work.
+
+```vue title="Binding exposed ref"
+<template>
+  <CustomText v-slot="{ props, ref }" :as="Slot">
+    <!-- The ref provided here ensures CustomText's internalRef is populated -->
+    <div v-bind="props" :ref="ref">
+      Custom text
+    </div>
+  </CustomText>
+</template>
+```
+
+## TypeScript
+
+To type your component's props to include the standard polymorphic properties (`as`, `class`, `style`), you can extend `BaseUIComponentProps`:
+
+```vue title="Typing props"
+<script setup lang="ts">
+import type { BaseUIComponentProps } from 'base-ui-vue'
+import { mergeProps, useRender } from 'base-ui-vue'
+
+defineOptions({ inheritAttrs: false })
+
+const props = defineProps<ButtonProps>()
+
+export interface ButtonProps extends BaseUIComponentProps {
+  disabled?: boolean
+}
+
+const defaultProps = {
+  class: 'Button',
+  type: 'button',
+}
+
+const element = useRender({
+  defaultTagName: 'button',
+  ...props,
+  props: mergeProps(defaultProps),
+})
+</script>
+```
+
+## Migrating from Radix Vue
+
+Radix Vue uses an `asChild` prop, while Base UI Vue uses an `as` prop accepting the `Slot` sentinel.
+
+In Radix Vue, you pass `as-child` to remove the wrapper tag.
+
+```vue title="Radix Vue asChild prop"
+<script setup>
+import { Button } from 'radix-vue'
+</script>
+
+<template>
+  <Button as-child>
+    <a href="/login" class="primary">Login</a>
+  </Button>
+</template>
+```
+
+In Base UI Vue, `useRender` lets you achieve the same thing by passing `:as="Slot"`. The props and state are explicitly exposed through a scoped slot, which you then bind to your custom element using `v-bind`.
+
+```vue title="Base UI Vue renderless mode"
+<script setup>
+import { Button, Slot } from 'base-ui-vue'
+</script>
+
+<template>
+  <Button v-slot="{ props }" :as="Slot">
+    <a href="/login" class="primary" v-bind="props">Login</a>
+  </Button>
+</template>
+```
+
+## API reference
+
+### Input parameters (`UseRenderParams`)
+
+| Parameter                | Type                                           | Description                                                                                                          |
+| ------------------------ | ---------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| `defaultTagName`         | `string`                                       | The default tag name to use when `as` is not provided.                                                               |
+| `as`                     | `string \| Component`                          | The element or component to use for the root node. Pass `Slot` for renderless mode.                                  |
+| `props`                  | `Record<string, any>`                          | Props to be merged with the component's internal attributes. Event handlers and classes are correctly joined.        |
+| `state`                  | `MaybeRefOrGetter<State>`                      | The state of the component. It automatically converts to `data-*` attributes and binds to `class`/`style` callbacks. |
+| `stateAttributesMapping` | `StateAttributesMapping<State>`                | Custom mapping for converting state properties to `data-*` attributes.                                               |
+| `class`                  | `any \| ((state: State) => any)`               | A Vue class binding or a function that receives the state and returns a class binding.                               |
+| `style`                  | `StyleValue \| ((state: State) => StyleValue)` | A Vue style binding or a function that receives the state and returns a style binding.                               |
+| `ref`                    | `RenderRef`                                    | The internal ref to apply to the rendered element.                                                                   |
+
+### Return value (`UseRenderReturn`)
+
+| Property      | Type                                            | Description                                                                  |
+| ------------- | ----------------------------------------------- | ---------------------------------------------------------------------------- |
+| `tag`         | `ComputedRef<string \| Component \| undefined>` | The resolved element or component to render. `undefined` in renderless mode. |
+| `renderProps` | `ComputedRef<Record<string, any>>`              | All merged attributes to bind to the element using `v-bind`.                 |
+| `renderless`  | `ComputedRef<boolean>`                          | `true` when `as` is `Slot`.                                                  |
+| `state`       | `ComputedRef<Readonly<State>>`                  | The component state, passed through for slot exposure.                       |
+| `ref`         | `((el: Element) => void) \| null`               | A callback ref to bind to the element using `:ref`.                          |
+
+```vue title="Usage"
+<script setup>
+const element = useRender({
+  // Input parameters
+})
+</script>
+
+<template>
+  <slot
+    v-if="element.renderless"
+    :ref="element.ref"
+    :props="element.renderProps"
+    :state="element.state"
+  />
+  <component
+    :is="element.tag"
+    v-else
+    v-bind="element.renderProps"
+    :ref="element.ref"
+  >
+    <!-- content -->
+  </component>
+</template>
+```

@@ -5,9 +5,9 @@ import { computed, getCurrentInstance, provide, ref, useAttrs, watchEffect } fro
 import CompositeList from '../../composite/list/CompositeList.vue'
 import { useDirection } from '../../direction-provider/DirectionContext'
 import { createChangeEventDetails } from '../../utils/createBaseUIEventDetails'
-import { getStateAttributesProps } from '../../utils/getStateAttributesProps'
 import { REASONS } from '../../utils/reasons'
 import { useControllableState } from '../../utils/useControllableState'
+import { useRenderElement } from '../../utils/useRenderElement'
 import { warn } from '../../utils/warn'
 import { accordionRootContextKey } from './AccordionRootContext'
 import { rootStateAttributesMapping } from './stateAttributesMapping'
@@ -107,23 +107,24 @@ provide(accordionRootContextKey, {
   value: openValues as Ref<AccordionValue>,
 })
 
-const mergedProps = computed(() => {
-  const stateAttributes = getStateAttributesProps(state.value, rootStateAttributesMapping)
-  return {
+const { tag, mergedProps, renderless } = useRenderElement({
+  componentProps: props,
+  state,
+  props: computed(() => ({
     ...attrs,
     dir: direction,
     role: 'region',
-    class: typeof props.class === 'function' ? props.class(state.value) : props.class,
-    style: typeof props.style === 'function' ? props.style(state.value) : props.style,
-    ...stateAttributes,
-  }
+  })),
+  stateAttributesMapping: rootStateAttributesMapping,
+  defaultTagName: 'div',
 })
 </script>
 
 <template>
   <CompositeList :elements-ref="_compositeRefs.elementsRef">
-    <component :is="props.as" v-bind="mergedProps">
-      <slot />
+    <slot v-if="renderless" :props="mergedProps" :state="state" />
+    <component :is="tag" v-else v-bind="mergedProps">
+      <slot :state="state" />
     </component>
   </CompositeList>
 </template>

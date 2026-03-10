@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import type { CollapsiblePanelProps, CollapsiblePanelState } from '../collapsible.types'
 import { computed, useAttrs, watch } from 'vue'
-import { getStateAttributesProps } from '../../utils/getStateAttributesProps'
 import { useOpenChangeComplete } from '../../utils/useOpenChangeComplete'
+import { useRenderElement } from '../../utils/useRenderElement'
 import { warn } from '../../utils/warn'
 import { useCollapsibleRootContext } from '../root/CollapsibleRootContext'
 import { collapsibleStateAttributesMapping } from '../root/stateAttributesMapping'
@@ -97,8 +97,7 @@ const shouldRender = computed(() =>
   props.keepMounted || props.hiddenUntilFound || ctx.mounted.value,
 )
 
-const mergedProps = computed(() => {
-  const stateAttributes = getStateAttributesProps(panelState.value, collapsibleStateAttributesMapping)
+const panelProps = computed(() => {
   const heightVal = ctx.height.value
   const widthVal = ctx.width.value
 
@@ -106,21 +105,33 @@ const mergedProps = computed(() => {
     ...attrs,
     id: ctx.panelId.value,
     hidden: props.hiddenUntilFound ? undefined : (hidden.value ? true : undefined),
-    class: typeof props.class === 'function' ? props.class(panelState.value) : props.class,
     style: [
-      typeof props.style === 'function' ? props.style(panelState.value) : props.style,
       {
         [CollapsiblePanelCssVars.collapsiblePanelHeight]: heightVal === undefined ? 'auto' : `${heightVal}px`,
         [CollapsiblePanelCssVars.collapsiblePanelWidth]: widthVal === undefined ? 'auto' : `${widthVal}px`,
       },
     ],
-    ...stateAttributes,
   }
+})
+
+const {
+  tag,
+  mergedProps,
+  renderless,
+  ref: renderRef,
+} = useRenderElement({
+  componentProps: props,
+  state: panelState,
+  props: panelProps,
+  stateAttributesMapping: collapsibleStateAttributesMapping,
+  defaultTagName: 'div',
+  ref: panelRef,
 })
 </script>
 
 <template>
-  <component :is="props.as" v-if="shouldRender" :ref="panelRef" v-bind="mergedProps">
-    <slot />
+  <slot v-if="renderless && shouldRender" :ref="renderRef" :props="mergedProps" :state="panelState" />
+  <component :is="tag" v-else-if="shouldRender" :ref="renderRef" v-bind="mergedProps">
+    <slot :state="panelState" />
   </component>
 </template>

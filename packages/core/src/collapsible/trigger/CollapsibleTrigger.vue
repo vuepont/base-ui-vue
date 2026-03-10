@@ -4,8 +4,8 @@ import type { CollapsibleRootState, CollapsibleTriggerProps } from '../collapsib
 import { computed, useAttrs } from 'vue'
 import { useButton } from '../../use-button'
 import { triggerOpenStateMapping } from '../../utils/collapsibleOpenStateMapping'
-import { getStateAttributesProps } from '../../utils/getStateAttributesProps'
 import { transitionStatusMapping } from '../../utils/stateAttributesMapping'
+import { useRenderElement } from '../../utils/useRenderElement'
 import { useCollapsibleRootContext } from '../root/CollapsibleRootContext'
 
 defineOptions({
@@ -35,26 +35,29 @@ const { getButtonProps, buttonRef } = useButton({
   native: () => props.nativeButton ?? true,
 })
 
-const mergedProps = computed(() => {
-  const state = ctx.state.value
-  const stateAttributes = getStateAttributesProps(state, triggerStateAttributesMapping)
-
-  const buttonProps = getButtonProps({
+const {
+  tag,
+  mergedProps,
+  renderless,
+  ref: renderRef,
+} = useRenderElement({
+  componentProps: props,
+  state: ctx.state,
+  props: computed(() => getButtonProps({
     ...attrs as Record<string, any>,
     'aria-controls': ctx.open.value ? ctx.panelId.value : undefined,
     'aria-expanded': ctx.open.value,
     'onClick': ctx.handleTrigger,
-    'class': typeof props.class === 'function' ? props.class(state) : props.class,
-    'style': typeof props.style === 'function' ? props.style(state) : props.style,
-    ...stateAttributes,
-  })
-
-  return buttonProps
+  })),
+  stateAttributesMapping: triggerStateAttributesMapping,
+  defaultTagName: 'button',
+  ref: buttonRef,
 })
 </script>
 
 <template>
-  <component :is="props.as" ref="buttonRef" v-bind="mergedProps">
-    <slot />
+  <slot v-if="renderless" :ref="renderRef" :props="mergedProps" :state="ctx.state" />
+  <component :is="tag" v-else :ref="renderRef" v-bind="mergedProps">
+    <slot :state="ctx.state" />
   </component>
 </template>
