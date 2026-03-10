@@ -4,7 +4,7 @@ import { mergeProps, useRender } from 'base-ui-vue'
 defineOptions({ inheritAttrs: false })
 const props = defineProps<{ as?: any }>()
 
-const element = useRender({
+const { tag, renderProps } = useRender({
   defaultTagName: 'p',
   ...props,
   props: mergeProps({
@@ -17,7 +17,7 @@ const element = useRender({
 </script>
 
 <template>
-  <component :is="element.tag" v-bind="element.renderProps">
+  <component :is="tag" v-bind="renderProps">
     <slot />
   </component>
 </template>

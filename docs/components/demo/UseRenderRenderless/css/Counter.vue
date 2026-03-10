@@ -18,7 +18,7 @@ const defaultProps = {
   'aria-label': computed(() => `Count is ${count.value}, click to increase.`),
 }
 
-const element = useRender({
+const { tag, renderProps, renderless, state: elementState, ref: elementRef } = useRender({
   defaultTagName: 'button',
   ...props,
   state,
@@ -27,9 +27,9 @@ const element = useRender({
 </script>
 
 <template>
-  <slot v-if="element.renderless" :ref="element.ref" :props="element.renderProps" :state="element.state" />
-  <component :is="element.tag" v-else v-bind="element.renderProps" :ref="element.ref">
+  <slot v-if="renderless" :ref="elementRef" :props="renderProps" :state="elementState" />
+  <component :is="tag" v-else v-bind="renderProps" :ref="elementRef">
     Counter: <span class="number">{{ count }}</span>
-    <span class="suffix">{{ state.odd ? '👎' : '👍' }}</span>
+    <span class="suffix">{{ elementState.odd ? '👎' : '👍' }}</span>
   </component>
 </template>
