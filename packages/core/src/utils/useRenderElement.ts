@@ -66,7 +66,7 @@ export interface UseRenderElementReturn<State> {
   /** The component state, passed through for slot exposure. */
   state: ComputedRef<State> | Ref<State>
   /** A callback ref to bind to the consumer element. `undefined` when no ref is provided. */
-  ref?: ((el: Element | ComponentPublicInstance | null) => void) | null
+  ref?: ((el: Element | ComponentPublicInstance | null) => void) | undefined
 }
 
 /**

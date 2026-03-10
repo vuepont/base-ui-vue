@@ -9,7 +9,7 @@ type MaybeRef<T>
 
 /**
  * Merges multiple refs or ref callbacks into a single template ref callback.
- * Returns `null` when all input refs are nullish (optimization to avoid no-op callbacks).
+ * Returns `undefined` when all input refs are nullish (optimization to avoid no-op callbacks).
  *
  * Supports cleanup callbacks: if a callback ref returns a function, it will be
  * called on unmount (when the ref receives `null`) instead of calling the
@@ -34,7 +34,7 @@ type MaybeRef<T>
  */
 export function useMergedRefs<T = Element>(...refs: MaybeRef<T>[]) {
   if (refs.every(ref => ref == null)) {
-    return null
+    return undefined
   }
 
   const cleanupCallbacks: Array<Cleanup | null> = Array.from(

@@ -70,7 +70,7 @@ export interface UseRenderReturn<State> {
   /** The component's readonly state. */
   state: ComputedRef<Readonly<State>>
   /** A callback ref to bind to the consumer element. `undefined` when no ref is provided. */
-  ref?: ((el: Element | ComponentPublicInstance | null) => void) | null
+  ref?: ((el: Element | ComponentPublicInstance | null) => void) | undefined
 }
 
 /**
