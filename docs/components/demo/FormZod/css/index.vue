@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import {
+  Button,
   FieldControl,
   FieldError,
   FieldLabel,
@@ -31,7 +32,12 @@ async function submitForm(formValues: Record<string, unknown>) {
 
 async function handleFormSubmit(formValues: Record<string, unknown>) {
   const response = await submitForm(formValues)
-  errors.value = response.errors
+  errors.value = Object.fromEntries(
+    Object.entries(response.errors).map(([key, value]) => [
+      key,
+      Array.isArray(value) ? value[0] ?? '' : value,
+    ]),
+  )
 }
 </script>
 
@@ -51,8 +57,8 @@ async function handleFormSubmit(formValues: Record<string, unknown>) {
       <FieldControl placeholder="Enter age" class="Input" />
       <FieldError class="Error" />
     </FieldRoot>
-    <button type="submit" class="Button">
+    <Button type="submit" class="Button">
       Submit
-    </button>
+    </Button>
   </Form>
 </template>

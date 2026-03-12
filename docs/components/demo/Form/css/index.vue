@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import {
+  Button,
   FieldControl,
   FieldError,
   FieldLabel,
@@ -53,8 +54,8 @@ async function handleFormSubmit(formValues: Record<string, unknown>) {
       />
       <FieldError class="Error" />
     </FieldRoot>
-    <button type="submit" :disabled="loading" class="Button">
+    <Button type="submit" :disabled="loading" focusable-when-disabled class="Button">
       Submit
-    </button>
+    </Button>
   </Form>
 </template>

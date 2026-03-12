@@ -65,12 +65,16 @@
   user-select: none;
   cursor: pointer;
 
-  &:hover:not(:disabled) {
-    background-color: var(--color-gray-100, #f3f4f6);
+  @media (hover: hover) {
+    &:hover:not([data-disabled]) {
+      background-color: var(--color-gray-100, #f3f4f6);
+    }
   }
 
-  &:active:not(:disabled) {
+  &:active:not([data-disabled]) {
     background-color: var(--color-gray-200);
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+    border-top-color: var(--color-gray-300, #d1d5db);
   }
 
   &:focus-visible {
@@ -78,7 +82,7 @@
     outline-offset: -1px;
   }
 
-  &:disabled {
+  &[data-disabled] {
     color: var(--color-gray-500, #6b7280);
     cursor: default;
   }
