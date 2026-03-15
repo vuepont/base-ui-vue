@@ -106,6 +106,64 @@ describe('<AvatarFallback />', () => {
 
       expect(wrapper.text()).toContain('AC')
     })
+
+    it('respects delay when it changes from undefined to a number', async () => {
+      useImageLoadingStatusMock.mockReturnValue({ value: 'error' } as any)
+
+      const TestComponent = defineComponent({
+        components: { AvatarRoot, AvatarImage, AvatarFallback },
+        setup() {
+          const delay = ref<number | undefined>(undefined)
+          return { delay }
+        },
+        template: `
+          <AvatarRoot>
+            <AvatarImage />
+            <AvatarFallback :delay="delay" data-testid="fallback">AC</AvatarFallback>
+          </AvatarRoot>
+        `,
+      })
+
+      const wrapper = mount(TestComponent)
+      expect(wrapper.find('[data-testid="fallback"]').exists()).toBe(true)
+
+      await wrapper.vm.$nextTick()
+      ;(wrapper.vm as any).delay = 200
+      await wrapper.vm.$nextTick()
+
+      expect(wrapper.find('[data-testid="fallback"]').exists()).toBe(false)
+
+      vi.advanceTimersByTime(200)
+      await wrapper.vm.$nextTick()
+
+      expect(wrapper.find('[data-testid="fallback"]').exists()).toBe(true)
+    })
+
+    it('shows fallback immediately when delay changes from a number to undefined', async () => {
+      useImageLoadingStatusMock.mockReturnValue({ value: 'error' } as any)
+
+      const TestComponent = defineComponent({
+        components: { AvatarRoot, AvatarImage, AvatarFallback },
+        setup() {
+          const delay = ref<number | undefined>(500)
+          return { delay }
+        },
+        template: `
+          <AvatarRoot>
+            <AvatarImage />
+            <AvatarFallback :delay="delay" data-testid="fallback">AC</AvatarFallback>
+          </AvatarRoot>
+        `,
+      })
+
+      const wrapper = mount(TestComponent)
+      expect(wrapper.find('[data-testid="fallback"]').exists()).toBe(false)
+
+      ;(wrapper.vm as any).delay = undefined
+      await wrapper.vm.$nextTick()
+
+      expect(wrapper.find('[data-testid="fallback"]').exists()).toBe(true)
+    })
   })
 
   it('keeps fallback mounted and image unmounted while the image is loading', async () => {
