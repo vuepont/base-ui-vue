@@ -34,9 +34,13 @@ const timeout = useTimeout()
 
 watchEffect((onCleanup) => {
   if (props.delay !== undefined) {
+    delayPassed.value = false
     timeout.start(props.delay, () => {
       delayPassed.value = true
     })
+  }
+  else {
+    delayPassed.value = true
   }
 
   onCleanup(() => {
