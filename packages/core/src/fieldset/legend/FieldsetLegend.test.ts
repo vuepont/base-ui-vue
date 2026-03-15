@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/vue'
 import { describe, expect, it } from 'vitest'
-import { defineComponent, nextTick } from 'vue'
+import { defineComponent, nextTick, ref } from 'vue'
 import FieldsetRoot from '../root/FieldsetRoot.vue'
 import FieldsetLegend from './FieldsetLegend.vue'
 
@@ -67,5 +67,33 @@ describe('<FieldsetLegend />', () => {
     renderFieldsetWithLegend({ disabled: false })
     const legend = screen.getByTestId('legend')
     expect(legend).not.toHaveAttribute('data-disabled')
+  })
+
+  it('preserves aria-labelledby when a non-active legend unmounts', async () => {
+    const showExtra = ref(true)
+
+    const TestComponent = defineComponent({
+      components: { FieldsetRoot, FieldsetLegend },
+      setup() {
+        return { showExtra }
+      },
+      template: `
+        <FieldsetRoot>
+          <FieldsetLegend v-if="showExtra" id="legend-extra">Extra</FieldsetLegend>
+          <FieldsetLegend id="legend-main">Main</FieldsetLegend>
+        </FieldsetRoot>
+      `,
+    })
+
+    render(TestComponent)
+    await nextTick()
+
+    const fieldset = screen.getByRole('group')
+    expect(fieldset).toHaveAttribute('aria-labelledby', 'legend-main')
+
+    showExtra.value = false
+    await nextTick()
+
+    expect(fieldset).toHaveAttribute('aria-labelledby', 'legend-main')
   })
 })
