@@ -30,7 +30,7 @@ export interface UseRenderParams<State extends Record<string, any>> {
    * are merged, class strings and style properties are joined, while other external props
    * overwrite the internal ones.
    */
-  props?: Record<string, any>
+  props?: MaybeRefOrGetter<Record<string, any> | undefined>
   /**
    * The state of the component, passed as the second argument to `class` and `style` callbacks.
    * State properties are automatically converted to `data-*` attributes.
@@ -95,7 +95,10 @@ export function useRender<State extends Record<string, any>>(
     componentProps: params,
     state,
     props: computed(() =>
-      mergeProps(attrs as Record<string, any>, params.props),
+      mergeProps(
+        attrs as Record<string, any>,
+        toValue(params.props),
+      ),
     ),
     stateAttributesMapping: params.stateAttributesMapping,
     defaultTagName: params.defaultTagName,

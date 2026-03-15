@@ -10,19 +10,22 @@ const odd = computed(() => count.value % 2 === 1)
 const state = computed(() => ({ odd: odd.value, count: count.value }))
 
 const defaultProps = {
-  'class': 'Button',
-  'type': 'button',
+  class: 'Button',
+  type: 'button',
   onClick() {
     count.value += 1
   },
-  'aria-label': computed(() => `Count is ${count.value}, click to increase.`),
 }
 
 const { tag, renderProps, renderless, state: elementState, ref: elementRef } = useRender({
   defaultTagName: 'button',
   ...props,
   state,
-  props: mergeProps(defaultProps),
+  props: computed(() =>
+    mergeProps(defaultProps, {
+      'aria-label': `Count is ${count.value}, click to increase.`,
+    }),
+  ),
 })
 </script>
 

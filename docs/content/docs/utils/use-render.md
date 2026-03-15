@@ -34,9 +34,11 @@ const props = defineProps<{ as?: any }>()
 const element = useRender({
   defaultTagName: 'button',
   ...props,
-  props: mergeProps({
-    class: 'Button',
-  }),
+  props: computed(() =>
+    mergeProps({
+      class: 'Button',
+    }),
+  ),
 })
 </script>
 
@@ -56,7 +58,7 @@ In Vue, template refs and callback refs are natively bound via the `:ref` attrib
 ```vue title="Merging Refs"
 <script setup lang="ts">
 import { useRender } from 'base-ui-vue'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 
 defineOptions({ inheritAttrs: false })
 const props = defineProps<{ as?: any }>()
@@ -66,6 +68,9 @@ const internalRef = ref<HTMLElement | null>(null)
 const element = useRender({
   defaultTagName: 'p',
   ...props,
+  props: computed(() => ({
+    'aria-label': `Example ${internalRef.value ? 'ready' : 'idle'}`,
+  })),
   ref: internalRef,
 })
 </script>
@@ -109,6 +114,7 @@ To type your component's props to include the standard polymorphic properties (`
 <script setup lang="ts">
 import type { BaseUIComponentProps } from 'base-ui-vue'
 import { mergeProps, useRender } from 'base-ui-vue'
+import { computed } from 'vue'
 
 defineOptions({ inheritAttrs: false })
 
@@ -126,7 +132,7 @@ const defaultProps = {
 const element = useRender({
   defaultTagName: 'button',
   ...props,
-  props: mergeProps(defaultProps),
+  props: computed(() => mergeProps(defaultProps)),
 })
 </script>
 ```
@@ -171,7 +177,7 @@ import { Button, Slot } from 'base-ui-vue'
 | ------------------------ | ---------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
 | `defaultTagName`         | `string`                                       | The default tag name to use when `as` is not provided.                                                               |
 | `as`                     | `string \| Component`                          | The element or component to use for the root node. Pass `Slot` for renderless mode.                                  |
-| `props`                  | `Record<string, any>`                          | Props to be merged with the component's internal attributes. Event handlers and classes are correctly joined.        |
+| `props`                  | `MaybeRefOrGetter<Record<string, any> \| undefined>` | Props to be merged with the component's internal attributes. Use a getter or computed when they depend on reactive state. |
 | `state`                  | `MaybeRefOrGetter<State>`                      | The state of the component. It automatically converts to `data-*` attributes and binds to `class`/`style` callbacks. |
 | `stateAttributesMapping` | `StateAttributesMapping<State>`                | Custom mapping for converting state properties to `data-*` attributes.                                               |
 | `class`                  | `any \| ((state: State) => any)`               | A Vue class binding or a function that receives the state and returns a class binding.                               |

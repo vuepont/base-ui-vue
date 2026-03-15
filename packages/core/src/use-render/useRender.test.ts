@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/vue'
 import { describe, expect, it } from 'vitest'
-import { computed, defineComponent, isReadonly, ref } from 'vue'
+import { computed, defineComponent, isReadonly, nextTick, ref } from 'vue'
 import { Slot } from '../utils/slot'
 import { useRender } from './useRender'
 
@@ -40,6 +40,37 @@ describe('useRender', () => {
     expect(element).toHaveAttribute('data-from-attrs', 'yes')
     expect(element).toHaveAttribute('data-active')
     expect(element).toHaveClass('from-state')
+  })
+
+  it('supports reactive props passed as a getter', async () => {
+    const TestComponent = defineComponent({
+      inheritAttrs: false,
+      setup() {
+        const count = ref(0)
+        const { tag, renderProps } = useRender({
+          defaultTagName: 'button',
+          props: computed(() => ({
+            'aria-label': `Count is ${count.value}`,
+            onClick() {
+              count.value += 1
+            },
+          })),
+        })
+
+        return { count, tag, renderProps }
+      },
+      template: `<component :is="tag" v-bind="renderProps">{{ count }}</component>`,
+    })
+
+    render(TestComponent)
+
+    const button = screen.getByRole('button', { name: 'Count is 0' })
+    expect(button).toHaveTextContent('0')
+
+    button.click()
+    await nextTick()
+
+    expect(screen.getByRole('button', { name: 'Count is 1' })).toHaveTextContent('1')
   })
 
   it('returns readonly state and supports renderless mode', () => {
