@@ -16,10 +16,10 @@ export class Timeout {
    */
   start(delay: number, fn: () => void) {
     this.clear()
-    this.currentId = window.setTimeout(() => {
+    this.currentId = setTimeout(() => {
       this.currentId = EMPTY
       fn()
-    }, delay)
+    }, delay) as unknown as TimeoutId
   }
 
   isStarted() {
@@ -28,7 +28,7 @@ export class Timeout {
 
   clear = () => {
     if (this.currentId !== EMPTY) {
-      window.clearTimeout(this.currentId)
+      clearTimeout(this.currentId)
       this.currentId = EMPTY
     }
   }
