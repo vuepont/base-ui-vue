@@ -405,16 +405,19 @@ export function useCollapsiblePanel(
       if (isOpen && isBeforeMatchRef.value) {
         panel.style.transitionDuration = '0s'
         setDimensions({ height: panel.scrollHeight, width: panel.scrollWidth })
+        let nextFrame = -1
         const frame = AnimationFrame.request(() => {
           isBeforeMatchRef.value = false
-          const nextFrame = AnimationFrame.request(() => {
+          nextFrame = AnimationFrame.request(() => {
             setTimeout(() => {
               panel.style.removeProperty('transition-duration')
             })
           })
-          return () => AnimationFrame.cancel(nextFrame)
         })
-        return () => AnimationFrame.cancel(frame)
+        return () => {
+          AnimationFrame.cancel(frame)
+          AnimationFrame.cancel(nextFrame)
+        }
       }
     },
     { flush: 'sync' },
