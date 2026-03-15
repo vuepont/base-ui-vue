@@ -109,6 +109,10 @@ const shouldRender = computed(() =>
 const panelProps = computed(() => {
   const heightVal = collapsibleCtx.height.value
   const widthVal = collapsibleCtx.width.value
+  const resolvedStyle
+    = typeof props.style === 'function'
+      ? props.style(panelState.value)
+      : props.style
 
   return {
     ...attrs,
@@ -117,6 +121,7 @@ const panelProps = computed(() => {
     'role': 'region',
     'hidden': hiddenUntilFound.value ? undefined : (hidden.value ? true : undefined),
     'style': [
+      resolvedStyle,
       {
         [AccordionPanelCssVars.accordionPanelHeight]: heightVal === undefined ? 'auto' : `${heightVal}px`,
         [AccordionPanelCssVars.accordionPanelWidth]: widthVal === undefined ? 'auto' : `${widthVal}px`,
@@ -131,7 +136,10 @@ const {
   renderless,
   ref: renderRef,
 } = useRenderElement({
-  componentProps: props,
+  componentProps: {
+    as: props.as,
+    class: props.class,
+  },
   state: panelState,
   props: panelProps,
   stateAttributesMapping: accordionStateAttributesMapping,

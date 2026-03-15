@@ -100,12 +100,17 @@ const shouldRender = computed(() =>
 const panelProps = computed(() => {
   const heightVal = ctx.height.value
   const widthVal = ctx.width.value
+  const resolvedStyle
+    = typeof props.style === 'function'
+      ? props.style(panelState.value)
+      : props.style
 
   return {
     ...attrs,
     id: ctx.panelId.value,
     hidden: props.hiddenUntilFound ? undefined : (hidden.value ? true : undefined),
     style: [
+      resolvedStyle,
       {
         [CollapsiblePanelCssVars.collapsiblePanelHeight]: heightVal === undefined ? 'auto' : `${heightVal}px`,
         [CollapsiblePanelCssVars.collapsiblePanelWidth]: widthVal === undefined ? 'auto' : `${widthVal}px`,
@@ -120,7 +125,10 @@ const {
   renderless,
   ref: renderRef,
 } = useRenderElement({
-  componentProps: props,
+  componentProps: {
+    as: props.as,
+    class: props.class,
+  },
   state: panelState,
   props: panelProps,
   stateAttributesMapping: collapsibleStateAttributesMapping,
