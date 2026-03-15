@@ -37,14 +37,16 @@ const props = withDefaults(defineProps<FieldsetLegendProps>(), {
 
 const attrs = useAttrs()
 
-const { disabled, setLegendId } = useFieldsetRootContext()
+const { disabled, legendId, setLegendId } = useFieldsetRootContext()
 
 const id = useBaseUiId(props.id)
 
 setLegendId(id)
 
 onBeforeUnmount(() => {
-  setLegendId(undefined)
+  if (legendId.value === id) {
+    setLegendId(undefined)
+  }
 })
 
 const state = computed<FieldsetLegendState>(() => ({
