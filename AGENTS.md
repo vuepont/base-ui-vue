@@ -39,3 +39,11 @@ Run the smallest relevant checks first, then broaden when needed:
 - Commits must pass repository hooks (`lint-staged`, `commitlint`).
 - Follow Conventional Commits style, e.g. `feat(button): add loading prop` or `fix(composite): correct roving focus`.
 - Keep each commit scoped to one logical change.
+
+## Cursor Cloud specific instructions
+
+- **Runtime requirements**: Node.js >=22.18.0 and pnpm 10.30.3 are pre-installed. The update script runs `pnpm install` automatically on VM startup.
+- **No external services needed**: This is a pure component library with no databases, Docker, or backend services. All commands run locally.
+- **Build before docs**: The docs dev server (`pnpm docs:dev`) requires a prior `pnpm build` so the core package is resolved correctly. The build produces `packages/core/dist/` which the docs site imports.
+- **Validation commands**: See the "Validation commands" section above — `pnpm lint`, `pnpm --filter base-ui-vue type-check`, `pnpm test`, `pnpm docs:dev`.
+- **Git hooks**: `simple-git-hooks` sets up `pre-commit` (runs `lint-staged` → eslint --fix) and `commit-msg` (runs `commitlint`). These are installed automatically via the `prepare` script during `pnpm install`.
