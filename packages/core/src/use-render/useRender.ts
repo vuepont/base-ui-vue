@@ -3,15 +3,36 @@ import type {
   ComponentPublicInstance,
   ComputedRef,
   MaybeRefOrGetter,
+  NativeElements,
   Ref,
   StyleValue,
 } from 'vue'
+import type { HTMLProps } from '../types'
 import type { StateAttributesMapping } from '../utils/getStateAttributesProps'
 import type { BaseUIComponentProps } from '../utils/types'
 import { computed, readonly, toValue, useAttrs } from 'vue'
 import { mergeProps } from '../merge-props'
 import { EMPTY_OBJECT } from '../utils/constants'
 import { useRenderElement } from '../utils/useRenderElement'
+
+type UseRenderIntrinsicElement = keyof NativeElements
+
+type UseRenderRef
+  = | Ref<HTMLElement | ComponentPublicInstance | null>
+    | ((el: Element | ComponentPublicInstance | null) => void)
+
+export type RenderRef = UseRenderRef
+
+export type UseRenderComponentProps<
+  State = Record<string, unknown>,
+  AdditionalProps extends object = Record<string, never>,
+> = BaseUIComponentProps<State> & AdditionalProps
+
+export type UseRenderElementProps<
+  Tag extends UseRenderIntrinsicElement | undefined = undefined,
+  AdditionalProps extends object = Record<string, never>,
+> = (Tag extends UseRenderIntrinsicElement ? NativeElements[Tag] : HTMLProps)
+  & AdditionalProps
 
 export interface UseRenderParams<State extends Record<string, any>> {
   /**
@@ -55,9 +76,7 @@ export interface UseRenderParams<State extends Record<string, any>> {
   /**
    * The ref to apply to the rendered element.
    */
-  ref?:
-    | Ref<HTMLElement | ComponentPublicInstance | null>
-    | ((el: Element | ComponentPublicInstance | null) => void)
+  ref?: UseRenderRef
 }
 
 export interface UseRenderReturn<State> {
@@ -116,12 +135,18 @@ export function useRender<State extends Record<string, any>>(
 
 // eslint-disable-next-line ts/no-namespace
 export namespace useRender {
-  export type ComponentProps<State = Record<string, unknown>>
-    = BaseUIComponentProps<State>
-  export type ElementProps = Record<string, any>
+  export type ComponentProps<
+    State = Record<string, unknown>,
+    AdditionalProps extends object = Record<string, never>,
+  > = UseRenderComponentProps<State, AdditionalProps>
+  export type ElementProps<
+    Tag extends UseRenderIntrinsicElement | undefined = undefined,
+    AdditionalProps extends object = Record<string, never>,
+  > = UseRenderElementProps<Tag, AdditionalProps>
   export type Parameters<State = Record<string, unknown>> = UseRenderParams<
     State extends Record<string, any> ? State : Record<string, any>
   >
   export type ReturnValue<State = Record<string, unknown>>
     = UseRenderReturn<State>
+  export type RenderRef = UseRenderRef
 }

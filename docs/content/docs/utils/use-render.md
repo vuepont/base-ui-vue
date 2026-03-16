@@ -34,11 +34,9 @@ const props = defineProps<{ as?: any }>()
 const element = useRender({
   defaultTagName: 'button',
   ...props,
-  props: computed(() =>
-    mergeProps({
-      class: 'Button',
-    }),
-  ),
+  props: mergeProps({
+    class: 'Button',
+  }),
 })
 </script>
 
@@ -108,31 +106,44 @@ If a consumer uses the `Slot` renderless mode, they MUST bind the `ref` provided
 
 ## TypeScript
 
-To type your component's props to include the standard polymorphic properties (`as`, `class`, `style`), you can extend `BaseUIComponentProps`:
+There are two helper types for authoring components around `useRender`:
+
+- `useRender.ComponentProps<State, ExtraProps>` types the declared component props that belong in `defineProps()`.
+- `useRender.ElementProps<Tag>` types the object you pass through `props`.
+
+In Vue, regular DOM attributes and listeners are usually fallthrough attrs, so they still come from `useAttrs()` rather than `defineProps()`.
 
 ```vue title="Typing props"
 <script setup lang="ts">
-import type { BaseUIComponentProps } from 'base-ui-vue'
 import { mergeProps, useRender } from 'base-ui-vue'
 import { computed } from 'vue'
+
+interface ButtonState {
+  disabled: boolean
+}
+
+type ButtonProps = useRender.ComponentProps<ButtonState, {
+  disabled?: boolean
+}>
 
 defineOptions({ inheritAttrs: false })
 
 const props = defineProps<ButtonProps>()
 
-export interface ButtonProps extends BaseUIComponentProps {
-  disabled?: boolean
-}
-
-const defaultProps = {
+const defaultProps: useRender.ElementProps<'button'> = {
   class: 'Button',
   type: 'button',
 }
 
+const state = computed<ButtonState>(() => ({
+  disabled: props.disabled ?? false,
+}))
+
 const element = useRender({
   defaultTagName: 'button',
   ...props,
-  props: computed(() => mergeProps(defaultProps)),
+  state,
+  props: mergeProps(defaultProps),
 })
 </script>
 ```
@@ -163,8 +174,8 @@ import { Button, Slot } from 'base-ui-vue'
 </script>
 
 <template>
-  <Button v-slot="{ props }" :as="Slot">
-    <a href="/login" class="primary" v-bind="props">Login</a>
+  <Button v-slot="{ props, ref }" :as="Slot">
+    <a :ref="ref" href="/login" class="primary" v-bind="props">Login</a>
   </Button>
 </template>
 ```
@@ -177,8 +188,8 @@ import { Button, Slot } from 'base-ui-vue'
 | ------------------------ | ---------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
 | `defaultTagName`         | `string`                                       | The default tag name to use when `as` is not provided.                                                               |
 | `as`                     | `string \| Component`                          | The element or component to use for the root node. Pass `Slot` for renderless mode.                                  |
-| `props`                  | `MaybeRefOrGetter<Record<string, any> \| undefined>` | Props to be merged with the component's internal attributes. Use a getter or computed when they depend on reactive state. |
-| `state`                  | `MaybeRefOrGetter<State>`                      | The state of the component. It automatically converts to `data-*` attributes and binds to `class`/`style` callbacks. |
+| `props`                  | `MaybeRefOrGetter<Record<string, any> \| undefined>` | Props to be merged with the component's internal attributes. Use a getter or computed when they depend on reactive state. For stronger typing, use `useRender.ElementProps<'button'>` or another intrinsic tag. |
+| `state`                  | `MaybeRefOrGetter<State \| undefined>`         | The state of the component. It automatically converts to `data-*` attributes and binds to `class`/`style` callbacks. |
 | `stateAttributesMapping` | `StateAttributesMapping<State>`                | Custom mapping for converting state properties to `data-*` attributes.                                               |
 | `class`                  | `any \| ((state: State) => any)`               | A Vue class binding or a function that receives the state and returns a class binding.                               |
 | `style`                  | `StyleValue \| ((state: State) => StyleValue)` | A Vue style binding or a function that receives the state and returns a style binding.                               |
@@ -192,7 +203,7 @@ import { Button, Slot } from 'base-ui-vue'
 | `renderProps` | `ComputedRef<Record<string, any>>`              | All merged attributes to bind to the element using `v-bind`.                 |
 | `renderless`  | `ComputedRef<boolean>`                          | `true` when `as` is `Slot`.                                                  |
 | `state`       | `ComputedRef<Readonly<State>>`                  | The component state, passed through for slot exposure.                       |
-| `ref`         | `((el: Element) => void) \| null`               | A callback ref to bind to the element using `:ref`.                          |
+| `ref`         | `((el: Element \| ComponentPublicInstance \| null) => void) \| undefined` | A callback ref to bind to the element using `:ref`. |
 
 ```vue title="Usage"
 <script setup>
