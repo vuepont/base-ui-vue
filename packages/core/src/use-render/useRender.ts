@@ -20,6 +20,8 @@ type UseRenderIntrinsicElement = keyof NativeElements
 type UseRenderRef
   = | Ref<HTMLElement | ComponentPublicInstance | null>
     | ((el: Element | ComponentPublicInstance | null) => void)
+    | null
+    | undefined
 
 export type RenderRef = UseRenderRef
 
