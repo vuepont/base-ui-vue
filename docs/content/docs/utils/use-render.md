@@ -31,17 +31,18 @@ import { mergeProps, useRender } from 'base-ui-vue'
 defineOptions({ inheritAttrs: false })
 const props = defineProps<{ as?: any }>()
 
-const element = useRender({
+const { tag, renderProps } = useRender({
   defaultTagName: 'button',
   ...props,
-  props: mergeProps({
-    class: 'Button',
-  }),
+  props: mergeProps(
+    { class: 'Button', type: 'button' },
+    { 'aria-label': 'Submit' },
+  ),
 })
 </script>
 
 <template>
-  <component :is="element.tag" v-bind="element.renderProps">
+  <component :is="tag" v-bind="renderProps">
     <slot />
   </component>
 </template>
@@ -63,7 +64,7 @@ const props = defineProps<{ as?: any }>()
 
 const internalRef = ref<HTMLElement | null>(null)
 
-const element = useRender({
+const { tag, renderProps, renderless, state, ref: elementRef } = useRender({
   defaultTagName: 'p',
   ...props,
   props: computed(() => ({
@@ -75,16 +76,16 @@ const element = useRender({
 
 <template>
   <slot
-    v-if="element.renderless"
-    :ref="element.ref"
-    :props="element.renderProps"
-    :state="element.state"
+    v-if="renderless"
+    :ref="elementRef"
+    :props="renderProps"
+    :state="state"
   />
   <component
-    :is="element.tag"
+    :is="tag"
     v-else
-    v-bind="element.renderProps"
-    :ref="element.ref"
+    v-bind="renderProps"
+    :ref="elementRef"
   >
     <slot />
   </component>
@@ -115,7 +116,7 @@ In Vue, regular DOM attributes and listeners are usually fallthrough attrs, so t
 
 ```vue title="Typing props"
 <script setup lang="ts">
-import { mergeProps, useRender } from 'base-ui-vue'
+import { useRender } from 'base-ui-vue'
 import { computed } from 'vue'
 
 interface ButtonState {
@@ -139,24 +140,24 @@ const state = computed<ButtonState>(() => ({
   disabled: props.disabled ?? false,
 }))
 
-const element = useRender({
+const { tag, renderProps } = useRender({
   defaultTagName: 'button',
   ...props,
   state,
-  props: mergeProps(defaultProps),
+  props: defaultProps,
 })
 </script>
 ```
 
-## Migrating from Radix Vue
+## Migrating from Reka UI
 
-Radix Vue uses an `asChild` prop, while Base UI Vue uses an `as` prop accepting the `Slot` sentinel.
+Reka UI uses an `asChild` prop, while Base UI Vue uses an `as` prop accepting the `Slot` sentinel.
 
-In Radix Vue, you pass `as-child` to remove the wrapper tag.
+In Reka UI, you pass `as-child` to remove the wrapper tag.
 
-```vue title="Radix Vue asChild prop"
+```vue title="Reka UI asChild prop"
 <script setup>
-import { Button } from 'radix-vue'
+import { Button } from 'reka-ui'
 </script>
 
 <template>
@@ -207,23 +208,23 @@ import { Button, Slot } from 'base-ui-vue'
 
 ```vue title="Usage"
 <script setup>
-const element = useRender({
+const { tag, renderProps, renderless, state, ref: elementRef } = useRender({
   // Input parameters
 })
 </script>
 
 <template>
   <slot
-    v-if="element.renderless"
-    :ref="element.ref"
-    :props="element.renderProps"
-    :state="element.state"
+    v-if="renderless"
+    :ref="elementRef"
+    :props="renderProps"
+    :state="state"
   />
   <component
-    :is="element.tag"
+    :is="tag"
     v-else
-    v-bind="element.renderProps"
-    :ref="element.ref"
+    v-bind="renderProps"
+    :ref="elementRef"
   >
     <!-- content -->
   </component>
