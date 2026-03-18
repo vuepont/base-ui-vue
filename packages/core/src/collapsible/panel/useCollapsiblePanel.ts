@@ -5,7 +5,10 @@ import type { AnimationType, Dimensions } from '../root/useCollapsibleRoot'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { createChangeEventDetails } from '../../utils/createBaseUIEventDetails'
 import { REASONS } from '../../utils/reasons'
-import { AnimationFrame, useAnimationFrame } from '../../utils/useAnimationFrame'
+import {
+  AnimationFrame,
+  useAnimationFrame,
+} from '../../utils/useAnimationFrame'
 import { useMergedRefs } from '../../utils/useMergedRefs'
 import { warn } from '../../utils/warn'
 import { CollapsiblePanelDataAttributes } from './CollapsiblePanelDataAttributes'
@@ -63,7 +66,7 @@ export interface UseCollapsiblePanelParameters {
 
 export interface UseCollapsiblePanelReturnValue {
   hidden: Ref<boolean>
-  panelRef: ((el: any) => void) | null
+  panelRef: ((el: any) => void) | undefined
 }
 
 export function useCollapsiblePanel(

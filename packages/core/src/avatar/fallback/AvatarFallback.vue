@@ -2,7 +2,7 @@
 import type { BaseUIComponentProps } from '../../utils/types'
 import type { AvatarRootState } from '../root/AvatarRoot.vue'
 import { computed, ref, useAttrs, watchEffect } from 'vue'
-import { getStateAttributesProps } from '../../utils/getStateAttributesProps'
+import { useRenderElement } from '../../utils/useRenderElement'
 import { useTimeout } from '../../utils/useTimeout'
 import { useAvatarRootContext } from '../root/AvatarRootContext'
 import { avatarStateAttributesMapping } from '../root/stateAttributesMapping'
@@ -52,18 +52,20 @@ const isEnabled = computed(() => {
   return imageLoadingStatus.value !== 'loaded' && delayPassed.value
 })
 
-const mergedProps = computed(() => {
-  return {
+const { tag, mergedProps, renderless } = useRenderElement({
+  componentProps: props,
+  state,
+  props: computed(() => ({
     ...attrs,
-    class: typeof props.class === 'function' ? props.class(state.value) : props.class,
-    style: typeof props.style === 'function' ? props.style(state.value) : props.style,
-    ...getStateAttributesProps(state.value, avatarStateAttributesMapping),
-  }
+  })),
+  stateAttributesMapping: avatarStateAttributesMapping,
+  defaultTagName: 'span',
 })
 </script>
 
 <template>
-  <component :is="props.as" v-if="isEnabled" v-bind="mergedProps">
-    <slot />
+  <slot v-if="renderless && isEnabled" :props="mergedProps" :state="state" />
+  <component :is="tag" v-else-if="isEnabled" v-bind="mergedProps">
+    <slot :state="state" />
   </component>
 </template>

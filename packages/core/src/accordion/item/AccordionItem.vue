@@ -5,9 +5,9 @@ import { computed, provide, ref, useAttrs } from 'vue'
 import { collapsibleRootContextKey } from '../../collapsible/root/CollapsibleRootContext'
 import { useCollapsibleRoot } from '../../collapsible/root/useCollapsibleRoot'
 import { useCompositeListItem } from '../../composite/list/useCompositeListItem'
-import { getStateAttributesProps } from '../../utils/getStateAttributesProps'
 import { useBaseUiId } from '../../utils/useBaseUiId'
 import { useMergedRefs } from '../../utils/useMergedRefs'
+import { useRenderElement } from '../../utils/useRenderElement'
 import { useAccordionRootContext } from '../root/AccordionRootContext'
 import { accordionItemContextKey } from './AccordionItemContext'
 import { accordionStateAttributesMapping } from './stateAttributesMapping'
@@ -99,19 +99,26 @@ provide(accordionItemContextKey, {
 const itemRef = ref<HTMLElement | null>(null)
 const mergedRef = useMergedRefs(itemRef, listItemRef)
 
-const mergedProps = computed(() => {
-  const stateAttributes = getStateAttributesProps(state.value, accordionStateAttributesMapping)
-  return {
+const {
+  tag,
+  mergedProps,
+  renderless,
+  ref: renderRef,
+} = useRenderElement({
+  componentProps: props,
+  state,
+  props: computed(() => ({
     ...attrs,
-    class: typeof props.class === 'function' ? props.class(state.value) : props.class,
-    style: typeof props.style === 'function' ? props.style(state.value) : props.style,
-    ...stateAttributes,
-  }
+  })),
+  stateAttributesMapping: accordionStateAttributesMapping,
+  defaultTagName: 'div',
+  ref: mergedRef,
 })
 </script>
 
 <template>
-  <component :is="props.as" :ref="mergedRef" v-bind="mergedProps">
-    <slot />
+  <slot v-if="renderless" :ref="renderRef" :props="mergedProps" :state="state" />
+  <component :is="tag" v-else :ref="renderRef" v-bind="mergedProps">
+    <slot :state="state" />
   </component>
 </template>

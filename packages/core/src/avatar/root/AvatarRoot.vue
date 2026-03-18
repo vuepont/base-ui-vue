@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { BaseUIComponentProps } from '../../utils/types'
 import { computed, provide, ref, useAttrs } from 'vue'
-import { getStateAttributesProps } from '../../utils/getStateAttributesProps'
+import { useRenderElement } from '../../utils/useRenderElement'
 import { AvatarRootContextKey } from './AvatarRootContext'
 import { avatarStateAttributesMapping } from './stateAttributesMapping'
 
@@ -43,18 +43,20 @@ const state = computed<AvatarRootState>(() => ({
   imageLoadingStatus: imageLoadingStatus.value,
 }))
 
-const mergedProps = computed(() => {
-  return {
+const { tag, mergedProps, renderless } = useRenderElement({
+  componentProps: props,
+  state,
+  props: computed(() => ({
     ...attrs,
-    class: typeof props.class === 'function' ? props.class(state.value) : props.class,
-    style: typeof props.style === 'function' ? props.style(state.value) : props.style,
-    ...getStateAttributesProps(state.value, avatarStateAttributesMapping),
-  }
+  })),
+  stateAttributesMapping: avatarStateAttributesMapping,
+  defaultTagName: 'span',
 })
 </script>
 
 <template>
-  <component :is="props.as" v-bind="mergedProps">
-    <slot />
+  <slot v-if="renderless" :props="mergedProps" :state="state" />
+  <component :is="tag" v-else v-bind="mergedProps">
+    <slot :state="state" />
   </component>
 </template>

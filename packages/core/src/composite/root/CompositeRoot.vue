@@ -4,6 +4,7 @@ import type { Dimensions, ModifierKey } from '../composite'
 import type { CompositeMetadata } from '../list/CompositeList.vue'
 import { computed, provide, reactive, useAttrs } from 'vue'
 import { useDirection } from '../../direction-provider/DirectionContext'
+import { useRenderElement } from '../../utils/useRenderElement'
 import CompositeList from '../list/CompositeList.vue'
 import { compositeRootContextKey } from './CompositeRootContext'
 import { useCompositeRoot } from './useCompositeRoot'
@@ -75,6 +76,21 @@ provide(
     relayKeyboardEvent: root.relayKeyboardEvent,
   }),
 )
+
+const state = computed(() => ({}))
+
+const {
+  tag,
+  mergedProps,
+  renderless,
+  ref: renderRef,
+} = useRenderElement({
+  componentProps: props,
+  state,
+  props: computed(() => root.getRootProps(attrs)),
+  defaultTagName: 'div',
+  ref: root.mergedRef,
+})
 </script>
 
 <template>
@@ -82,12 +98,9 @@ provide(
     :elements-ref="root.elementsRef"
     @map-change="(newMap: any) => { emit('mapChange', newMap); root.onMapChange(newMap) }"
   >
-    <component
-      :is="props.as" :ref="root.mergedRef" v-bind="root.getRootProps(attrs)"
-      :class="typeof props.class === 'function' ? props.class({}) : props.class"
-      :style="typeof props.style === 'function' ? props.style({}) : props.style"
-    >
-      <slot />
+    <slot v-if="renderless" :ref="renderRef" :props="mergedProps" :state="state" />
+    <component :is="tag" v-else :ref="renderRef" v-bind="mergedProps">
+      <slot :state="state" />
     </component>
   </CompositeList>
 </template>

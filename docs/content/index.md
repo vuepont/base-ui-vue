@@ -9,7 +9,7 @@ hero:
       link: /docs/overview/getting-started
     - theme: alt
       text: Components
-      link: /docs/components/
+      link: /docs/components/accordion
 features:
   - title: Composable
     details: Build your own system with unstyled primitives.

@@ -3,7 +3,7 @@ import type { StateAttributesMapping } from '../../utils/getStateAttributesProps
 import type { BaseUIComponentProps } from '../../utils/types'
 import { computed, useAttrs } from 'vue'
 import { EMPTY_OBJECT } from '../../utils/constants'
-import { getStateAttributesProps } from '../../utils/getStateAttributesProps'
+import { useRenderElement } from '../../utils/useRenderElement'
 import { useCompositeItem } from './useCompositeItem'
 
 export interface CompositeItemProps<Metadata, State extends Record<string, any>> extends Pick<
@@ -35,9 +35,7 @@ const { compositeProps, compositeRef } = useCompositeItem({
   metadata: () => props.metadata,
 })
 
-const mergedProps = computed(() => {
-  const stateAttributes = getStateAttributesProps(props.state, props.stateAttributesMapping)
-
+const externalProps = computed(() => {
   let externalProps = {}
 
   if (props.props) {
@@ -51,15 +49,27 @@ const mergedProps = computed(() => {
     ...attrs,
     ...externalProps,
     ...compositeProps.value,
-    ...stateAttributes,
-    class: typeof props.class === 'function' ? props.class(props.state) : props.class,
-    style: typeof props.style === 'function' ? props.style(props.state) : props.style,
   }
+})
+
+const {
+  tag,
+  mergedProps,
+  renderless,
+  ref: renderRef,
+} = useRenderElement({
+  componentProps: props,
+  state: computed(() => props.state),
+  props: externalProps,
+  stateAttributesMapping: props.stateAttributesMapping,
+  defaultTagName: 'div',
+  ref: compositeRef,
 })
 </script>
 
 <template>
-  <component :is="props.as" :ref="compositeRef" v-bind="mergedProps">
-    <slot />
+  <slot v-if="renderless" :ref="renderRef" :props="mergedProps" :state="props.state" />
+  <component :is="tag" v-else :ref="renderRef" v-bind="mergedProps">
+    <slot :state="props.state" />
   </component>
 </template>

@@ -5,9 +5,9 @@ import type { TransitionStatus } from '../../utils/useTransitionStatus'
 import type { AvatarRootState } from '../root/AvatarRoot.vue'
 import type { ImageLoadingStatus } from './useImageLoadingStatus'
 import { computed, ref, useAttrs, watchEffect } from 'vue'
-import { getStateAttributesProps } from '../../utils/getStateAttributesProps'
 import { transitionStatusMapping } from '../../utils/stateAttributesMapping'
 import { useOpenChangeComplete } from '../../utils/useOpenChangeComplete'
+import { useRenderElement } from '../../utils/useRenderElement'
 import { useTransitionStatus } from '../../utils/useTransitionStatus'
 import { useAvatarRootContext } from '../root/AvatarRootContext'
 import { avatarStateAttributesMapping } from '../root/stateAttributesMapping'
@@ -77,19 +77,27 @@ const stateAttributesMapping: StateAttributesMapping<AvatarImageState> = {
   ...transitionStatusMapping,
 }
 
-const mergedProps = computed(() => {
-  return {
+const {
+  tag,
+  mergedProps,
+  renderless,
+  ref: renderRef,
+} = useRenderElement({
+  componentProps: props,
+  state,
+  props: computed(() => ({
     ...attrs,
     src: props.src,
-    class: typeof props.class === 'function' ? props.class(state.value) : props.class,
-    style: typeof props.style === 'function' ? props.style(state.value) : props.style,
-    ...getStateAttributesProps(state.value, stateAttributesMapping),
-  }
+  })),
+  stateAttributesMapping,
+  defaultTagName: 'img',
+  ref: imageRef,
 })
 </script>
 
 <template>
-  <component :is="props.as" v-if="mounted" ref="imageRef" v-bind="mergedProps">
-    <slot />
+  <slot v-if="renderless && mounted" :ref="renderRef" :props="mergedProps" :state="state" />
+  <component :is="tag" v-else-if="mounted" :ref="renderRef" v-bind="mergedProps">
+    <slot :state="state" />
   </component>
 </template>
