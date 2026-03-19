@@ -2,7 +2,7 @@
 import type { ButtonProps } from './button.types'
 import { computed, useAttrs } from 'vue'
 import { useButton } from '../use-button'
-import { getStateAttributesProps } from '../utils/getStateAttributesProps'
+import { useRenderElement } from '../utils/useRenderElement'
 
 defineOptions({
   name: 'BaseUIButton',
@@ -35,19 +35,25 @@ const state = computed(() => ({
   disabled: props.disabled,
 }))
 
-const mergedProps = computed(() => {
-  const stateAttributes = getStateAttributesProps(state.value)
-  return getButtonProps({
+const {
+  tag,
+  mergedProps,
+  renderless,
+  ref: renderRef,
+} = useRenderElement({
+  componentProps: props,
+  state,
+  props: computed(() => getButtonProps({
     ...attrs,
-    class: typeof props.class === 'function' ? props.class(state.value) : props.class,
-    style: typeof props.style === 'function' ? props.style(state.value) : props.style,
-    ...stateAttributes,
-  })
+  })),
+  defaultTagName: 'button',
+  ref: buttonRef,
 })
 </script>
 
 <template>
-  <component :is="props.as" ref="buttonRef" v-bind="mergedProps">
-    <slot />
+  <slot v-if="renderless" :ref="renderRef" :props="mergedProps" :state="state" />
+  <component :is="tag" v-else :ref="renderRef" v-bind="mergedProps">
+    <slot :state="state" />
   </component>
 </template>

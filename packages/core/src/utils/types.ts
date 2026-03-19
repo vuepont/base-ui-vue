@@ -10,7 +10,9 @@ export type Orientation = 'horizontal' | 'vertical'
  */
 export interface BaseUIComponentProps<State> {
   /**
-   * The element or component to use for the root node.
+   * The element or component for the root node.
+   * Pass `Slot` (value import from base-ui-vue) for renderless mode.
+   * Slot is typed as Component, so no special type handling needed.
    */
   as?: string | Component
   /**

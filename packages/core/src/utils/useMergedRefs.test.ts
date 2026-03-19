@@ -44,9 +44,9 @@ describe('useMergedRefs', () => {
     expect(screen.getByTestId('hasRef').textContent).toBe('true')
   })
 
-  it('returns null if none of the forked branches requires a ref', () => {
+  it('returns undefined if none of the forked branches requires a ref', () => {
     const result = useMergedRefs(null, undefined, null)
-    expect(result).toBeNull()
+    expect(result).toBeUndefined()
   })
 
   it('handles unwrapping component instances to get the $el', async () => {

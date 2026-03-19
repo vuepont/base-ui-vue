@@ -104,4 +104,26 @@ describe('<CollapsiblePanel />', () => {
       },
     )
   })
+
+  it('keeps internal CSS variables ahead of user style overrides', () => {
+    const App = defineComponent({
+      components: { CollapsibleRoot, CollapsibleTrigger, CollapsiblePanel },
+      template: `
+        <CollapsibleRoot :open="true">
+          <CollapsibleTrigger>Toggle</CollapsibleTrigger>
+          <CollapsiblePanel :style="{ '--collapsible-panel-height': '1px', '--collapsible-panel-width': '2px' }">
+            ${PANEL_CONTENT}
+          </CollapsiblePanel>
+        </CollapsibleRoot>
+      `,
+    })
+
+    render(App)
+    const style = screen.getByText(PANEL_CONTENT).getAttribute('style') || ''
+
+    expect(style).toContain('--collapsible-panel-height')
+    expect(style).toContain('--collapsible-panel-width')
+    expect(style).not.toContain('1px')
+    expect(style).not.toContain('2px')
+  })
 })

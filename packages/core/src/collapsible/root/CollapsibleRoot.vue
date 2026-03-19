@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { CollapsibleChangeEventDetails, CollapsibleRootProps } from '../collapsible.types'
 import { computed, getCurrentInstance, provide, useAttrs } from 'vue'
-import { getStateAttributesProps } from '../../utils/getStateAttributesProps'
+import { useRenderElement } from '../../utils/useRenderElement'
 import { collapsibleRootContextKey } from './CollapsibleRootContext'
 import { collapsibleStateAttributesMapping } from './stateAttributesMapping'
 import { useCollapsibleRoot } from './useCollapsibleRoot'
@@ -41,19 +41,20 @@ const state = collapsible.state
 
 provide(collapsibleRootContextKey, collapsible)
 
-const mergedProps = computed(() => {
-  const stateAttributes = getStateAttributesProps(state.value, collapsibleStateAttributesMapping)
-  return {
+const { tag, mergedProps, renderless } = useRenderElement({
+  componentProps: props,
+  state,
+  props: computed(() => ({
     ...attrs,
-    class: typeof props.class === 'function' ? props.class(state.value) : props.class,
-    style: typeof props.style === 'function' ? props.style(state.value) : props.style,
-    ...stateAttributes,
-  }
+  })),
+  stateAttributesMapping: collapsibleStateAttributesMapping,
+  defaultTagName: 'div',
 })
 </script>
 
 <template>
-  <component :is="props.as" v-bind="mergedProps">
-    <slot />
+  <slot v-if="renderless" :props="mergedProps" :state="state" />
+  <component :is="tag" v-else v-bind="mergedProps">
+    <slot :state="state" />
   </component>
 </template>

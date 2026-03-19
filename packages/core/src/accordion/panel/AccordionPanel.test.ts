@@ -75,6 +75,32 @@ describe('<AccordionPanel />', () => {
     expect(style).toContain('--accordion-panel-width')
   })
 
+  it('keeps internal CSS variables ahead of user style overrides', () => {
+    const App = defineComponent({
+      components: { AccordionRoot, AccordionItem, AccordionHeader, AccordionTrigger, AccordionPanel },
+      template: `
+        <AccordionRoot :default-value="['item-1']">
+          <AccordionItem value="item-1">
+            <AccordionHeader>
+              <AccordionTrigger>Trigger 1</AccordionTrigger>
+            </AccordionHeader>
+            <AccordionPanel :style="{ '--accordion-panel-height': '1px', '--accordion-panel-width': '2px' }">
+              Panel content
+            </AccordionPanel>
+          </AccordionItem>
+        </AccordionRoot>
+      `,
+    })
+
+    render(App)
+    const style = screen.getByText('Panel content').getAttribute('style') || ''
+
+    expect(style).toContain('--accordion-panel-height')
+    expect(style).toContain('--accordion-panel-width')
+    expect(style).not.toContain('1px')
+    expect(style).not.toContain('2px')
+  })
+
   it('keepMounted keeps the panel in the DOM', async () => {
     const App = defineComponent({
       components: { AccordionRoot, AccordionItem, AccordionHeader, AccordionTrigger, AccordionPanel },

@@ -13,8 +13,8 @@ import {
 } from '../../composite/composite'
 import { useButton } from '../../use-button'
 import { triggerOpenStateMapping } from '../../utils/collapsibleOpenStateMapping'
-import { getStateAttributesProps } from '../../utils/getStateAttributesProps'
 import { isElementDisabled } from '../../utils/isElementDisabled'
+import { useRenderElement } from '../../utils/useRenderElement'
 import { useAccordionItemContext } from '../item/AccordionItemContext'
 import { useAccordionRootContext } from '../root/AccordionRootContext'
 
@@ -156,30 +156,31 @@ function handleKeyDown(event: KeyboardEvent) {
   }
 }
 
-const mergedProps = computed(() => {
-  const stateAttributes = getStateAttributesProps(
-    itemCtx.state.value,
-    triggerOpenStateMapping,
-  )
-
-  const buttonProps = getButtonProps({
+const {
+  tag,
+  mergedProps,
+  renderless,
+  ref: renderRef,
+} = useRenderElement({
+  componentProps: props,
+  state: itemCtx.state,
+  props: computed(() => getButtonProps({
     ...attrs as Record<string, any>,
     'id': itemCtx.triggerId.value,
     'aria-controls': collapsibleCtx.open.value ? collapsibleCtx.panelId.value : undefined,
     'aria-expanded': collapsibleCtx.open.value,
     'onClick': collapsibleCtx.handleTrigger,
     'onKeydown': handleKeyDown,
-    'class': typeof props.class === 'function' ? props.class(itemCtx.state.value) : props.class,
-    'style': typeof props.style === 'function' ? props.style(itemCtx.state.value) : props.style,
-    ...stateAttributes,
-  })
-
-  return buttonProps
+  })),
+  stateAttributesMapping: triggerOpenStateMapping,
+  defaultTagName: 'button',
+  ref: buttonRef,
 })
 </script>
 
 <template>
-  <component :is="props.as" ref="buttonRef" v-bind="mergedProps">
-    <slot />
+  <slot v-if="renderless" :ref="renderRef" :props="mergedProps" :state="itemCtx.state" />
+  <component :is="tag" v-else :ref="renderRef" v-bind="mergedProps">
+    <slot :state="itemCtx.state" />
   </component>
 </template>
