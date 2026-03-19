@@ -3,8 +3,8 @@ import type { BaseUIComponentProps } from '../../utils/types'
 import type { FieldRootState } from '../root/FieldRoot.vue'
 import { computed, useAttrs, watchEffect } from 'vue'
 import { useLabelableContext } from '../../labelable-provider/LabelableContext'
-import { getStateAttributesProps } from '../../utils/getStateAttributesProps'
 import { useBaseUiId } from '../../utils/useBaseUiId'
+import { useRenderElement } from '../../utils/useRenderElement'
 import { useFieldRootContext } from '../root/FieldRootContext'
 import { fieldValidityMapping } from '../utils/constants'
 
@@ -42,20 +42,21 @@ watchEffect((onCleanup) => {
   }
 })
 
-const mergedProps = computed(() => {
-  const stateAttributes = getStateAttributesProps(fieldRootContext.state.value, fieldValidityMapping)
-  return {
+const { tag, mergedProps, renderless } = useRenderElement({
+  componentProps: props,
+  state: fieldRootContext.state,
+  props: computed(() => ({
     ...attrs,
     id: id.value,
-    class: typeof props.class === 'function' ? props.class(fieldRootContext.state.value) : props.class,
-    style: typeof props.style === 'function' ? props.style(fieldRootContext.state.value) : props.style,
-    ...stateAttributes,
-  }
+  })),
+  stateAttributesMapping: fieldValidityMapping,
+  defaultTagName: 'p',
 })
 </script>
 
 <template>
-  <component :is="props.as" v-bind="mergedProps">
-    <slot />
+  <slot v-if="renderless" :props="mergedProps" :state="fieldRootContext.state" />
+  <component :is="tag" v-else v-bind="mergedProps">
+    <slot :state="fieldRootContext.state" />
   </component>
 </template>

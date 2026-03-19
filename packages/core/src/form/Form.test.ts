@@ -5,6 +5,7 @@ import { defineComponent, nextTick, ref } from 'vue'
 import FieldControl from '../field/control/FieldControl.vue'
 import FieldError from '../field/error/FieldError.vue'
 import FieldRoot from '../field/root/FieldRoot.vue'
+import { Slot } from '../utils/slot'
 import Form from './Form.vue'
 
 function createApp(options: {
@@ -26,6 +27,25 @@ describe('<Form />', () => {
       }),
     )
     expect(screen.getByTestId('form').tagName).toBe('FORM')
+  })
+
+  it('supports renderless mode via Slot', () => {
+    render(
+      defineComponent({
+        components: { Form },
+        setup() {
+          return { Slot }
+        },
+        template: `
+          <Form :as="Slot" v-slot="{ props }">
+            <form data-testid="form" v-bind="props" />
+          </Form>
+        `,
+      }),
+    )
+
+    expect(screen.getByTestId('form').tagName).toBe('FORM')
+    expect(screen.getByTestId('form')).toHaveAttribute('novalidate')
   })
 
   it('does not submit if there are errors', async () => {

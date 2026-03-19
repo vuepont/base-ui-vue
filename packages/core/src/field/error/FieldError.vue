@@ -6,10 +6,10 @@ import type { FieldRootState } from '../root/FieldRoot.vue'
 import { computed, onUnmounted, ref, useAttrs, watch } from 'vue'
 import { useFormContext } from '../../form/FormContext'
 import { useLabelableContext } from '../../labelable-provider/LabelableContext'
-import { getStateAttributesProps } from '../../utils/getStateAttributesProps'
 import { transitionStatusMapping } from '../../utils/stateAttributesMapping'
 import { useBaseUiId } from '../../utils/useBaseUiId'
 import { useOpenChangeComplete } from '../../utils/useOpenChangeComplete'
+import { useRenderElement } from '../../utils/useRenderElement'
 import { useTransitionStatus } from '../../utils/useTransitionStatus'
 import { useFieldRootContext } from '../root/FieldRootContext'
 import { fieldValidityMapping } from '../utils/constants'
@@ -117,21 +117,33 @@ const state = computed<FieldErrorState>(() => ({
   transitionStatus: transitionStatus.value,
 }))
 
-const mergedProps = computed(() => {
-  const stateAttributes = getStateAttributesProps(state.value, stateAttributesMapping)
-  return {
+const {
+  tag,
+  mergedProps,
+  renderless,
+  ref: renderRef,
+} = useRenderElement({
+  componentProps: props,
+  state,
+  props: computed(() => ({
     ...attrs,
     id,
-    ref: errorRef,
-    class: typeof props.class === 'function' ? props.class(state.value) : props.class,
-    style: typeof props.style === 'function' ? props.style(state.value) : props.style,
-    ...stateAttributes,
-  }
+  })),
+  stateAttributesMapping,
+  defaultTagName: 'div',
+  ref: errorRef,
 })
 </script>
 
 <template>
-  <component :is="props.as" v-if="mounted" v-bind="mergedProps">
+  <slot
+    v-if="mounted && renderless"
+    :ref="renderRef"
+    :props="mergedProps"
+    :state="state"
+    :message="errorMessage"
+  />
+  <component :is="tag" v-else-if="mounted" :ref="renderRef" v-bind="mergedProps">
     <slot v-if="$slots.default" />
     <template v-else-if="Array.isArray(errorMessage)">
       <ul>

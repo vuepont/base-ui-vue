@@ -1,7 +1,8 @@
 import userEvent from '@testing-library/user-event'
 import { render, screen } from '@testing-library/vue'
 import { describe, expect, it } from 'vitest'
-import { defineComponent } from 'vue'
+import { defineComponent, h, nextTick, ref } from 'vue'
+import { Slot } from '../../utils/slot'
 import FieldError from '../error/FieldError.vue'
 import FieldRoot from '../root/FieldRoot.vue'
 import FieldControl from './FieldControl.vue'
@@ -43,6 +44,43 @@ describe('<FieldControl />', () => {
       }),
     )
     expect(screen.getByTestId('input')).toHaveValue('hello')
+  })
+
+  it('supports renderless mode and keeps the internal input ref working', async () => {
+    const user = userEvent.setup()
+
+    const WrappedInput = defineComponent({
+      inheritAttrs: false,
+      setup(_, { attrs }) {
+        return () => h('input', attrs)
+      },
+    })
+
+    render(
+      defineComponent({
+        components: { FieldRoot, FieldControl, FieldError, WrappedInput },
+        setup() {
+          const fieldRef = ref<InstanceType<typeof FieldRoot> | null>(null)
+          const validate = () => 'Custom error message'
+          return { Slot, fieldRef, validate }
+        },
+        template: `
+          <FieldRoot ref="fieldRef" :validate="validate">
+            <FieldControl :as="Slot" v-slot="{ props, ref }">
+              <WrappedInput data-testid="input" v-bind="props" :ref="ref" />
+            </FieldControl>
+            <FieldError data-testid="error" />
+          </FieldRoot>
+          <button data-testid="validate" type="button" @click="fieldRef?.validate()">Validate</button>
+        `,
+      }),
+    )
+
+    await user.click(screen.getByTestId('validate'))
+    await nextTick()
+
+    expect(screen.getByTestId('input').tagName).toBe('INPUT')
+    expect(screen.getByTestId('error').textContent).toBe('Custom error message')
   })
 
   describe('prop: disabled', () => {

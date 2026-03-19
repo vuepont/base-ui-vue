@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import type { BaseUIComponentProps } from '../../utils/types'
 import type { FieldRootState } from '../root/FieldRoot.vue'
-import { computed, ref, shallowRef, useAttrs, useTemplateRef, watchEffect } from 'vue'
+import { computed, ref, shallowRef, useAttrs, watchEffect } from 'vue'
 import { useLabelableContext } from '../../labelable-provider/LabelableContext'
 import { useAriaLabelledBy } from '../../labelable-provider/useAriaLabelledBy'
 import { useLabelableId } from '../../labelable-provider/useLabelableId'
-import { getStateAttributesProps } from '../../utils/getStateAttributesProps'
+import { mergeProps } from '../../merge-props/mergeProps'
+import { useRenderElement } from '../../utils/useRenderElement'
 import { useFieldRootContext } from '../root/FieldRootContext'
 import { useField } from '../useField'
 import { fieldValidityMapping } from '../utils/constants'
@@ -46,6 +47,7 @@ const emit = defineEmits<{
 }>()
 
 const attrs = useAttrs()
+const attrsObject = attrs as Record<string, any>
 
 const fieldContext = useFieldRootContext()
 
@@ -83,24 +85,6 @@ const currentValue = computed(() => {
 })
 
 const inputElementRef = ref<HTMLElement | null>(null)
-const templateRef = useTemplateRef<unknown>('control')
-
-function isHTMLElement(value: unknown): value is HTMLElement {
-  return typeof HTMLElement !== 'undefined' && value instanceof HTMLElement
-}
-
-function resolveHTMLElement(value: unknown): HTMLElement | null {
-  if (isHTMLElement(value)) {
-    return value
-  }
-  if (value && typeof value === 'object' && '$el' in value) {
-    const el = (value as { $el?: unknown }).$el
-    if (isHTMLElement(el)) {
-      return el
-    }
-  }
-  return null
-}
 
 const { labelId } = useLabelableContext()
 const ariaLabelledByAttr = computed(() => attrs['aria-labelledby'] as string | undefined)
@@ -113,9 +97,7 @@ const ariaLabelledBy = useAriaLabelledBy({
 })
 
 watchEffect(() => {
-  const element = resolveHTMLElement(templateRef.value)
-  inputElementRef.value = element
-  validation.setInputRef(element as HTMLInputElement | null)
+  validation.setInputRef(inputElementRef.value as HTMLInputElement | null)
 })
 
 useField({
@@ -177,12 +159,10 @@ function handleKeydown(event: KeyboardEvent) {
   }
 }
 
-const mergedProps = computed(() => {
-  const stateAttributes = getStateAttributesProps(state.value, fieldValidityMapping)
-  const inputValidationProps = validation.getInputValidationProps()
-
-  const baseProps: Record<string, any> = {
-    ...attrs,
+const controlProps = computed(() => mergeProps(
+  attrsObject,
+  validation.getInputValidationProps(),
+  {
     'id': controlId.value,
     'disabled': disabled.value,
     'name': name.value,
@@ -197,32 +177,35 @@ const mergedProps = computed(() => {
     'max': props.max,
     'step': props.step,
     'placeholder': props.placeholder,
-    'class': typeof props.class === 'function' ? props.class(state.value) : props.class,
-    'style': typeof props.style === 'function' ? props.style(state.value) : props.style,
-    ...stateAttributes,
     'value': isControlled.value ? props.value : internalValue.value,
-  }
+    'onInput': handleInputCombined,
+    'onFocus': handleFocus,
+    'onBlur': handleBlur,
+    'onKeydown': handleKeydown,
+  },
+))
 
-  for (const [key, val] of Object.entries(inputValidationProps)) {
-    if (key === 'onInput')
-      continue
-    if (!(key in baseProps) || baseProps[key] === undefined) {
-      baseProps[key] = val
-    }
-  }
-
-  return baseProps
+const {
+  tag,
+  mergedProps,
+  renderless,
+  ref: renderRef,
+} = useRenderElement({
+  componentProps: props,
+  state,
+  props: controlProps,
+  stateAttributesMapping: fieldValidityMapping,
+  defaultTagName: 'input',
+  ref: inputElementRef,
 })
 </script>
 
 <template>
+  <slot v-if="renderless" :ref="renderRef" :props="mergedProps" :state="state" />
   <component
-    :is="props.as"
-    ref="control"
+    :is="tag"
+    v-else
+    :ref="renderRef"
     v-bind="mergedProps"
-    @input="handleInputCombined"
-    @focus="handleFocus"
-    @blur="handleBlur"
-    @keydown="handleKeydown"
   />
 </template>

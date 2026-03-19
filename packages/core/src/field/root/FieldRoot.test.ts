@@ -3,6 +3,7 @@ import { fireEvent, render, screen } from '@testing-library/vue'
 import { describe, expect, it, vi } from 'vitest'
 import { defineComponent, nextTick, ref } from 'vue'
 import Form from '../../form/Form.vue'
+import { Slot } from '../../utils/slot'
 import FieldControl from '../control/FieldControl.vue'
 import FieldDescription from '../description/FieldDescription.vue'
 import FieldError from '../error/FieldError.vue'
@@ -48,6 +49,29 @@ describe('<FieldRoot />', () => {
     )
     expect(screen.getByText('Name')).toBeTruthy()
     expect(screen.getByRole('textbox')).toBeTruthy()
+  })
+
+  it('supports renderless mode via Slot', () => {
+    render(
+      defineComponent({
+        components: { FieldRoot, FieldControl },
+        setup() {
+          return { Slot }
+        },
+        template: `
+          <FieldRoot :as="Slot" v-slot="{ props, state }">
+            <section data-testid="field" v-bind="props" :data-focused-state="state.focused">
+              <FieldControl />
+            </section>
+          </FieldRoot>
+        `,
+      }),
+    )
+
+    const field = screen.getByTestId('field')
+    expect(field.tagName).toBe('SECTION')
+    expect(screen.getByRole('textbox')).toBeTruthy()
+    expect(field).toHaveAttribute('data-focused-state', 'false')
   })
 
   it('associates label with control via aria-labelledby', async () => {

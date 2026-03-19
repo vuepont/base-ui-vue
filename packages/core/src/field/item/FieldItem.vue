@@ -4,7 +4,7 @@ import type { FieldRootState } from '../root/FieldRoot.vue'
 import type { FieldItemContext } from './FieldItemContext'
 import { computed, provide, useAttrs } from 'vue'
 import LabelableProvider from '../../labelable-provider/LabelableProvider.vue'
-import { getStateAttributesProps } from '../../utils/getStateAttributesProps'
+import { useRenderElement } from '../../utils/useRenderElement'
 import { useFieldRootContext } from '../root/FieldRootContext'
 import { fieldValidityMapping } from '../utils/constants'
 import { fieldItemContextKey } from './FieldItemContext'
@@ -42,22 +42,22 @@ const contextValue: FieldItemContext = {
 
 provide(fieldItemContextKey, contextValue)
 
-const mergedProps = computed(() => {
-  const stateAttributes = getStateAttributesProps(state.value, fieldValidityMapping)
-
-  return {
+const { tag, mergedProps, renderless } = useRenderElement({
+  componentProps: props,
+  state,
+  props: computed(() => ({
     ...attrs,
-    class: typeof props.class === 'function' ? props.class(state.value) : props.class,
-    style: typeof props.style === 'function' ? props.style(state.value) : props.style,
-    ...stateAttributes,
-  }
+  })),
+  stateAttributesMapping: fieldValidityMapping,
+  defaultTagName: 'div',
 })
 </script>
 
 <template>
   <LabelableProvider>
-    <component :is="props.as" v-bind="mergedProps">
-      <slot />
+    <slot v-if="renderless" :props="mergedProps" :state="state" />
+    <component :is="tag" v-else v-bind="mergedProps">
+      <slot :state="state" />
     </component>
   </LabelableProvider>
 </template>

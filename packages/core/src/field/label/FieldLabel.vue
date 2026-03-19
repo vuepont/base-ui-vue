@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import type { BaseUIComponentProps } from '../../utils/types'
 import type { FieldRootState } from '../root/FieldRoot.vue'
-import { computed, ref, useAttrs, watchEffect } from 'vue'
+import { computed, useAttrs, watchEffect } from 'vue'
 import { useLabelableContext } from '../../labelable-provider/LabelableContext'
-import { getStateAttributesProps } from '../../utils/getStateAttributesProps'
 import { useBaseUiId } from '../../utils/useBaseUiId'
+import { useRenderElement } from '../../utils/useRenderElement'
 import { useFieldRootContext } from '../root/FieldRootContext'
 import { fieldValidityMapping } from '../utils/constants'
 
@@ -41,8 +41,6 @@ const { controlId, setLabelId, labelId: contextLabelId } = useLabelableContext()
 const generatedLabelId = useBaseUiId(props.id)
 const labelId = computed(() => props.id ?? contextLabelId.value ?? generatedLabelId)
 
-const labelRef = ref<HTMLElement | null>(null)
-
 watchEffect((onCleanup) => {
   const id = labelId.value
   setLabelId(id)
@@ -69,35 +67,36 @@ function handleInteraction(event: MouseEvent) {
   }
 }
 
-const mergedProps = computed(() => {
-  const stateAttributes = getStateAttributesProps(fieldRootContext.state.value, fieldValidityMapping)
-
-  const baseProps: Record<string, any> = {
-    ...attrs,
-    id: labelId.value,
-    ref: labelRef,
-    class: typeof props.class === 'function' ? props.class(fieldRootContext.state.value) : props.class,
-    style: typeof props.style === 'function' ? props.style(fieldRootContext.state.value) : props.style,
-    ...stateAttributes,
-  }
-
-  if (props.nativeLabel) {
-    baseProps.for = controlId.value ?? undefined
-    baseProps.onMousedown = handleInteraction
-  }
-  else {
-    baseProps.onClick = handleInteraction
-    baseProps.onPointerdown = (event: PointerEvent) => {
-      event.preventDefault()
+const { tag, mergedProps, renderless } = useRenderElement({
+  componentProps: props,
+  state: fieldRootContext.state,
+  props: computed(() => {
+    if (props.nativeLabel) {
+      return {
+        ...attrs,
+        id: labelId.value,
+        for: controlId.value ?? undefined,
+        onMousedown: handleInteraction,
+      }
     }
-  }
 
-  return baseProps
+    return {
+      ...attrs,
+      id: labelId.value,
+      onClick: handleInteraction,
+      onPointerdown: (event: PointerEvent) => {
+        event.preventDefault()
+      },
+    }
+  }),
+  stateAttributesMapping: fieldValidityMapping,
+  defaultTagName: 'label',
 })
 </script>
 
 <template>
-  <component :is="props.as" v-bind="mergedProps">
-    <slot />
+  <slot v-if="renderless" :props="mergedProps" :state="fieldRootContext.state" />
+  <component :is="tag" v-else v-bind="mergedProps">
+    <slot :state="fieldRootContext.state" />
   </component>
 </template>

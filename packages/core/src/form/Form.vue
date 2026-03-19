@@ -3,6 +3,7 @@ import type { BaseUIComponentProps } from '../utils/types'
 import type { FormContext, FormErrors, FormField, FormValidationMode } from './FormContext'
 import { computed, provide, ref, shallowRef, useAttrs, watch } from 'vue'
 import { EMPTY_OBJECT } from '../utils/empty'
+import { useRenderElement } from '../utils/useRenderElement'
 import { formContextKey } from './FormContext'
 
 export interface FormActions {
@@ -50,6 +51,7 @@ const emit = defineEmits<{
 }>()
 
 const attrs = useAttrs()
+const state = computed<FormState>(() => ({}))
 
 const formRef = shallowRef<{ fields: Map<string, FormField> }>({ fields: new Map() })
 const submittedRef = ref(false)
@@ -162,16 +164,15 @@ function handleSubmit(event: Event) {
   }
 }
 
-const mergedProps = computed(() => {
-  const baseProps: Record<string, any> = {
+const { tag, mergedProps, renderless } = useRenderElement({
+  componentProps: props,
+  state,
+  props: computed(() => ({
     ...attrs,
     novalidate: props.noValidate || undefined,
-    class: typeof props.class === 'function' ? props.class({}) : props.class,
-    style: typeof props.style === 'function' ? props.style({}) : props.style,
     onSubmit: handleSubmit,
-  }
-
-  return baseProps
+  })),
+  defaultTagName: 'form',
 })
 
 defineExpose({
@@ -180,7 +181,8 @@ defineExpose({
 </script>
 
 <template>
-  <component :is="props.as" v-bind="mergedProps">
-    <slot :actions="actionsRef" />
+  <slot v-if="renderless" :props="mergedProps" :state="state" :actions="actionsRef" />
+  <component :is="tag" v-else v-bind="mergedProps">
+    <slot :state="state" :actions="actionsRef" />
   </component>
 </template>
