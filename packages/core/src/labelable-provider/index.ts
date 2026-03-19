@@ -1,0 +1,6 @@
+export { labelableContextKey, useLabelableContext } from './LabelableContext'
+export type { LabelableContext } from './LabelableContext'
+export { default as LabelableProvider } from './LabelableProvider.vue'
+export type { LabelableProviderProps } from './LabelableProvider.vue'
+export { useLabelableId } from './useLabelableId'
+export type { UseLabelableIdParameters } from './useLabelableId'

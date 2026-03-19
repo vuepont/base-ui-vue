@@ -62,7 +62,9 @@ export default defineConfig({
           { text: 'Avatar', link: '/docs/components/avatar' },
           { text: 'Button', link: '/docs/components/button' },
           { text: 'Collapsible', link: '/docs/components/collapsible' },
+          { text: 'Field', link: '/docs/components/field' },
           { text: 'Fieldset', link: '/docs/components/fieldset' },
+          { text: 'Form', link: '/docs/components/form' },
         ],
       },
       {

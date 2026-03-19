@@ -17,6 +17,8 @@ This repository contains the source code and documentation for Base UI Vue, a Vu
 - Reuse existing utilities/composables before adding new abstractions; keep APIs close to Base UI semantics unless Vue adaptation requires changes.
 - Prefer explicit, strongly typed public APIs; avoid unnecessary casts (especially `as any`).
 - Keep component behavior and accessibility logic close to source counterparts, but implement with Vue idioms (refs, composables, provide/inject).
+- When implementing or migrating Base UI features, think at the library architecture level: preserve behavior and accessibility semantics, but design the implementation for Vue rather than mechanically mirroring the source.
+- Prefer maintainable, extensible solutions implemented at the correct layer of the library over scattered local patches or case-specific workarounds.
 
 ## Validation commands
 

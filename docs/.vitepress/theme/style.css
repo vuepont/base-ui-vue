@@ -129,3 +129,16 @@
   --vp-custom-block-tip-code-bg: var(--vp-c-brand-soft);
 }
 
+/**
+ * Component Preview Reset
+ * -------------------------------------------------------------------------- */
+
+:where(.vp-doc .demo-playground-inner) :where(h1, h2, h3, h4, h5, h6, p, summary) {
+  margin: 0;
+  padding: 0;
+  line-height: inherit;
+}
+
+:where(.vp-doc .demo-playground-inner) :where(input, button, textarea, select) {
+  font: inherit;
+}
