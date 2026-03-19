@@ -8,22 +8,22 @@ import { getCombinedFieldValidityData } from '../utils/getCombinedFieldValidityD
 
 const validityKeys = Object.keys(DEFAULT_VALIDITY_STATE) as Array<keyof ValidityState>
 
-function isOnlyValueMissing(state: Record<keyof ValidityState, boolean> | undefined) {
+export function isOnlyValueMissing(state: Record<keyof ValidityState, boolean> | undefined) {
   if (!state || state.valid || !state.valueMissing) {
     return false
   }
-  let onlyValueMissing = false
+
   for (const key of validityKeys) {
-    if (key === 'valid')
+    if (key === 'valid' || key === 'valueMissing') {
       continue
-    if (key === 'valueMissing') {
-      onlyValueMissing = state[key]
     }
+
     if (state[key]) {
-      onlyValueMissing = false
+      return false
     }
   }
-  return onlyValueMissing
+
+  return true
 }
 
 export interface UseFieldValidationParameters {
