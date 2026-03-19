@@ -4,8 +4,6 @@ import { useFormContext } from '../form/FormContext'
 import { useFieldRootContext } from './root/FieldRootContext'
 import { getCombinedFieldValidityData } from './utils/getCombinedFieldValidityData'
 
-const initializedValidityData = new WeakSet<object>()
-
 export interface UseFieldParameters {
   enabled?: Ref<boolean>
   value: Ref<unknown>
@@ -29,17 +27,14 @@ export function useField(params: UseFieldParameters) {
       return
     }
 
-    if (initializedValidityData.has(validityData)) {
-      return
-    }
-
     let initialValue = value.value
     if (initialValue === undefined) {
       initialValue = getValue()
     }
 
-    setValidityData({ ...validityData.value, initialValue })
-    initializedValidityData.add(validityData)
+    if (validityData.value.initialValue === null && initialValue !== null) {
+      setValidityData({ ...validityData.value, initialValue })
+    }
   })
 
   watchEffect((onCleanup) => {
