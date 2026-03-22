@@ -13,7 +13,13 @@ const cssFramework = useStorage<'css' | 'tailwind'>('cssFramework', 'tailwind')
 const allFiles = computed(() => {
   if (!props.files)
     return {}
-  return JSON.parse(decodeURIComponent(props.files))
+  try {
+    const parsed = JSON.parse(decodeURIComponent(props.files))
+    return parsed && typeof parsed === 'object' ? parsed : {}
+  }
+  catch {
+    return {}
+  }
 })
 
 const availableFrameworks = computed(() =>
