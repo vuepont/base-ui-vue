@@ -42,7 +42,7 @@ export interface UseCompositeRootParameters {
   defaultHighlightedIndex?: () => number | undefined
   onHighlightedIndexChange?: (index: number) => void
   dense?: () => boolean | undefined
-  direction: TextDirection
+  direction: () => TextDirection
   itemSizes?: () => Array<Dimensions> | undefined
   rootRef?: Ref<HTMLElement | null>
   /**
@@ -95,7 +95,6 @@ export function useCompositeRoot(params: UseCompositeRootParameters) {
   const externalSetHighlightedIndex = params.onHighlightedIndexChange
 
   const internalHighlightedIndex = ref(params.defaultHighlightedIndex?.() ?? 0)
-  const { direction } = params
   const isGrid = computed(() => cols.value > 1)
 
   const rootRef = ref<HTMLElement | null>(null)
@@ -127,7 +126,7 @@ export function useCompositeRoot(params: UseCompositeRootParameters) {
       scrollIntoViewIfNeeded(
         rootRef.value,
         newActiveItem,
-        direction,
+        params.direction(),
         orientation.value,
       )
     }
@@ -152,7 +151,7 @@ export function useCompositeRoot(params: UseCompositeRootParameters) {
     scrollIntoViewIfNeeded(
       rootRef.value,
       activeItem,
-      direction,
+      params.direction(),
       orientation.value,
     )
   }
@@ -180,7 +179,7 @@ export function useCompositeRoot(params: UseCompositeRootParameters) {
     if (!element) {
       return
     }
-    const isRtl = direction === 'rtl'
+    const isRtl = params.direction() === 'rtl'
 
     const horizontalForwardKey = isRtl ? ARROW_LEFT : ARROW_RIGHT
     const forwardKey = {

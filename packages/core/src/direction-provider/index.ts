@@ -1,7 +1,8 @@
-export type { DirectionProviderProps } from './DirectionContext'
+export { useDirection } from './DirectionContext'
 
-export {
-  Provider as DirectionProvider,
-  type TextDirection,
-  useDirection,
-} from './index.parts'
+export type {
+  DirectionProviderProps,
+  TextDirection,
+} from './DirectionContext'
+
+export { default as DirectionProvider } from './DirectionProvider.vue'

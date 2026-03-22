@@ -1,4 +1,4 @@
-import type { InjectionKey, Ref } from 'vue'
+import type { ComputedRef, InjectionKey, Ref } from 'vue'
 import type { TextDirection } from '../../direction-provider/DirectionContext'
 import type { Orientation } from '../../utils/types'
 import type { AccordionRootState, AccordionValue } from '../accordion.types'
@@ -6,7 +6,7 @@ import { inject } from 'vue'
 
 export interface AccordionRootContext<Value = any> {
   accordionItemRefs: Ref<Array<HTMLElement | null>>
-  direction: TextDirection
+  direction: ComputedRef<TextDirection>
   disabled: Ref<boolean>
   handleValueChange: (
     newValue: AccordionValue<Value>[number],

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { DirectionProviderProps } from './DirectionContext'
-import { provide, reactive, toRef } from 'vue'
+import { provide, toRef } from 'vue'
 import {
   directionContextKey,
 
@@ -19,9 +19,9 @@ const props = withDefaults(defineProps<DirectionProviderProps>(), {
   direction: 'ltr',
 })
 
-const contextValue = reactive({
+const contextValue = {
   direction: toRef(props, 'direction'),
-})
+}
 
 provide(directionContextKey, contextValue)
 </script>
