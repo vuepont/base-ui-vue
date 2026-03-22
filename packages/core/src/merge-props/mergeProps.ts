@@ -61,8 +61,12 @@ function isEventHandler(key: string, value: unknown) {
 export function mergeProps(
   ...args: (Record<string, any> | undefined)[]
 ): Record<string, any> {
-  const merged = vueMergeProps(...(args as any))
-  const classValue = mergeClassValues(args)
+  const definedArgs = args.filter(
+    (arg): arg is Record<string, any> => arg != null,
+  )
+
+  const merged = vueMergeProps(...definedArgs)
+  const classValue = mergeClassValues(definedArgs)
 
   if (classValue !== undefined) {
     merged.class = classValue
@@ -85,11 +89,15 @@ export function mergeProps(
 export function mergePropsN(
   props: readonly (Record<string, any> | undefined)[],
 ): Record<string, any> {
-  if (props.length === 0) {
+  const definedProps = props.filter(
+    (prop): prop is Record<string, any> => prop != null,
+  )
+
+  if (definedProps.length === 0) {
     return {}
   }
 
-  return mergeProps(...props)
+  return mergeProps(...definedProps)
 }
 
 function mergeClassValues(args: (Record<string, any> | undefined)[]) {
@@ -107,9 +115,10 @@ function mergeClassValues(args: (Record<string, any> | undefined)[]) {
 function wrapEventHandlers(handlers: unknown) {
   if (Array.isArray(handlers)) {
     // Vue may merge listeners into arrays; flatten them so execution order stays predictable.
-    const flatHandlers = handlers.flat(Infinity).filter(Boolean) as ((
-      ...args: any[]
-    ) => void)[]
+    const flatHandlers = handlers.flat(Infinity).filter(
+      (handler): handler is (...args: unknown[]) => unknown =>
+        typeof handler === 'function',
+    )
 
     return (...args: unknown[]) => {
       const preventableArgs = getPreventableArgs(args)
