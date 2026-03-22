@@ -40,7 +40,11 @@ const currentFramework = computed(() => {
   return availableFrameworks.value[0] ?? 'css'
 })
 
-const currentFiles = computed(() => allFiles.value[currentFramework.value] ?? [])
+const currentFiles = computed<string[]>(() => {
+  const files = allFiles.value[currentFramework.value]
+
+  return Array.isArray(files) ? files : []
+})
 
 const fileNames = computed(() =>
   currentFiles.value.map((f: string) => f.split('/').pop() ?? f),
