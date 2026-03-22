@@ -1,6 +1,6 @@
 import type { BaseUIEvent } from '../types'
 import { describe, expect, it, vi } from 'vitest'
-import { mergeProps } from './mergeProps'
+import { mergeProps, mergePropsN } from './mergeProps'
 
 describe('mergeProps', () => {
   it('merges event handlers', () => {
@@ -23,7 +23,7 @@ describe('mergeProps', () => {
     const ourCallOrder = ourProps.onClick.mock.invocationCallOrder[0]
     const theirCallOrder = theirProps.onClick.mock.invocationCallOrder[0]
 
-    expect(ourCallOrder).toBeLessThan(theirCallOrder)
+    expect(theirCallOrder).toBeLessThan(ourCallOrder)
     expect(ourProps.onClick).toHaveBeenCalled()
     expect(theirProps.onClick).toHaveBeenCalled()
     expect(theirProps.onKeydown).toHaveBeenCalled()
@@ -36,7 +36,7 @@ describe('mergeProps', () => {
     const mergedProps = mergeProps(
       {
         onClick() {
-          log.push('1')
+          log.push('3')
         },
       },
       {
@@ -46,7 +46,7 @@ describe('mergeProps', () => {
       },
       {
         onClick() {
-          log.push('3')
+          log.push('1')
         },
       },
     )
@@ -61,7 +61,7 @@ describe('mergeProps', () => {
     const mergedProps = mergeProps(
       {
         onClick() {
-          log.push('1')
+          log.push('3')
         },
       },
       {
@@ -69,13 +69,69 @@ describe('mergeProps', () => {
       },
       {
         onClick() {
-          log.push('3')
+          log.push('1')
         },
       },
     )
 
     mergedProps.onClick?.({ nativeEvent: new MouseEvent('click') } as any)
     expect(log).toEqual(['1', '3'])
+  })
+
+  it('makes a lone synthetic event handler preventable', () => {
+    let prevented = false
+
+    const mergedProps = mergeProps(
+      {},
+      {
+        onMousedown(event: BaseUIEvent<MouseEvent>) {
+          event.preventBaseUIHandler()
+          prevented = event.baseUIHandlerPrevented === true
+        },
+      },
+    )
+
+    mergedProps.onMousedown?.({ nativeEvent: new MouseEvent('mousedown') } as any)
+
+    expect(prevented).toBe(true)
+  })
+
+  it('makes a first-position synthetic event handler preventable', () => {
+    let prevented = false
+
+    const mergedProps = mergeProps(
+      {
+        onMousedown(event: BaseUIEvent<MouseEvent>) {
+          event.preventBaseUIHandler()
+          prevented = event.baseUIHandlerPrevented === true
+        },
+      },
+      {
+        id: 'test-button',
+      },
+    )
+
+    mergedProps.onMousedown?.({ nativeEvent: new MouseEvent('mousedown') } as any)
+
+    expect(prevented).toBe(true)
+  })
+
+  it('makes a lone obscure synthetic event handler preventable', () => {
+    let prevented = false
+
+    const mergedProps = mergeProps(
+      {},
+      {
+        onContextmenu(event: BaseUIEvent<MouseEvent>) {
+          event.preventBaseUIHandler()
+          prevented = event.baseUIHandlerPrevented === true
+        },
+      },
+    )
+
+    mergedProps.onContextmenu?.({ nativeEvent: new MouseEvent('contextmenu') } as any)
+
+    expect(prevented).toBe(true)
   })
 
   it('merges styles', () => {
@@ -114,7 +170,7 @@ describe('mergeProps', () => {
     expect(mergedProps.style).toBeUndefined()
   })
 
-  it('merges classes natively (leftmost first)', () => {
+  it('merges classes with rightmost first', () => {
     const theirProps = {
       class: 'external-class',
     }
@@ -123,7 +179,7 @@ describe('mergeProps', () => {
     }
     const mergedProps = mergeProps(ourProps, theirProps)
 
-    expect(mergedProps.class).toBe('internal-class external-class')
+    expect(mergedProps.class).toBe('external-class internal-class')
   })
 
   it('merges multiple classes', () => {
@@ -139,7 +195,7 @@ describe('mergeProps', () => {
       },
     )
 
-    expect(mergedProps.class).toBe('class-1 class-2 class-3')
+    expect(mergedProps.class).toBe('class-3 class-2 class-1')
   })
 
   it('merges classes with undefined', () => {
@@ -161,7 +217,7 @@ describe('mergeProps', () => {
     expect(mergedProps.class).toBeUndefined()
   })
 
-  it('does not prevent external handler if event.preventBaseUIHandler is NOT called', () => {
+  it('does not prevent internal handler if event.preventBaseUIHandler() is not called', () => {
     let ran = false
 
     const mergedProps = mergeProps(
@@ -180,23 +236,23 @@ describe('mergeProps', () => {
     expect(ran).toBe(true)
   })
 
-  it('prevents external handler if event.preventBaseUIHandler() IS called', () => {
+  it('prevents internal handler if event.preventBaseUIHandler() is called', () => {
     let ran = false
 
     const mergedProps = mergeProps(
       {
+        onClick() {
+          ran = true
+        },
+      },
+      {
+        onClick() {
+          ran = true
+        },
+      },
+      {
         onClick(event: BaseUIEvent<MouseEvent>) {
           event.preventBaseUIHandler()
-        },
-      },
-      {
-        onClick() {
-          ran = true
-        },
-      },
-      {
-        onClick() {
-          ran = true
         },
       },
     )
@@ -213,25 +269,112 @@ describe('mergeProps', () => {
     const mergedProps = mergeProps(
       {
         onClick() {
-          log.push('1')
+          log.push('2')
         },
       },
       {
         onClick(event: BaseUIEvent<MouseEvent>) {
           event.preventBaseUIHandler()
-          log.push('2')
+          log.push('1')
         },
       },
       {
         onClick() {
-          log.push('3')
+          log.push('0')
         },
       },
     )
 
     mergedProps.onClick?.({ nativeEvent: new MouseEvent('click') } as any)
 
-    expect(log).toEqual(['1', '2'])
+    expect(log).toEqual(['0', '1'])
+  })
+
+  it('returns the rightmost handler return value', () => {
+    const mergedProps = mergeProps(
+      {
+        onClick() {
+          return 'internal'
+        },
+      },
+      {
+        onClick() {
+          return 'external'
+        },
+      },
+    )
+
+    const result = mergedProps.onClick?.({ nativeEvent: new MouseEvent('click') } as any)
+
+    expect(result).toBe('external')
+  })
+
+  it('returns the preventing handler return value when the chain is stopped', () => {
+    const mergedProps = mergeProps(
+      {
+        onClick() {
+          return 'internal'
+        },
+      },
+      {
+        onClick(event: BaseUIEvent<MouseEvent>) {
+          event.preventBaseUIHandler()
+          return 'preventing-handler'
+        },
+      },
+    )
+
+    const result = mergedProps.onClick?.({ nativeEvent: new MouseEvent('click') } as any)
+
+    expect(result).toBe('preventing-handler')
+  })
+
+  it('preserves additional arguments when the event is not the first payload', () => {
+    const log: Array<[string, string, boolean]> = []
+
+    const mergedProps = mergeProps(
+      {
+        onFormSubmit(formValues: { name: string }, event: BaseUIEvent<Event>) {
+          log.push(['internal', formValues.name, typeof event.preventBaseUIHandler === 'function'])
+        },
+      },
+      {
+        onFormSubmit(formValues: { name: string }, event: BaseUIEvent<Event>) {
+          log.push(['external', formValues.name, typeof event.preventBaseUIHandler === 'function'])
+        },
+      },
+    )
+
+    mergedProps.onFormSubmit?.({ name: 'Ada' }, new Event('submit'))
+
+    expect(log).toEqual([
+      ['external', 'Ada', true],
+      ['internal', 'Ada', true],
+    ])
+  })
+
+  it('preserves all arguments for custom events without an event payload', () => {
+    const log: Array<[string, boolean, string]> = []
+
+    const mergedProps = mergeProps(
+      {
+        onOpenChange(open: boolean, reason: string) {
+          log.push(['internal', open, reason])
+        },
+      },
+      {
+        onOpenChange(open: boolean, reason: string) {
+          log.push(['external', open, reason])
+        },
+      },
+    )
+
+    mergedProps.onOpenChange?.(true, 'manual')
+
+    expect(log).toEqual([
+      ['external', true, 'manual'],
+      ['internal', true, 'manual'],
+    ])
   });
 
   [true, 13, 'newValue', { key: 'value' }, ['value'], () => 'value'].forEach(
@@ -247,14 +390,14 @@ describe('mergeProps', () => {
           },
           {
             onValueChange() {
-              log.push('2')
+              log.push('0')
             },
           },
         )
 
         mergedProps.onValueChange(eventArgument)
 
-        expect(log).toEqual(['1', '2'])
+        expect(log).toEqual(['0', '1'])
       })
     },
   )
@@ -289,5 +432,53 @@ describe('mergeProps', () => {
     mergedProps.onClick?.({ nativeEvent: new MouseEvent('click') } as any)
 
     expect(observedFlag).toBe(true)
+  })
+})
+
+describe('mergePropsN', () => {
+  it('returns an empty object if no props are provided', () => {
+    expect(mergePropsN([])).toEqual({})
+  })
+
+  it('merges props from an array using the same semantics as mergeProps', () => {
+    const mergedProps = mergePropsN([
+      {
+        class: 'class-1',
+        style: { color: 'blue', backgroundColor: 'blue' },
+      },
+      {
+        class: 'class-2',
+        style: { color: 'red' },
+      },
+      {
+        class: 'class-3',
+      },
+    ])
+
+    expect(mergedProps.class).toBe('class-3 class-2 class-1')
+    expect(mergedProps.style).toEqual({
+      color: 'red',
+      backgroundColor: 'blue',
+    })
+  })
+
+  it('makes a first-position synthetic event handler preventable in mergePropsN', () => {
+    let prevented = false
+
+    const mergedProps = mergePropsN([
+      {
+        onMousedown(event: BaseUIEvent<MouseEvent>) {
+          event.preventBaseUIHandler()
+          prevented = event.baseUIHandlerPrevented === true
+        },
+      },
+      {
+        id: 'test-button',
+      },
+    ])
+
+    mergedProps.onMousedown?.({ nativeEvent: new MouseEvent('mousedown') } as any)
+
+    expect(prevented).toBe(true)
   })
 })
