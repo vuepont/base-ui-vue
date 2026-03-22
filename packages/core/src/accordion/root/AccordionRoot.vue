@@ -112,7 +112,7 @@ const { tag, mergedProps, renderless } = useRenderElement({
   state,
   props: computed(() => ({
     ...attrs,
-    dir: direction,
+    dir: direction.value,
     role: 'region',
   })),
   stateAttributesMapping: rootStateAttributesMapping,

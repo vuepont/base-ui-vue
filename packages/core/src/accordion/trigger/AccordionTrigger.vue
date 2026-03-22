@@ -88,7 +88,7 @@ function handleKeyDown(event: KeyboardEvent) {
   let nextIndex = -1
   const thisIndex = triggers.indexOf(event.target as HTMLButtonElement)
 
-  const isRtl = rootCtx.direction === 'rtl'
+  const isRtl = rootCtx.direction.value === 'rtl'
   const isHorizontal = rootCtx.orientation.value === 'horizontal'
   const loopFocus = rootCtx.loopFocus.value
 
