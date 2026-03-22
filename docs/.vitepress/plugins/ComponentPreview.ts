@@ -49,15 +49,11 @@ export default function (md: MarkdownRenderer) {
         props[propName] = propValue
       }
 
-      const pathName = `../../../components/demo/${props.name}`
-      insertComponentImport(`import ${props.name}Tailwind from '${pathName}/tailwind/index.vue'`)
-      insertComponentImport(`import ${props.name}Css from '${pathName}/css/index.vue'`)
-
-      const index = state.tokens.findIndex(i => i.content.match(regex))
-
       const { realPath, path: _path } = state.env as MarkdownEnv
+      const pathName = `../../../components/demo/${props.name}`
+      const demoPath = resolve(dirname(realPath ?? _path), pathName)
 
-      const childFiles = readdirSync(resolve(dirname(realPath ?? _path), pathName), { withFileTypes: false, recursive: true })
+      const childFiles = readdirSync(demoPath, { withFileTypes: false, recursive: true })
         .map(file => typeof file === 'string' ? file.split(/[/\\]/).join('/') : file)
 
       const groupedFiles = childFiles.reduce((prev, curr) => {
@@ -75,7 +71,25 @@ export default function (md: MarkdownRenderer) {
         return prev
       }, {} as { [key: string]: string[] })
 
-      state.tokens[index].content = `<ComponentPreview name="${props.name}" files="${encodeURIComponent(JSON.stringify(groupedFiles))}" >\n<template #demo-tailwind><${props.name}Tailwind /></template>\n<template #demo-css><${props.name}Css /></template>`
+      if (groupedFiles.tailwind) {
+        insertComponentImport(`import ${props.name}Tailwind from '${pathName}/tailwind/index.vue'`)
+      }
+
+      if (groupedFiles.css) {
+        insertComponentImport(`import ${props.name}Css from '${pathName}/css/index.vue'`)
+      }
+
+      const index = state.tokens.findIndex(i => i.content.match(regex))
+
+      const demoSlots = []
+      if (groupedFiles.tailwind) {
+        demoSlots.push(`<template #demo-tailwind><${props.name}Tailwind /></template>`)
+      }
+      if (groupedFiles.css) {
+        demoSlots.push(`<template #demo-css><${props.name}Css /></template>`)
+      }
+
+      state.tokens[index].content = `<ComponentPreview name="${props.name}" files="${encodeURIComponent(JSON.stringify(groupedFiles))}" >\n${demoSlots.join('\n')}`
       const tokenArray: InstanceType<typeof state.Token>[] = []
 
       Object.entries(groupedFiles).forEach(([key, value]) => {

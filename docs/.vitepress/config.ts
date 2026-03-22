@@ -69,7 +69,10 @@ export default defineConfig({
       },
       {
         text: 'Utils',
-        items: [{ text: 'useRender', link: '/docs/utils/use-render' }],
+        items: [
+          { text: 'useRender', link: '/docs/utils/use-render' },
+          { text: 'mergeProps', link: '/docs/utils/merge-props' },
+        ],
       },
     ],
 
