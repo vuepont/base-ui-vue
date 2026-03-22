@@ -1,7 +1,8 @@
 import userEvent from '@testing-library/user-event'
 import { render, screen } from '@testing-library/vue'
 import { describe, expect, it } from 'vitest'
-import { defineComponent } from 'vue'
+import { defineComponent, ref } from 'vue'
+import { DirectionProvider } from '../../direction-provider'
 import AccordionHeader from '../header/AccordionHeader.vue'
 import AccordionItem from '../item/AccordionItem.vue'
 import AccordionPanel from '../panel/AccordionPanel.vue'
@@ -50,6 +51,53 @@ function renderAccordion(
             <AccordionPanel>Panel 3</AccordionPanel>
           </AccordionItem>
         </AccordionRoot>
+      `,
+    }),
+  )
+}
+
+function renderReactiveDirectionAccordion(initialDirection: 'ltr' | 'rtl' = 'ltr') {
+  return render(
+    defineComponent({
+      components: {
+        AccordionRoot,
+        AccordionItem,
+        AccordionHeader,
+        AccordionTrigger,
+        AccordionPanel,
+        DirectionProvider,
+      },
+      setup() {
+        const direction = ref<'ltr' | 'rtl'>(initialDirection)
+
+        return { direction }
+      },
+      template: `
+        <button type="button" @click="direction = 'ltr'">Set LTR</button>
+        <button type="button" @click="direction = 'rtl'">Set RTL</button>
+
+        <DirectionProvider :direction="direction">
+          <AccordionRoot orientation="horizontal">
+            <AccordionItem value="item-1">
+              <AccordionHeader>
+                <AccordionTrigger>Trigger 1</AccordionTrigger>
+              </AccordionHeader>
+              <AccordionPanel>Panel 1</AccordionPanel>
+            </AccordionItem>
+            <AccordionItem value="item-2">
+              <AccordionHeader>
+                <AccordionTrigger>Trigger 2</AccordionTrigger>
+              </AccordionHeader>
+              <AccordionPanel>Panel 2</AccordionPanel>
+            </AccordionItem>
+            <AccordionItem value="item-3">
+              <AccordionHeader>
+                <AccordionTrigger>Trigger 3</AccordionTrigger>
+              </AccordionHeader>
+              <AccordionPanel>Panel 3</AccordionPanel>
+            </AccordionItem>
+          </AccordionRoot>
+        </DirectionProvider>
       `,
     }),
   )
@@ -207,6 +255,52 @@ describe('<AccordionTrigger />', () => {
       await user.keyboard('[ArrowLeft]')
 
       expect(trigger1).toHaveFocus()
+    })
+
+    it('updates ArrowLeft and ArrowRight behavior when direction changes from ltr to rtl', async () => {
+      const user = userEvent.setup()
+      renderReactiveDirectionAccordion('ltr')
+
+      const trigger1 = screen.getByRole('button', { name: 'Trigger 1' })
+      const trigger2 = screen.getByRole('button', { name: 'Trigger 2' })
+      const setRtl = screen.getByRole('button', { name: 'Set RTL' })
+
+      trigger1.focus()
+      await user.keyboard('[ArrowRight]')
+      expect(trigger2).toHaveFocus()
+
+      await user.click(setRtl)
+
+      trigger2.focus()
+      await user.keyboard('[ArrowRight]')
+      expect(trigger1).toHaveFocus()
+
+      trigger1.focus()
+      await user.keyboard('[ArrowLeft]')
+      expect(trigger2).toHaveFocus()
+    })
+
+    it('updates ArrowLeft and ArrowRight behavior when direction changes from rtl to ltr', async () => {
+      const user = userEvent.setup()
+      renderReactiveDirectionAccordion('rtl')
+
+      const trigger1 = screen.getByRole('button', { name: 'Trigger 1' })
+      const trigger2 = screen.getByRole('button', { name: 'Trigger 2' })
+      const setLtr = screen.getByRole('button', { name: 'Set LTR' })
+
+      trigger1.focus()
+      await user.keyboard('[ArrowLeft]')
+      expect(trigger2).toHaveFocus()
+
+      await user.click(setLtr)
+
+      trigger2.focus()
+      await user.keyboard('[ArrowLeft]')
+      expect(trigger1).toHaveFocus()
+
+      trigger1.focus()
+      await user.keyboard('[ArrowRight]')
+      expect(trigger2).toHaveFocus()
     })
   })
 
