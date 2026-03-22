@@ -327,6 +327,54 @@ describe('mergeProps', () => {
     const result = mergedProps.onClick?.({ nativeEvent: new MouseEvent('click') } as any)
 
     expect(result).toBe('preventing-handler')
+  })
+
+  it('preserves additional arguments when the event is not the first payload', () => {
+    const log: Array<[string, string, boolean]> = []
+
+    const mergedProps = mergeProps(
+      {
+        onFormSubmit(formValues: { name: string }, event: BaseUIEvent<Event>) {
+          log.push(['internal', formValues.name, typeof event.preventBaseUIHandler === 'function'])
+        },
+      },
+      {
+        onFormSubmit(formValues: { name: string }, event: BaseUIEvent<Event>) {
+          log.push(['external', formValues.name, typeof event.preventBaseUIHandler === 'function'])
+        },
+      },
+    )
+
+    mergedProps.onFormSubmit?.({ name: 'Ada' }, new Event('submit'))
+
+    expect(log).toEqual([
+      ['external', 'Ada', true],
+      ['internal', 'Ada', true],
+    ])
+  })
+
+  it('preserves all arguments for custom events without an event payload', () => {
+    const log: Array<[string, boolean, string]> = []
+
+    const mergedProps = mergeProps(
+      {
+        onOpenChange(open: boolean, reason: string) {
+          log.push(['internal', open, reason])
+        },
+      },
+      {
+        onOpenChange(open: boolean, reason: string) {
+          log.push(['external', open, reason])
+        },
+      },
+    )
+
+    mergedProps.onOpenChange?.(true, 'manual')
+
+    expect(log).toEqual([
+      ['external', true, 'manual'],
+      ['internal', true, 'manual'],
+    ])
   });
 
   [true, 13, 'newValue', { key: 'value' }, ['value'], () => 'value'].forEach(

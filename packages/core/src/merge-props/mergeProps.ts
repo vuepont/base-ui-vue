@@ -111,16 +111,17 @@ function wrapEventHandlers(handlers: unknown) {
       ...args: any[]
     ) => void)[]
 
-    return (event: unknown) => {
-      if (event != null && typeof event === 'object') {
-        const baseUIEvent = makeEventPreventable(event as Event)
+    return (...args: unknown[]) => {
+      const preventableArgs = getPreventableArgs(args)
+
+      if (preventableArgs) {
         let result: unknown
         for (let i = flatHandlers.length - 1; i >= 0; i -= 1) {
-          const handlerResult = flatHandlers[i](baseUIEvent)
+          const handlerResult = flatHandlers[i](...preventableArgs.args)
           if (result === undefined) {
             result = handlerResult
           }
-          if (baseUIEvent.baseUIHandlerPrevented) {
+          if (preventableArgs.event.baseUIHandlerPrevented) {
             break
           }
         }
@@ -129,7 +130,7 @@ function wrapEventHandlers(handlers: unknown) {
 
       let result: unknown
       for (let i = flatHandlers.length - 1; i >= 0; i -= 1) {
-        const handlerResult = flatHandlers[i](event)
+        const handlerResult = flatHandlers[i](...args)
         if (result === undefined) {
           result = handlerResult
         }
@@ -142,11 +143,41 @@ function wrapEventHandlers(handlers: unknown) {
     return handlers
   }
 
-  return (event: unknown) => {
-    if (event != null && typeof event === 'object') {
-      return handlers(makeEventPreventable(event as Event))
+  return (...args: unknown[]) => {
+    const preventableArgs = getPreventableArgs(args)
+
+    if (preventableArgs) {
+      return handlers(...preventableArgs.args)
     }
 
-    return handlers(event)
+    return handlers(...args)
   }
+}
+
+function getPreventableArgs(args: unknown[]) {
+  const eventIndex = args.findIndex(isPreventableEventArg)
+  if (eventIndex === -1) {
+    return null
+  }
+
+  const nextArgs = [...args]
+  const event = makeEventPreventable(nextArgs[eventIndex] as Event)
+  nextArgs[eventIndex] = event
+
+  return {
+    args: nextArgs,
+    event,
+  }
+}
+
+function isPreventableEventArg(value: unknown): value is Event {
+  return Boolean(
+    value
+    && typeof value === 'object'
+    && (
+      value instanceof Event
+      || 'nativeEvent' in value
+      || 'preventBaseUIHandler' in value
+    ),
+  )
 }
