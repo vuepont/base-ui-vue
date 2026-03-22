@@ -1,4 +1,8 @@
 @import "tailwindcss/theme";
 @import "tailwindcss/utilities";
 @import "./demo-theme.css";
+
+@source "../custom";
 @source "../../components/demo";
+
+@custom-variant dark (&:where(.dark, .dark *));

@@ -1,5 +1,8 @@
 export const siteName = 'Base UI Vue'
 export const siteShortName = 'Base UI Vue'
 export const siteDescription = 'Unstyled UI components for building accessible user interfaces'
+export const baseUi = 'https://base-ui.com/'
+export const discord = 'https://discord.gg/SWzhwGMxsZ'
 export const github = 'https://github.com/vuepont/base-ui-vue'
+export const npm = 'https://www.npmjs.com/package/base-ui-vue'
 export const releases = 'https://github.com/vuepont/base-ui-vue/releases'
