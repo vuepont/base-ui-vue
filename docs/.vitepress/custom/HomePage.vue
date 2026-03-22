@@ -26,7 +26,7 @@ const faqs = [
   },
   {
     answer:
-      'Yes. The components ship without opinionated CSS, so they fit Tailwind CSS, CSS Modules, styled solutions, or plain CSS equally well.',
+      'Yes. The components ship without opinionated CSS, so they work with Tailwind CSS, CSS-in-JS, plain CSS, and any other styling library you prefer.',
     question: 'Does it work with any styling library?',
     value: 'styling-library',
   },
