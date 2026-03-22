@@ -17,7 +17,7 @@ const allFiles = computed(() => {
 })
 
 const availableFrameworks = computed(() =>
-  Object.keys(allFiles.value).filter(Boolean) as ('css' | 'tailwind')[],
+  (['css', 'tailwind'] as const).filter(framework => framework in allFiles.value),
 )
 
 watch(availableFrameworks, (frameworks) => {
