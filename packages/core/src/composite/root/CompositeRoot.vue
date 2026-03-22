@@ -64,7 +64,7 @@ const root = useCompositeRoot({
   stopEventPropagation: () => props.stopEventPropagation,
   disabledIndices: () => props.disabledIndices,
   modifierKeys: () => props.modifierKeys,
-  direction,
+  direction: () => direction.value,
 })
 
 provide(

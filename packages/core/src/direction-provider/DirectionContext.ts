@@ -1,10 +1,10 @@
-import type { InjectionKey } from 'vue'
-import { inject } from 'vue'
+import type { ComputedRef, InjectionKey, Ref } from 'vue'
+import { computed, inject } from 'vue'
 
 export type TextDirection = 'ltr' | 'rtl'
 
 export interface DirectionContextValue {
-  direction: TextDirection
+  direction: Ref<TextDirection>
 }
 
 /**
@@ -22,9 +22,8 @@ export interface DirectionProviderProps {
   direction?: TextDirection
 }
 
-export function useDirection(): TextDirection {
+export function useDirection(): ComputedRef<TextDirection> {
   const context = inject(directionContextKey, undefined)
-  const direction = context?.direction ?? 'ltr'
 
-  return direction
+  return computed(() => context?.direction.value ?? 'ltr')
 }
