@@ -2,7 +2,7 @@
 
 A guide to animating Base UI Vue components.
 
-Base UI Vue components can be animated using CSS transitions, CSS animations, or JavaScript animation. Each componentss provides a number of data attributes to target its states, as well as a few attributes specifically for animation.
+Base UI Vue components can be animated using CSS transitions, CSS animations, or JavaScript animation. Each components provides a number of data attributes to target its states, as well as a few attributes specifically for animation.
 
 ## CSS transitions
 
