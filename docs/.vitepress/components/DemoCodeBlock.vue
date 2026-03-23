@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import type { VNode } from 'vue'
+import type { VNode, VNodeArrayChildren } from 'vue'
 import { CollapsiblePanel, CollapsibleRoot, CollapsibleTrigger } from 'base-ui-vue'
-import { computed, ref, useSlots, watch } from 'vue'
+import { computed, isVNode, ref, useSlots, watch } from 'vue'
 
 const props = defineProps<{
   modelValue: 'css' | 'tailwind'
@@ -17,23 +17,34 @@ const emit = defineEmits<{
 const slots = useSlots()
 
 const slotsFramework = computed(() =>
-  slots.default?.()
-    .map(slot => slot.props?.key?.toString()?.replace('_', ''))
-    .filter(Boolean) ?? [],
+  ['css', 'tailwind'].filter(name => !!slots[name]) as ('css' | 'tailwind')[],
 )
 
-const cssFrameworkOptions = computed(() => [
+const frameworkOptions = [
   { label: 'CSS', value: 'css' },
   { label: 'Tailwind CSS', value: 'tailwind' },
-].filter(i => slotsFramework.value.includes(i.value)))
+] as const
+
+function flattenCodeNodes(nodes: VNode[] | undefined): VNode[] {
+  if (!nodes?.length)
+    return []
+
+  return nodes.flatMap((node) => {
+    const children = node.children as VNodeArrayChildren
+    if (Array.isArray(children)) {
+      return children.filter(isVNode)
+    }
+    return [node]
+  })
+}
+
+const cssFrameworkOptions = computed(() =>
+  frameworkOptions.filter(option => slotsFramework.value.includes(option.value)),
+)
 
 const codeBlocks = computed(() => {
-  const currentFramework = slots.default?.().find(
-    slot => slot.props?.key?.toString().includes(props.modelValue),
-  )
-  if (!currentFramework?.children)
-    return []
-  return currentFramework.children as VNode[]
+  const frameworkSlot = props.modelValue === 'tailwind' ? slots.tailwind : slots.css
+  return flattenCodeNodes(frameworkSlot?.() as VNode[] | undefined)
 })
 
 const tabNames = computed(() => {

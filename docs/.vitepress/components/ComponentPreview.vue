@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useStorage } from '@vueuse/core'
-import { computed } from 'vue'
+import { computed, watch } from 'vue'
 import DemoCodeBlock from './DemoCodeBlock.vue'
 
 const props = withDefaults(defineProps<{
@@ -13,10 +13,38 @@ const cssFramework = useStorage<'css' | 'tailwind'>('cssFramework', 'tailwind')
 const allFiles = computed(() => {
   if (!props.files)
     return {}
-  return JSON.parse(decodeURIComponent(props.files))
+  try {
+    const parsed = JSON.parse(decodeURIComponent(props.files))
+    return parsed && typeof parsed === 'object' ? parsed : {}
+  }
+  catch {
+    return {}
+  }
 })
 
-const currentFiles = computed(() => allFiles.value[cssFramework.value] ?? [])
+const availableFrameworks = computed(() =>
+  (['css', 'tailwind'] as const).filter(framework => framework in allFiles.value),
+)
+
+watch(availableFrameworks, (frameworks) => {
+  if (!frameworks.length)
+    return
+  if (!frameworks.includes(cssFramework.value))
+    cssFramework.value = frameworks[0]
+}, { immediate: true })
+
+const currentFramework = computed(() => {
+  if (availableFrameworks.value.includes(cssFramework.value))
+    return cssFramework.value
+
+  return availableFrameworks.value[0] ?? 'css'
+})
+
+const currentFiles = computed<string[]>(() => {
+  const files = allFiles.value[currentFramework.value]
+
+  return Array.isArray(files) ? files : []
+})
 
 const fileNames = computed(() =>
   currentFiles.value.map((f: string) => f.split('/').pop() ?? f),
@@ -27,7 +55,7 @@ const fileNames = computed(() =>
   <div class="demo-root">
     <div class="demo-playground">
       <div class="demo-playground-inner">
-        <slot v-if="cssFramework === 'tailwind'" name="demo-tailwind" />
+        <slot v-if="currentFramework === 'tailwind'" name="demo-tailwind" />
         <slot v-else name="demo-css" />
       </div>
     </div>
@@ -38,8 +66,12 @@ const fileNames = computed(() =>
       :files="currentFiles"
       :file-names="fileNames"
     >
-      <slot name="tailwind" />
-      <slot name="css" />
+      <template v-if="availableFrameworks.includes('tailwind')" #tailwind>
+        <slot name="tailwind" />
+      </template>
+      <template v-if="availableFrameworks.includes('css')" #css>
+        <slot name="css" />
+      </template>
     </DemoCodeBlock>
   </div>
 </template>
