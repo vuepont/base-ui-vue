@@ -3,6 +3,7 @@ import tailwindcss from '@tailwindcss/vite'
 import { defineConfig } from 'vitepress'
 import { version } from '../../package.json'
 import {
+  discord,
   github,
   releases,
   siteDescription,
@@ -38,7 +39,7 @@ export default defineConfig({
 
     // https://vitepress.dev/reference/default-theme-config
     nav: [
-      { text: 'Docs', link: '/docs/overview/getting-started' },
+      { text: 'Docs', link: '/docs/overview/quick-start' },
       { text: 'Components', link: '/docs/components/accordion' },
       {
         text: `v${version}`,
@@ -50,14 +51,26 @@ export default defineConfig({
       {
         text: 'Overview',
         items: [
-          { text: 'Getting Started', link: '/docs/overview/getting-started' },
-          { text: 'Installation', link: '/docs/overview/installation' },
+          { text: 'Quick Start', link: '/docs/overview/quick-start' },
+          { text: 'Accessibility', link: '/docs/overview/accessibility' },
+          { text: 'Releases', link: 'https://github.com/vuepont/base-ui-vue/releases' },
+          { text: 'About', link: '/docs/overview/about' },
+        ],
+      },
+      {
+        text: 'Handbook',
+        items: [
+          { text: 'Styling', link: '/docs/handbook/styling' },
+          { text: 'Animation', link: '/docs/handbook/animation' },
+          { text: 'Composition', link: '/docs/handbook/composition' },
+          { text: 'Customization', link: '/docs/handbook/customization' },
+          { text: 'Forms', link: '/docs/handbook/forms' },
+          { text: 'TypeScript', link: '/docs/handbook/typescript' },
         ],
       },
       {
         text: 'Components',
         items: [
-          // { text: 'Introduction', link: '/docs/components/' },
           { text: 'Accordion', link: '/docs/components/accordion' },
           { text: 'Avatar', link: '/docs/components/avatar' },
           { text: 'Button', link: '/docs/components/button' },
@@ -83,6 +96,6 @@ export default defineConfig({
       pattern:
         'https://github.com/vuepont/base-ui-vue/edit/main/docs/content/:path',
     },
-    socialLinks: [{ icon: 'github', link: github }],
+    socialLinks: [{ icon: 'github', link: github }, { icon: 'discord', link: discord }],
   },
 })

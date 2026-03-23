@@ -13,7 +13,7 @@ import {
   npm,
 } from '../meta'
 
-const docsLink = '/docs/overview/getting-started'
+const docsLink = '/docs/overview/quick-start'
 const copyrightHolder = 'VuePont'
 const copyrightYear = '2026'
 
