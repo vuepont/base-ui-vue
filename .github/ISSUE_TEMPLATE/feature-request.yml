@@ -1,0 +1,94 @@
+name: ✨ Feature request
+description: Suggest an improvement or new feature for Base UI Vue.
+title: '[Feature]: '
+labels:
+  - enhancement
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to suggest an improvement.
+
+        Before submitting, please make sure you have:
+        - checked the documentation.
+        - searched the existing issues.
+        - considered whether the request fits Base UI Vue's current component and utility scope.
+
+        If you are not sure whether this should be an issue, feel free to ask first in [Discord](https://discord.gg/SWzhwGMxsZ).
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before submitting
+      options:
+        - label: I searched the existing issues and did not find a duplicate.
+          required: true
+        - label: I checked the documentation and examples.
+          required: true
+        - label: This request is specific to Base UI Vue and not only to app-specific code.
+          required: true
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: A short summary of the feature or improvement you want.
+      placeholder: Describe the feature request.
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem statement
+      description: Explain the problem or limitation you are running into today.
+      placeholder: What is difficult or missing right now?
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed-solution
+    attributes:
+      label: Proposed solution
+      description: Describe the API, behavior, or docs change you would like to see.
+      placeholder: How would you like this to work?
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Describe any workarounds or alternative approaches you have already considered.
+      placeholder: What are you doing today instead?
+    validations:
+      required: false
+
+  - type: textarea
+    id: examples
+    attributes:
+      label: Examples or references
+      description: Share examples, links, or references that help explain the request.
+      placeholder: Links, code samples, screenshots, or references.
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional context
+      description: Add any extra details here.
+      placeholder: Anything else that may help us evaluate the request.
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: additional-info
+    attributes:
+      label: Additional information
+      description: Additional information that helps us decide how to proceed.
+      options:
+        - label: I intend to submit a PR for this feature.
+        - label: I have already implemented and/or tested this feature.
+    validations:
+      required: false
