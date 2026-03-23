@@ -6,7 +6,7 @@ hero:
   actions:
     - theme: brand
       text: Getting Started
-      link: /docs/overview/getting-started
+      link: /docs/overview/quick-start
     - theme: alt
       text: Components
       link: /docs/components/accordion
