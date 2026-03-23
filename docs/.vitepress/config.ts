@@ -70,6 +70,7 @@ export default defineConfig({
       {
         text: 'Utils',
         items: [
+          { text: 'Direction Provider', link: '/docs/utils/direction-provider' },
           { text: 'useRender', link: '/docs/utils/use-render' },
           { text: 'mergeProps', link: '/docs/utils/merge-props' },
         ],
