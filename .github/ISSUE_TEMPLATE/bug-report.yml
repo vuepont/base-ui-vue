@@ -1,0 +1,114 @@
+name: 🐞 Bug report
+description: Report a reproducible problem in Base UI Vue.
+title: '[Bug]: '
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to file an issue.
+
+        Before submitting, please make sure you have:
+        - checked the documentation.
+        - searched for existing issues.
+        - reduced the problem to a minimal reproduction when possible.
+
+        This form is only for bug reports. If you have a usage question or are not sure whether this is a bug, please first:
+
+        - Read the [docs](https://baseui-vue.com/docs/overview/quick-start)
+        - Ask in [Discord](https://discord.gg/SWzhwGMxsZ)
+
+        If you find an older closed issue that still reproduces in the latest version, open a new issue instead of commenting on the old one.
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before submitting
+      options:
+        - label: I searched the existing issues and did not find a duplicate.
+          required: true
+        - label: I checked the documentation and examples.
+          required: true
+        - label: I can reproduce this issue with Base UI Vue itself and not only with app-specific code.
+          required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: A short summary of the problem.
+      placeholder: Describe what is happening.
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Please provide the relevant environment details.
+      value: |
+        Development/Production OS:
+        Node version:
+        Package manager:
+        Base UI Vue version:
+        Vue version:
+        Nuxt version (if applicable):
+        CSS framework (if applicable):
+        Client OS:
+        Browser:
+      render: bash
+    validations:
+      required: true
+
+  - type: input
+    id: reproduction-link
+    attributes:
+      label: Link to minimal reproduction
+      description: |
+        Please provide a minimal reproduction, such as a StackBlitz or repository,
+        that contains the smallest amount of code needed to show the problem.
+      placeholder: https://stackblitz.com/...
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: List the exact steps needed to reproduce the issue.
+      placeholder: |
+        1. Render ...
+        2. Click ...
+        3. Observe ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: A clear and concise description of what you expected to happen.
+      placeholder: Describe what you expected to happen.
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      description: A clear and concise description of what actually happened instead.
+      placeholder: Describe what actually happened instead.
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional context
+      description: |
+        Add any extra details, logs, or screenshots here.
+        You can drag and drop images directly into this field.
+      placeholder: Anything else that may help us debug the issue.
+    validations:
+      required: false

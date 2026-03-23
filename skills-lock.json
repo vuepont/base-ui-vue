@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "skills": {
+    "antfu": {
+      "source": "antfu/skills",
+      "sourceType": "github",
+      "computedHash": "6935586ef3ab02e18747a4477d396e692bc96e8f28b0d95b374ffc37fce74cda"
+    },
+    "vitepress": {
+      "source": "antfu/skills",
+      "sourceType": "github",
+      "computedHash": "629d8ec4bcbf7cac86c15c3ca5f173933f01729bcb6396c0d74733755a896a41"
+    },
+    "vitest": {
+      "source": "antfu/skills",
+      "sourceType": "github",
+      "computedHash": "669c7275f7e1379b06b2bcfa593603aead4c983b951c7e8edbc09640aa38d0a1"
+    },
+    "vue": {
+      "source": "antfu/skills",
+      "sourceType": "github",
+      "computedHash": "9c241141e07e836e4f0537c63e8f929fba3767c2997250be38e699f19b75e3f2"
+    },
+    "vue-best-practices": {
+      "source": "antfu/skills",
+      "sourceType": "github",
+      "computedHash": "d7d22c8cb343583c3904692c4d1d7b50382945e433e4f6e053f4aabb9846cbc3"
+    },
+    "vue-testing-best-practices": {
+      "source": "antfu/skills",
+      "sourceType": "github",
+      "computedHash": "18c7d8f42f350f927e37de055e34c97b8cfb9f79c12cf942f7f3d2a0821057b5"
+    }
+  }
+}

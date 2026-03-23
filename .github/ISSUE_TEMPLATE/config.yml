@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 📚 Documentation
+    url: https://baseui-vue.com/docs/overview/quick-start
+    about: Check the documentation and examples before opening an issue.
+  - name: 🗨️ Discord
+    url: https://discord.gg/SWzhwGMxsZ
+    about: Ask usage questions or discuss ideas with the community.

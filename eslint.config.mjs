@@ -4,5 +4,8 @@ export default antfu(
   {
     vue: true,
     typescript: true,
+    ignores: [
+      '.agents/**',
+    ],
   },
 )

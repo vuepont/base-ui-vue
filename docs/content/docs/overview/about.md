@@ -23,7 +23,7 @@ Component APIs are fully open, so you have direct access to each node, you can e
 ## Team
 
 - **Charlie Wang** (Vuepont) [@cwandev](https://x.com/cwandev)
-- **Emmanuel Raymond** (Vuepont) [@peoray](https://x.com/peoray)
+- **Emmanuel Raymond** (Vuepont) [@peoray](https://x.com/peoray_)
 
 <!-- ## Browser support
 
@@ -47,4 +47,4 @@ For community support, questions, and tips, join our [Discord](https://discord.g
 
 ### X
 
-The best way to stay up-to-date on new releases and announcements is by following [Raymond on X](https://x.com/peoray) and [Charlie on X](https://x.com/cwandev).
+The best way to stay up-to-date on new releases and announcements is by following [Raymond on X](https://x.com/peoray_) and [Charlie on X](https://x.com/cwandev).

@@ -1,0 +1,52 @@
+title: '[Discussion] '
+labels:
+  - discussion
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for starting a discussion.
+
+        Use discussions for questions, feedback, ideas, and broader design conversations that are not best handled as a bug report or feature request.
+
+  - type: dropdown
+    id: topic
+    attributes:
+      label: Topic
+      description: What kind of discussion is this?
+      options:
+        - Question
+        - Feedback
+        - Idea
+        - API design
+        - Documentation
+        - Showcase
+    validations:
+      required: true
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: A short summary of what you want to discuss.
+      placeholder: Describe the topic.
+    validations:
+      required: true
+
+  - type: textarea
+    id: details
+    attributes:
+      label: Details
+      description: Add the full context, examples, or questions here.
+      placeholder: Share the details of your discussion topic.
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: Include any relevant links, code samples, screenshots, or related issues.
+      placeholder: Anything else that will help others join the discussion.
+    validations:
+      required: false
