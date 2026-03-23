@@ -1,7 +1,5 @@
 # Quick Start
 
-Learn how to make the most of Base UI’s accessibility features and guidelines.
-
 A quick guide to getting started with Base UI Vue.
 
 ## Install the library
