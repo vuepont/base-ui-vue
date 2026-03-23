@@ -94,8 +94,15 @@ import { Form } from 'base-ui-vue'
 async function handleFormSubmit(formValues: Record<string, unknown>) {
   await fetch('https://api.example.com', {
     method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
     body: JSON.stringify(formValues),
   })
+
+  if (!response.ok) {
+    throw new Error('Form submission failed')
+  }
 }
 </script>
 
