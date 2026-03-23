@@ -1,3 +1,8 @@
+---
+title: useRender
+description: A composable for enabling renderless mode in custom components.
+---
+
 # useRender
 
 Composable for enabling renderless mode in custom components.

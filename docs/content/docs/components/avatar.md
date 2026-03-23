@@ -1,3 +1,8 @@
+---
+title: Avatar
+description: A high-quality, unstyled Vue avatar component that is easy to customize.
+---
+
 # Avatar
 
 An easily stylable avatar component.

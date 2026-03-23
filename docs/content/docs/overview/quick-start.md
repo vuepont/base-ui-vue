@@ -1,3 +1,8 @@
+---
+title: Quick Start
+description: A quick guide to getting started with Base UI Vue.
+---
+
 # Quick Start
 
 A quick guide to getting started with Base UI Vue.
@@ -45,3 +50,9 @@ This walkthrough outlines the basics of putting together a Base UI Vue component
 - Browse the [Components](/docs/components/accordion)
 - Check [GitHub Releases](https://github.com/vuepont/base-ui-vue/releases) for updates
 - Use the [Handbook](/docs/handbook/styling) for cross-cutting patterns
+
+## Working with LLMs
+
+For those of you working with LLMs, each docs page has a "View as Markdown" link at the top, which can be shared with AI chat assistants to help them understand Base UI Vue concepts and component APIs.
+
+Additionally, there is an ["llms.txt"](/llms.txt) link in the "Handbook" section of the navigation sidebar, which you can feed to AI chat assistants to help them navigate the docs.

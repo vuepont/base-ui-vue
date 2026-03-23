@@ -1,6 +1,7 @@
 import { resolve } from 'node:path'
 import tailwindcss from '@tailwindcss/vite'
 import { defineConfig } from 'vitepress'
+import llmstxt, { copyOrDownloadAsMarkdownButtons } from 'vitepress-plugin-llms'
 import { version } from '../../package.json'
 import {
   discord,
@@ -25,9 +26,12 @@ export default defineConfig({
     preConfig(md) {
       md.use(ComponentPreviewPlugin)
     },
+    config(md) {
+      md.use(copyOrDownloadAsMarkdownButtons)
+    },
   },
   vite: {
-    plugins: [tailwindcss()],
+    plugins: [tailwindcss(), llmstxt()],
     resolve: {
       alias: {
         'base-ui-vue': resolve(__dirname, '../../packages/core/src/index.ts'),
@@ -66,6 +70,7 @@ export default defineConfig({
           { text: 'Customization', link: '/docs/handbook/customization' },
           { text: 'Forms', link: '/docs/handbook/forms' },
           { text: 'TypeScript', link: '/docs/handbook/typescript' },
+          { text: 'llms.txt', link: '/llms.txt' },
         ],
       },
       {

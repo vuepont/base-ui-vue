@@ -1,3 +1,8 @@
+---
+title: Field
+description: A high-quality, unstyled Vue field component that provides labeling and validation for form controls.
+---
+
 # Field
 
 A component that provides labeling and validation for form controls.

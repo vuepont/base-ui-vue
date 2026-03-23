@@ -1,3 +1,8 @@
+---
+title: Button
+description: A high-quality, unstyled Vue button component that can be rendered as another tag or focusable when disabled.
+---
+
 # Button
 
 A button component that can be rendered as another tag or focusable when disabled.

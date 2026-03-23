@@ -1,3 +1,8 @@
+---
+title: Styling
+description: Learn how to style Base UI Vue components with your preferred styling engine.
+---
+
 # Styling
 
 A guide to styling Base UI Vue components with your preferred styling engine.

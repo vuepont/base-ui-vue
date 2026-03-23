@@ -1,3 +1,8 @@
+---
+title: Forms
+description: A guide to building forms with Base UI Vue components.
+---
+
 # Forms
 
 A guide to building forms with Base UI Vue components.

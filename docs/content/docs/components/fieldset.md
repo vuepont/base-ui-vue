@@ -1,3 +1,8 @@
+---
+title: Fieldset
+description: A high-quality, unstyled Vue fieldset component with an easily stylable legend.
+---
+
 # Fieldset
 
 A native fieldset element with an easily stylable legend.

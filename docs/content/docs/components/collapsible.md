@@ -1,3 +1,8 @@
+---
+title: Collapsible
+description: A high-quality, unstyled Vue collapsible component that displays a collapsible panel controlled by a button.
+---
+
 # Collapsible
 
 A collapsible panel controlled by a button.

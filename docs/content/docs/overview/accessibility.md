@@ -1,3 +1,8 @@
+---
+title: Accessibility
+description: Learn how to make the most of Base UI Vue's accessibility features and guidelines.
+---
+
 # Accessibility
 
 Learn how to make the most of Base UI Vue's accessibility features and guidelines.
