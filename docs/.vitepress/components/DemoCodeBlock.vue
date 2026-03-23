@@ -59,19 +59,28 @@ watch(() => props.modelValue, () => {
   currentTab.value = tabNames.value[0] ?? 'index.vue'
 })
 
+const demoSourceModules = import.meta.glob('../../components/demo/**/*', {
+  query: '?raw',
+  import: 'default',
+}) as Record<string, () => Promise<string>>
+
 const sources = ref<Record<string, string>>({})
 
-watch(() => [props.modelValue, props.files], () => {
-  sources.value = {}
-  props.files?.forEach((file) => {
-    const parts = file.split('/')
-    const fileName = parts.pop() ?? file
-    const folder = parts[0]
-    const extension = fileName.split('.').pop()
-    import(`../../components/demo/${props.name}/${folder}/${fileName.replace(`.${extension}`, '')}.${extension}?raw`).then(
-      res => (sources.value[fileName] = res.default),
-    )
-  })
+watch(() => [props.name, props.modelValue, props.files], async () => {
+  const nextSources: Record<string, string> = {}
+
+  await Promise.all((props.files ?? []).map(async (file) => {
+    const fileName = file.split('/').pop() ?? file
+    const modulePath = `../../components/demo/${props.name}/${file}`
+    const loadSource = demoSourceModules[modulePath]
+
+    if (!loadSource)
+      return
+
+    nextSources[fileName] = await loadSource()
+  }))
+
+  sources.value = nextSources
 }, { immediate: true })
 
 const currentSource = computed(() => {
