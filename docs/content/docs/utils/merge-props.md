@@ -1,3 +1,8 @@
+---
+title: mergeProps
+description: A utility to merge multiple sets of props, handling event handlers, class, and style props intelligently.
+---
+
 # mergeProps
 
 Utilities for merging Vue props and attributes with Base UI Vue semantics.

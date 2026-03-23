@@ -1,3 +1,8 @@
+---
+title: Composition
+description: Learn how to compose Base UI Vue components with your own Vue components.
+---
+
 # Composition
 
 A guide to composing Base UI Vue components with your own Vue components.

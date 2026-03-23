@@ -1,3 +1,8 @@
+---
+title: Animation
+description: A guide to animating Base UI Vue components.
+---
+
 # Animation
 
 A guide to animating Base UI Vue components.

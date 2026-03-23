@@ -1,3 +1,8 @@
+---
+title: TypeScript
+description: A guide to using TypeScript with Base UI Vue.
+---
+
 # TypeScript
 
 A guide to using TypeScript with Base UI Vue.

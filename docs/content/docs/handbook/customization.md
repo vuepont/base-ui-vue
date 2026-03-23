@@ -1,3 +1,8 @@
+---
+title: Customization
+description: Learn how to customize the behavior of Base UI Vue components.
+---
+
 # Customization
 
 A guide to customizing the behavior of Base UI Vue components.

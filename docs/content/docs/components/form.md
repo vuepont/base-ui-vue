@@ -1,3 +1,8 @@
+---
+title: Form
+description: A high-quality, unstyled Vue form component with consolidated error handling.
+---
+
 # Form
 
 A native form element with consolidated error handling.

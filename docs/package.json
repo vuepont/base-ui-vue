@@ -17,6 +17,7 @@
   "devDependencies": {
     "@tailwindcss/vite": "^4.2.1",
     "tailwindcss": "^4.2.1",
-    "vitepress": "2.0.0-alpha.16"
+    "vitepress": "2.0.0-alpha.16",
+    "vitepress-plugin-llms": "^1.12.0"
   }
 }

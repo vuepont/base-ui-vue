@@ -1,3 +1,8 @@
+---
+title: Accordion
+description: A high-quality, unstyled Vue accordion component that displays a set of collapsible panels with headings.
+---
+
 # Accordion
 
 A set of collapsible panels with headings.

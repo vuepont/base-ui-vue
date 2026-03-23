@@ -1,3 +1,8 @@
+---
+title: DirectionProvider
+description: A direction provider component that enables RTL behavior for Base UI Vue components.
+---
+
 # DirectionProvider
 
 Enables RTL behavior for Base UI Vue components.

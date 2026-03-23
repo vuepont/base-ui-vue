@@ -1,3 +1,8 @@
+---
+title: About
+description: Learn about Base UI Vue, an open-source Vue component library for building accessible user interfaces.
+---
+
 # About Base UI Vue
 
 An open-source Vue component library for building accessible user interfaces.
