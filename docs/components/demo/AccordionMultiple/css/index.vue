@@ -62,4 +62,4 @@ import {
   </AccordionRoot>
 </template>
 
-<style scoped src="../../../demo/Accordion/css/styles.css"></style>
+<style src="../../../demo/Accordion/css/styles.css"></style>
