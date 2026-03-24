@@ -1,7 +1,7 @@
 {
   "name": "base-ui-vue",
   "type": "module",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Vue port of Base UI",
   "author": "vuepont",
   "license": "MIT",
