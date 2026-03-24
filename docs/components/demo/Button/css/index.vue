@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { Button } from 'base-ui-vue'
-import './styles.css'
 </script>
 
 <template>
@@ -8,3 +7,5 @@ import './styles.css'
     Submit
   </Button>
 </template>
+
+<style scoped src="./styles.css"></style>

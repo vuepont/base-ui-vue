@@ -8,7 +8,6 @@ import {
   Form,
 } from 'base-ui-vue'
 import { ref } from 'vue'
-import './styles.css'
 
 const errors = ref<Record<string, string | string[]>>({})
 const loading = ref(false)
@@ -59,3 +58,5 @@ async function handleFormSubmit(formValues: Record<string, unknown>) {
     </Button>
   </Form>
 </template>
+
+<style scoped src="./styles.css"></style>

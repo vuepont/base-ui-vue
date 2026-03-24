@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { Slot } from 'base-ui-vue'
 import Counter from './Counter.vue'
-import './styles.css'
 </script>
 
 <template>
@@ -12,3 +11,5 @@ import './styles.css'
     </button>
   </Counter>
 </template>
+
+<style scoped src="./styles.css"></style>

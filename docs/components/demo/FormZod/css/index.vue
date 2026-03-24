@@ -9,7 +9,6 @@ import {
 } from 'base-ui-vue'
 import { ref } from 'vue'
 import { z } from 'zod'
-import './styles.css'
 
 const schema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -62,3 +61,5 @@ async function handleFormSubmit(formValues: Record<string, unknown>) {
     </Button>
   </Form>
 </template>
+
+<style scoped src="./styles.css"></style>

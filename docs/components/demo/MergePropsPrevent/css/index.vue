@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { mergeProps } from 'base-ui-vue'
 import { computed, ref, useAttrs } from 'vue'
-import './styles.css'
 
 defineOptions({ inheritAttrs: false })
 
@@ -73,3 +72,5 @@ const buttonProps = computed(() => mergeProps(
     </button>
   </div>
 </template>
+
+<style scoped src="./styles.css"></style>
