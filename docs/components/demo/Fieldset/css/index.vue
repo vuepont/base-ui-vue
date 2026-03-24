@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { FieldsetLegend, FieldsetRoot } from 'base-ui-vue'
-import './styles.css'
 </script>
 
 <template>
@@ -20,3 +19,5 @@ import './styles.css'
     </div>
   </FieldsetRoot>
 </template>
+
+<style scoped src="./styles.css"></style>

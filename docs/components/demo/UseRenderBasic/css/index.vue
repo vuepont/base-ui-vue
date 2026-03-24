@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import CustomText from './CustomText.vue'
-import './styles.css'
 </script>
 
 <template>
@@ -11,3 +10,5 @@ import './styles.css'
     </CustomText>
   </div>
 </template>
+
+<style scoped src="./styles.css"></style>

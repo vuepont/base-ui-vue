@@ -6,7 +6,6 @@ import {
   AccordionRoot,
   AccordionTrigger,
 } from 'base-ui-vue'
-import '../../../demo/Accordion/css/styles.css'
 </script>
 
 <template>
@@ -62,3 +61,5 @@ import '../../../demo/Accordion/css/styles.css'
     </AccordionItem>
   </AccordionRoot>
 </template>
+
+<style scoped src="../../../demo/Accordion/css/styles.css"></style>

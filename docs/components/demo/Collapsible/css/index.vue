@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { CollapsiblePanel, CollapsibleRoot, CollapsibleTrigger } from 'base-ui-vue'
-import './styles.css'
 </script>
 
 <template>
@@ -20,3 +19,5 @@ import './styles.css'
     </CollapsiblePanel>
   </CollapsibleRoot>
 </template>
+
+<style scoped src="./styles.css"></style>

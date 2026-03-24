@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { AvatarFallback, AvatarImage, AvatarRoot } from 'base-ui-vue'
-import './styles.css'
 </script>
 
 <template>
@@ -20,3 +19,5 @@ import './styles.css'
     </AvatarRoot>
   </div>
 </template>
+
+<style scoped src="./styles.css"></style>

@@ -6,7 +6,6 @@ import {
   FieldLabel,
   FieldRoot,
 } from 'base-ui-vue'
-import './styles.css'
 </script>
 
 <template>
@@ -23,3 +22,5 @@ import './styles.css'
     </FieldDescription>
   </FieldRoot>
 </template>
+
+<style scoped src="./styles.css"></style>
