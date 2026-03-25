@@ -47,7 +47,7 @@ const state = computed<ToolbarLinkState>(() => ({
     :style="props.style"
     :metadata="TOOLBAR_LINK_METADATA"
     :state="state"
-    :props="[attrs as Record<string, any>]"
+    :props="[attrs]"
   >
     <slot :state="state" />
   </CompositeItem>
