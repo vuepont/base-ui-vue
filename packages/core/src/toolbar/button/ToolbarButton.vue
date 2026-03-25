@@ -85,7 +85,7 @@ const itemRefs = [buttonRef]
     :state="state"
     :refs="itemRefs"
     :props="[
-      attrs as Record<string, any>,
+      attrs,
       () => getButtonProps(),
     ]"
   >
