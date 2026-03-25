@@ -61,11 +61,13 @@ export function useButton(
   parameters: UseButtonParameters = {},
 ): UseButtonReturnValue {
   const buttonRef = ref<HTMLElement | null>(null)
+  const isCompositeItem = useCompositeRootContext(true) !== undefined
 
   const { props: focusableWhenDisabledProps } = useFocusableWhenDisabled({
     focusableWhenDisabled: () =>
       toValue(parameters.focusableWhenDisabled) ?? false,
     disabled: () => toValue(parameters.disabled) ?? false,
+    composite: () => isCompositeItem,
     isNativeButton: () => toValue(parameters.native) ?? true,
     tabIndex: () => toValue(parameters.tabIndex) ?? 0,
   })
@@ -105,7 +107,6 @@ export function useButton(
   // <Toolbar.Button disabled as={<Menu.Trigger />} />
   // the `disabled` prop needs to pass through 2 `useButton`s then finally
   // delete the `disabled` attribute from DOM
-  const isCompositeItem = useCompositeRootContext(true) !== undefined
   const updateDisabled = () => {
     const element = buttonRef.value
     if (!isButtonElement(element))

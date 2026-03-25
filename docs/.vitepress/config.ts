@@ -83,6 +83,7 @@ export default defineConfig({
           { text: 'Field', link: '/docs/components/field' },
           { text: 'Fieldset', link: '/docs/components/fieldset' },
           { text: 'Form', link: '/docs/components/form' },
+          { text: 'Toolbar', link: '/docs/components/toolbar' },
         ],
       },
       {

@@ -53,7 +53,12 @@ export function useFocusableWhenDisabled(
 
     const additionalProps = {
       onKeydown(event: KeyboardEvent) {
-        if (disabled && focusableWhenDisabled && event.key !== 'Tab') {
+        if (
+          disabled
+          && focusableWhenDisabled
+          && !composite
+          && event.key !== 'Tab'
+        ) {
           event.preventDefault()
         }
       },
