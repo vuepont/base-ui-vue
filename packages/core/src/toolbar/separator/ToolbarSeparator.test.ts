@@ -51,4 +51,21 @@ describe('<ToolbarSeparator />', () => {
 
     expect(separator.attributes('aria-orientation')).toBe('horizontal')
   })
+
+  it('forwards Separator slot state to ToolbarSeparator consumers', () => {
+    const TestComponent = defineComponent({
+      components: { ToolbarRoot, ToolbarSeparator },
+      template: `
+        <ToolbarRoot orientation="horizontal">
+          <ToolbarSeparator v-slot="{ state }">
+            <span data-testid="slot-state">{{ state.orientation }}</span>
+          </ToolbarSeparator>
+        </ToolbarRoot>
+      `,
+    })
+
+    const wrapper = mount(TestComponent)
+
+    expect(wrapper.get('[data-testid="slot-state"]').text()).toBe('vertical')
+  })
 })

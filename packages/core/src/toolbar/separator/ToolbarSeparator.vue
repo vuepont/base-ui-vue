@@ -29,12 +29,13 @@ const orientation = computed(() => props.orientation
 
 <template>
   <Separator
+    v-slot="slotProps"
     :as="props.as"
     :class="props.class"
     :style="props.style"
     :orientation="orientation"
     v-bind="attrs"
   >
-    <slot />
+    <slot v-bind="slotProps" />
   </Separator>
 </template>
