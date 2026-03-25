@@ -7,9 +7,9 @@ export enum ToolbarButtonDataAttributes {
    * Indicates the orientation of the toolbar.
    * @type {'horizontal' | 'vertical'}
    */
-  focusable = 'data-focusable',
+  orientation = 'data-orientation',
   /**
    * Present when the button remains focusable when disabled.
    */
-  orientation = 'data-orientation',
+  focusable = 'data-focusable',
 }

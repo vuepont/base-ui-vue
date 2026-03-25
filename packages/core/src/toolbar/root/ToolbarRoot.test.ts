@@ -161,4 +161,40 @@ describe('<ToolbarRoot />', () => {
 
     wrapper.unmount()
   })
+
+  it('does not skip enabled items when focusableWhenDisabled is false', async () => {
+    const user = userEvent.setup()
+
+    const TestComponent = defineComponent({
+      components: {
+        ToolbarRoot,
+        ToolbarButton,
+      },
+      template: `
+        <ToolbarRoot>
+          <ToolbarButton>One</ToolbarButton>
+          <ToolbarButton :focusable-when-disabled="false">Two</ToolbarButton>
+          <ToolbarButton>Three</ToolbarButton>
+        </ToolbarRoot>
+      `,
+    })
+
+    const wrapper = mount(TestComponent, { attachTo: document.body })
+
+    const [button1, button2, button3] = wrapper.findAll('button').map(node => node.element as HTMLButtonElement)
+
+    expect(button2.hasAttribute('disabled')).toBe(false)
+    expect(button2.hasAttribute('aria-disabled')).toBe(false)
+
+    await user.tab()
+    expect(document.activeElement).toBe(button1)
+
+    await user.keyboard('[ArrowRight]')
+    expect(document.activeElement).toBe(button2)
+
+    await user.keyboard('[ArrowRight]')
+    expect(document.activeElement).toBe(button3)
+
+    wrapper.unmount()
+  })
 })

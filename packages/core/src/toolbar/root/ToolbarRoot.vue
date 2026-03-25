@@ -7,6 +7,7 @@ import CompositeList from '../../composite/list/CompositeList.vue'
 import { compositeRootContextKey } from '../../composite/root/CompositeRootContext'
 import { useCompositeRoot } from '../../composite/root/useCompositeRoot'
 import { useDirection } from '../../direction-provider/DirectionContext'
+import { isElementDisabled } from '../../utils/isElementDisabled'
 import { useRenderElement } from '../../utils/useRenderElement'
 import { toolbarRootContextKey } from './ToolbarRootContext'
 
@@ -66,8 +67,12 @@ const itemMap = ref(new Map<Element, CompositeMetadata<ToolbarRootItemMetadata> 
 const disabledIndices = computed(() => {
   const output: number[] = []
 
-  itemMap.value.forEach((itemMetadata) => {
-    if (itemMetadata?.index != null && !itemMetadata.focusableWhenDisabled) {
+  itemMap.value.forEach((itemMetadata, element) => {
+    if (
+      itemMetadata?.index != null
+      && !itemMetadata.focusableWhenDisabled
+      && isElementDisabled(element as HTMLElement)
+    ) {
       output.push(itemMetadata.index)
     }
   })
