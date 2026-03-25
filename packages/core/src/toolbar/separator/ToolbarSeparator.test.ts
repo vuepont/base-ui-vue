@@ -20,6 +20,22 @@ describe('<ToolbarSeparator />', () => {
     expect(separator.attributes('aria-orientation')).toBe('vertical')
   })
 
+  it('uses a horizontal separator in a vertical toolbar by default', () => {
+    const TestComponent = defineComponent({
+      components: { ToolbarRoot, ToolbarSeparator },
+      template: `
+        <ToolbarRoot orientation="vertical">
+          <ToolbarSeparator data-testid="separator" />
+        </ToolbarRoot>
+      `,
+    })
+
+    const wrapper = mount(TestComponent)
+    const separator = wrapper.get('[data-testid="separator"]')
+
+    expect(separator.attributes('aria-orientation')).toBe('horizontal')
+  })
+
   it('allows the orientation to be overridden explicitly', () => {
     const TestComponent = defineComponent({
       components: { ToolbarRoot, ToolbarSeparator },
