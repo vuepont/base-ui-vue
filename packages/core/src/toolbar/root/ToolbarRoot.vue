@@ -124,9 +124,10 @@ const {
   ref: root.mergedRef,
 })
 
-function handleMapChange(newMap: Map<Element, CompositeMetadata<any> | null>) {
-  itemMap.value = newMap as Map<Element, CompositeMetadata<ToolbarRootItemMetadata> | null>
-  root.onMapChange(newMap as any)
+function handleMapChange(newMap: Map<Element, { index?: number | null | undefined } | null>) {
+  const typedMap = newMap as Map<Element, CompositeMetadata<ToolbarRootItemMetadata> | null>
+  itemMap.value = typedMap
+  root.onMapChange(typedMap)
 }
 </script>
 
