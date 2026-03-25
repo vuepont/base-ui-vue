@@ -57,6 +57,34 @@ describe('<ToolbarInput />', () => {
     wrapper.unmount()
   })
 
+  it('allows vertical navigation keys when disabled in a vertical toolbar', async () => {
+    const user = userEvent.setup()
+
+    const TestComponent = defineComponent({
+      components: { ToolbarRoot, ToolbarButton, ToolbarInput },
+      template: `
+        <ToolbarRoot orientation="vertical">
+          <ToolbarButton>One</ToolbarButton>
+          <ToolbarInput disabled data-testid="input" default-value="" />
+          <ToolbarButton>Two</ToolbarButton>
+        </ToolbarRoot>
+      `,
+    })
+
+    const wrapper = mount(TestComponent, { attachTo: document.body })
+    const input = wrapper.get('[data-testid="input"]').element as HTMLInputElement
+    const button2 = wrapper.findAll('button')[1]?.element as HTMLButtonElement
+
+    await user.tab()
+    await user.keyboard('[ArrowDown]')
+    expect(document.activeElement).toBe(input)
+
+    await user.keyboard('[ArrowDown]')
+    expect(document.activeElement).toBe(button2)
+
+    wrapper.unmount()
+  })
+
   ;([
     ['horizontal', ARROW_RIGHT, ARROW_LEFT],
     ['vertical', ARROW_DOWN, ARROW_UP],

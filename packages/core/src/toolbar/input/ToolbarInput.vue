@@ -2,7 +2,7 @@
 import type { BaseUIComponentProps } from '../../utils/types'
 import type { ToolbarRootState } from '../root/ToolbarRoot.vue'
 import { computed, useAttrs } from 'vue'
-import { ARROW_LEFT, ARROW_RIGHT, stopEvent } from '../../composite/composite'
+import { ARROW_DOWN, ARROW_LEFT, ARROW_RIGHT, ARROW_UP, stopEvent } from '../../composite/composite'
 import CompositeItem from '../../composite/item/CompositeItem.vue'
 import { useFocusableWhenDisabled } from '../../utils/useFocusableWhenDisabled'
 import { useToolbarGroupContext } from '../group/ToolbarGroupContext'
@@ -73,6 +73,12 @@ const state = computed<ToolbarInputState>(() => ({
   focusable: props.focusableWhenDisabled,
 }))
 
+const allowedKeysWhenDisabled = computed(() =>
+  toolbarRootContext.orientation.value === 'vertical'
+    ? new Set([ARROW_UP, ARROW_DOWN])
+    : new Set([ARROW_LEFT, ARROW_RIGHT]),
+)
+
 const defaultProps = computed(() => ({
   onClick(event: MouseEvent) {
     if (disabled.value) {
@@ -80,7 +86,7 @@ const defaultProps = computed(() => ({
     }
   },
   onKeydown(event: KeyboardEvent) {
-    if (event.key !== ARROW_LEFT && event.key !== ARROW_RIGHT && disabled.value) {
+    if (disabled.value && !allowedKeysWhenDisabled.value.has(event.key)) {
       stopEvent(event)
     }
   },
