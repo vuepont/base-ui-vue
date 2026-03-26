@@ -210,6 +210,31 @@ describe('<CheckboxGroup />', () => {
     expect(screen.getByTestId('parent')).toHaveAttribute('aria-checked', 'mixed')
   })
 
+  it('does not remain dirty when the selected values return to the initial set in a different order', async () => {
+    const user = userEvent.setup()
+
+    render(createGroupApp({
+      template: `
+        <FieldRoot name="letters">
+          <CheckboxGroup :default-value="['a', 'b']">
+            <CheckboxRoot value="a" data-testid="a" />
+            <CheckboxRoot value="b" data-testid="b" />
+          </CheckboxGroup>
+        </FieldRoot>
+      `,
+    }))
+
+    const group = screen.getByRole('group')
+
+    expect(group).not.toHaveAttribute('data-dirty')
+
+    await user.click(screen.getByTestId('a'))
+    expect(group).toHaveAttribute('data-dirty')
+
+    await user.click(screen.getByTestId('a'))
+    expect(group).not.toHaveAttribute('data-dirty')
+  })
+
   describe('fieldLabel', () => {
     it('implicit association', async () => {
       const user = userEvent.setup()

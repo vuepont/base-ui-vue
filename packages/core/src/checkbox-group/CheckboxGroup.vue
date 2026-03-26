@@ -161,9 +161,11 @@ watch(
     const initialValue = Array.isArray(validityData.value.initialValue)
       ? validityData.value.initialValue as string[]
       : EMPTY_ARRAY as string[]
+    const normalizedNextValue = normalizeSelection(nextValue)
+    const normalizedInitialValue = normalizeSelection(initialValue)
 
     setFilled(nextValue.length > 0)
-    setDirty(!areArraysEqual(nextValue, initialValue))
+    setDirty(!areArraysEqual(normalizedNextValue, normalizedInitialValue))
 
     if (shouldValidateOnChange()) {
       void validation.commit(nextValue)
@@ -223,6 +225,10 @@ function areArraysEqual(a: readonly string[], b: readonly string[]) {
   }
 
   return a.every((item, index) => item === b[index])
+}
+
+function normalizeSelection(values: readonly string[]) {
+  return values.slice().sort()
 }
 </script>
 
