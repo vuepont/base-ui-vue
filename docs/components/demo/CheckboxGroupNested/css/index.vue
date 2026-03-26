@@ -13,7 +13,7 @@ function handleMainValueChange(value: string[]) {
   if (value.includes('manage-users')) {
     managementValue.value = userManagementPermissions.slice()
   }
-  else if (managementValue.value.length === userManagementPermissions.length) {
+  else {
     managementValue.value = []
   }
   mainValue.value = value
