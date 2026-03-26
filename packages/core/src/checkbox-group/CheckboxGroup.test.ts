@@ -422,6 +422,46 @@ describe('<CheckboxGroup />', () => {
       checkboxes.forEach(checkbox => expect(checkbox).toHaveAttribute('aria-invalid', 'true'))
     })
 
+    it('does not let a parent checkbox overwrite group validation state', async () => {
+      const user = userEvent.setup()
+
+      render(createGroupApp({
+        setup() {
+          const allValues = ['a', 'b', 'c']
+          const value = ref<string[]>(['a', 'b', 'c'])
+
+          function onValueChange(nextValue: string[]) {
+            value.value = nextValue
+          }
+
+          function validate(nextValue: unknown) {
+            return Array.isArray(nextValue) && nextValue.length > 0 ? null : 'error'
+          }
+
+          return { allValues, value, onValueChange, validate }
+        },
+        template: `
+        <FieldRoot validation-mode="onChange" :validate="validate" name="permissions">
+          <CheckboxGroup :all-values="allValues" :value="value" @value-change="onValueChange">
+            <CheckboxRoot parent data-testid="parent" />
+            <CheckboxRoot value="a" data-testid="a" />
+            <CheckboxRoot value="b" data-testid="b" />
+            <CheckboxRoot value="c" data-testid="c" />
+          </CheckboxGroup>
+        </FieldRoot>
+      `,
+      }))
+
+      const group = screen.getByRole('group')
+
+      expect(group).not.toHaveAttribute('aria-invalid')
+
+      await user.click(screen.getByTestId('a'))
+
+      expect(screen.getByTestId('parent')).toHaveAttribute('aria-checked', 'mixed')
+      expect(group).not.toHaveAttribute('aria-invalid')
+    })
+
     it('revalidates when the controlled value changes externally', async () => {
       const user = userEvent.setup()
       const validateSpy = vi.fn((value: unknown) => {

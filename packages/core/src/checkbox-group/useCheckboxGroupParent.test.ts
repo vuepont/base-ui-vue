@@ -36,10 +36,8 @@ describe('useCheckboxGroupParent', () => {
       </CheckboxGroup>
     `, () => ({ parentCheckedChange, childCheckedChange })))
 
-    const children = screen.getAllByRole('checkbox').filter(
-      checkbox => checkbox.getAttribute('value') && checkbox.tagName === 'BUTTON',
-    )
     const parent = screen.getByTestId('parent')
+    const children = screen.getAllByRole('checkbox').filter(checkbox => checkbox !== parent)
 
     children.forEach((checkbox) => {
       expect(checkbox).toHaveAttribute('aria-checked', 'false')

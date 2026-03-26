@@ -364,7 +364,7 @@ watchEffect(() => {
 watch(
   () => checked.value,
   (nextChecked) => {
-    if (groupContext && !props.parent) {
+    if (groupContext) {
       return
     }
 
