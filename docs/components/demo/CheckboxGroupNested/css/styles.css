@@ -1,51 +1,74 @@
 .CheckboxGroup {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: 0.5rem;
+  align-items: start;
+  gap: 0.25rem;
   margin-left: 1rem;
+  color: var(--color-gray-900);
 }
 
 .NestedGroup {
-  margin-top: 0.25rem;
+  margin-left: 1rem;
 }
 
 .Item {
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  gap: 0.75rem;
-  color: #0f172a;
-  font-size: 0.95rem;
+  gap: 0.5rem;
+  font-weight: 400;
 }
 
 .ParentItem {
   margin-left: -1rem;
-  font-weight: 600;
 }
 
 .Checkbox {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  box-sizing: border-box;
+  display: flex;
   width: 1.25rem;
   height: 1.25rem;
-  border: 1px solid #cbd5e1;
-  border-radius: 0.35rem;
-  background: white;
-  color: #0f172a;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.25rem;
+  outline: 0;
+  padding: 0;
+  margin: 0;
+  border: none;
 }
 
-.Checkbox[data-checked],
+.Checkbox[data-unchecked] {
+  border: 1px solid var(--color-gray-300);
+  background-color: transparent;
+}
+
+.Checkbox[data-checked] {
+  background-color: var(--color-gray-900);
+}
+
 .Checkbox[data-indeterminate] {
-  border-color: #0f172a;
-  background: #0f172a;
-  color: white;
+  border: 1px solid var(--color-gray-300);
+  background-color: canvas;
 }
 
-.Dot {
-  display: block;
-  width: 0.5rem;
-  height: 0.5rem;
-  border-radius: 999px;
-  background: currentColor;
+.Checkbox:focus-visible {
+  outline: 2px solid var(--color-blue);
+  outline-offset: 2px;
+}
+
+.Indicator {
+  display: flex;
+  color: var(--color-gray-50);
+}
+
+.Indicator[data-unchecked] {
+  display: none;
+}
+
+.Indicator[data-indeterminate] {
+  color: var(--color-gray-900);
+}
+
+.Icon {
+  width: 0.75rem;
+  height: 0.75rem;
 }

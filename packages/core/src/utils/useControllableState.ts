@@ -18,9 +18,7 @@ export interface UseControllableStateReturnValue<T> {
 }
 
 /**
- * Manages controlled / uncontrolled state following the same semantics as
- * React's `useControlled` hook.
- *
+ * Manages controlled / uncontrolled state
  * - When `controlled()` returns a non-`undefined` value the component is
  *   considered **controlled** and the internal state is ignored.
  * - When `controlled()` returns `undefined` the component is **uncontrolled**

@@ -67,7 +67,7 @@ useOpenChangeComplete({
 const baseStateAttributesMapping = useCheckboxStateAttributesMapping(rootState)
 
 const stateAttributesMapping: StateAttributesMapping<CheckboxIndicatorState> = {
-  // Compose checkbox, transition, and validity attributes to mirror the React contract.
+  // Compose checkbox, transition, and validity attributes.
   ...baseStateAttributesMapping,
   ...transitionStatusMapping,
   ...fieldValidityMapping,
