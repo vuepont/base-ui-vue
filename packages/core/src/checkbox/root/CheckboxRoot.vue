@@ -481,7 +481,11 @@ function handleInputChange(event: Event) {
     return
   }
 
-  applyCheckedChange(target.checked, event)
+  const applied = applyCheckedChange(target.checked, event)
+  if (!applied) {
+    target.checked = computedChecked.value
+    target.indeterminate = computedIndeterminate.value
+  }
 }
 
 function handleRootClick(event: MouseEvent | KeyboardEvent) {

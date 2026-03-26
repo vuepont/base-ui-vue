@@ -42,9 +42,9 @@ function handleManagementValueChange(value: string[]) {
       <CheckboxRoot
         parent
         :indeterminate="managementValue.length > 0 && managementValue.length !== userManagementPermissions.length"
-        class="flex size-5 items-center justify-center rounded-xs focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-800 data-checked:bg-gray-900 data-unchecked:border data-unchecked:border-gray-300 data-indeterminate:border data-indeterminate:border-gray-300 data-indeterminate:bg-[canvas]"
+        class="flex size-5 items-center justify-center rounded-xs focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-800 data-[checked]:bg-gray-900 data-[unchecked]:border data-[unchecked]:border-gray-300 data-[indeterminate]:border data-[indeterminate]:border-gray-300 data-[indeterminate]:bg-[canvas]"
       >
-        <CheckboxIndicator v-slot="{ state }" class="flex text-gray-50 data-unchecked:hidden data-indeterminate:text-gray-900">
+        <CheckboxIndicator v-slot="{ state }" class="flex text-gray-50 data-[unchecked]:hidden data-[indeterminate]:text-gray-900">
           <svg
             v-if="state.indeterminate"
             class="size-3"
