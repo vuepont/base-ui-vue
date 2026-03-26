@@ -17,6 +17,7 @@ export interface UseCheckboxGroupParentReturnValue {
   id: string | undefined
   indeterminate: Readonly<Ref<boolean>>
   disabledStatesRef: Ref<Map<string, boolean>>
+  registeredControlIdsRef: Ref<Map<string, string>>
   getParentProps: () => {
     'id': string | undefined
     'indeterminate': boolean
@@ -34,6 +35,7 @@ export interface UseCheckboxGroupParentReturnValue {
       eventDetails: BaseUIChangeEventDetails<typeof REASONS.none>,
     ) => void
   }
+  registerChildControlId: (value: string, id: string | undefined) => void
 }
 
 export function useCheckboxGroupParent(
@@ -44,6 +46,7 @@ export function useCheckboxGroupParent(
 
   const uncontrolledStateRef = ref<string[]>(value.value)
   const disabledStatesRef = ref(new Map<string, boolean>())
+  const registeredControlIdsRef = ref(new Map<string, string>())
   const status = ref<'on' | 'off' | 'mixed'>('mixed')
 
   const id = useBaseUiId()
@@ -67,7 +70,10 @@ export function useCheckboxGroupParent(
       id,
       'indeterminate': indeterminate.value,
       'checked': checked.value,
-      'aria-controls': resolvedAllValues.value.map(item => `${id}-${item}`).join(' '),
+      'aria-controls': resolvedAllValues.value
+        .map(item => registeredControlIdsRef.value.get(item))
+        .filter((item): item is string => Boolean(item))
+        .join(' '),
       onCheckedChange(
         _nextChecked: boolean,
         eventDetails: BaseUIChangeEventDetails<typeof REASONS.none>,
@@ -142,11 +148,26 @@ export function useCheckboxGroupParent(
     }
   }
 
+  function registerChildControlId(value: string, id: string | undefined) {
+    const nextRegisteredControlIds = new Map(registeredControlIdsRef.value)
+
+    if (id === undefined) {
+      nextRegisteredControlIds.delete(value)
+      registeredControlIdsRef.value = nextRegisteredControlIds
+      return
+    }
+
+    nextRegisteredControlIds.set(value, id)
+    registeredControlIdsRef.value = nextRegisteredControlIds
+  }
+
   return {
     id,
     indeterminate,
     disabledStatesRef,
+    registeredControlIdsRef,
     getParentProps,
     getChildProps,
+    registerChildControlId,
   }
 }

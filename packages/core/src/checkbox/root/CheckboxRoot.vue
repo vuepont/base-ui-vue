@@ -207,14 +207,10 @@ const groupParentId = useBaseUiId()
 
 const inputId = computed(() => {
   // Parent/child checkboxes inside a group share a predictable id scheme so the
-  // parent can point `aria-controls` at child inputs
+  // parent can identify itself. Child controls register their real input ids.
   if (isGroupedWithParent.value && parentContext.value) {
     if (props.parent) {
       return parentContext.value.id ?? groupParentId
-    }
-
-    if (checkboxValue.value) {
-      return `${parentContext.value.id}-${checkboxValue.value}`
     }
   }
 
@@ -233,6 +229,27 @@ watchEffect((onCleanup) => {
     labelableContext.registerControlId(controlSource, undefined)
   })
 })
+
+watch(
+  () => ({
+    groupedWithParent: isGroupedWithParent.value,
+    checkboxValue: checkboxValue.value,
+    inputId: inputId.value,
+    isParent: props.parent,
+  }),
+  (nextState, _prevState, onCleanup) => {
+    if (!nextState.groupedWithParent || !groupContext || nextState.isParent || !nextState.checkboxValue) {
+      return
+    }
+
+    groupContext.parent.registerChildControlId(nextState.checkboxValue, nextState.inputId)
+
+    onCleanup(() => {
+      groupContext.parent.registerChildControlId(nextState.checkboxValue!, undefined)
+    })
+  },
+  { immediate: true },
+)
 
 const groupProps = computed<GroupCheckboxProps>(() => {
   if (!isGroupedWithParent.value || !groupContext) {

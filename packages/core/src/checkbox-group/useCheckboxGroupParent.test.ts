@@ -1,5 +1,5 @@
 import userEvent from '@testing-library/user-event'
-import { render, screen } from '@testing-library/vue'
+import { render, screen, waitFor } from '@testing-library/vue'
 import { describe, expect, it, vi } from 'vitest'
 import { defineComponent, ref } from 'vue'
 import CheckboxRoot from '../checkbox/root/CheckboxRoot.vue'
@@ -126,23 +126,32 @@ describe('useCheckboxGroupParent', () => {
     expect(screen.getByTestId('parent')).toHaveAttribute('aria-checked', 'true')
   })
 
-  it('should apply space-separated aria-controls attribute with child names', () => {
-    render(createApp(`
-      <CheckboxGroup :value="value" @value-change="(nextValue) => value = nextValue" :all-values="allValues">
+  it('should apply space-separated aria-controls attribute with registered child ids', async () => {
+    render(defineComponent({
+      components: { CheckboxGroup, CheckboxRoot },
+      setup() {
+        const value = ref<string[]>([])
+        const allValuesWithWhitespace = ['alpha one', 'beta two', 'gamma three']
+        return { value, allValuesWithWhitespace }
+      },
+      template: `
+      <CheckboxGroup :value="value" @value-change="(nextValue) => value = nextValue" :all-values="allValuesWithWhitespace">
         <CheckboxRoot parent data-testid="parent" />
-        <CheckboxRoot value="a" />
-        <CheckboxRoot value="b" />
-        <CheckboxRoot value="c" />
+        <CheckboxRoot id="control-alpha" value="alpha one" />
+        <CheckboxRoot id="control-beta" value="beta two" />
+        <CheckboxRoot id="control-gamma" value="gamma three" />
       </CheckboxGroup>
-    `))
+    `,
+    }))
 
     const parent = screen.getByTestId('parent')
-    const id = parent.getAttribute('id')
 
-    expect(parent).toHaveAttribute(
-      'aria-controls',
-      allValues.map(value => `${id}-${value}`).join(' '),
-    )
+    await waitFor(() => {
+      expect(parent).toHaveAttribute(
+        'aria-controls',
+        ['control-alpha', 'control-beta', 'control-gamma'].join(' '),
+      )
+    })
   })
 
   it('preserves initial state if mixed when parent is clicked', async () => {
