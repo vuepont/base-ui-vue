@@ -199,7 +199,7 @@ const disabled = computed(() =>
   || props.disabled,
 )
 const name = computed(() => fieldName.value ?? props.name)
-const checkboxValue = computed(() => props.value ?? name.value)
+const checkboxValue = computed(() => (props.value !== undefined ? props.value : name.value))
 
 const rootElementId = useBaseUiId()
 const generatedInputId = useBaseUiId()
@@ -238,7 +238,12 @@ watch(
     isParent: props.parent,
   }),
   (nextState, _prevState, onCleanup) => {
-    if (!nextState.groupedWithParent || !groupContext || nextState.isParent || !nextState.checkboxValue) {
+    if (
+      !nextState.groupedWithParent
+      || !groupContext
+      || nextState.isParent
+      || nextState.checkboxValue === undefined
+    ) {
       return
     }
 
@@ -260,7 +265,7 @@ const groupProps = computed<GroupCheckboxProps>(() => {
     return groupContext.parent.getParentProps()
   }
 
-  if (checkboxValue.value) {
+  if (checkboxValue.value !== undefined) {
     return groupContext.parent.getChildProps(checkboxValue.value)
   }
 
@@ -288,14 +293,14 @@ const validation = groupContext?.validation ?? localValidation
 const { value: checked, setValue: setCheckedState } = useControllableState<boolean>({
   controlled: () => {
     // Child checkboxes in a group derive checked state from the shared value array.
-    if (groupContext && !props.parent && checkboxValue.value) {
+    if (groupContext && !props.parent && checkboxValue.value !== undefined) {
       return groupContext.value.value.includes(checkboxValue.value)
     }
 
     return groupChecked.value
   },
   default:
-    groupContext && !props.parent && checkboxValue.value
+    groupContext && !props.parent && checkboxValue.value !== undefined
       ? groupContext.defaultValue.value.includes(checkboxValue.value)
       : props.defaultChecked,
 })
@@ -377,17 +382,34 @@ watch(
   { flush: 'sync' },
 )
 
-watchEffect((onCleanup) => {
-  if (!parentContext.value || !checkboxValue.value) {
-    return
-  }
+watch(
+  () => ({
+    parentContext: parentContext.value,
+    checkboxValue: checkboxValue.value,
+    disabled: disabled.value,
+  }),
+  (nextState, _prevState, onCleanup) => {
+    if (!nextState.parentContext || nextState.checkboxValue === undefined) {
+      return
+    }
 
-  parentContext.value.disabledStatesRef.value.set(checkboxValue.value, disabled.value)
+    const checkboxKey = nextState.checkboxValue
+    const nextDisabledStates = new Map(nextState.parentContext.disabledStatesRef.value)
+    nextDisabledStates.set(checkboxKey, nextState.disabled)
+    nextState.parentContext.disabledStatesRef.value = nextDisabledStates
 
-  onCleanup(() => {
-    parentContext.value?.disabledStatesRef.value.delete(checkboxValue.value!)
-  })
-})
+    onCleanup(() => {
+      if (!nextState.parentContext) {
+        return
+      }
+
+      const cleanupDisabledStates = new Map(nextState.parentContext.disabledStatesRef.value)
+      cleanupDisabledStates.delete(checkboxKey)
+      nextState.parentContext.disabledStatesRef.value = cleanupDisabledStates
+    })
+  },
+  { immediate: true },
+)
 
 const { getButtonProps, buttonRef } = useButton({
   disabled,
@@ -431,7 +453,7 @@ function applyCheckedChange(nextChecked: boolean, event: Event) {
 
   // Standalone children of a CheckboxGroup update the shared value array here;
   // parent checkboxes use the group's parent-controller helpers instead.
-  if (groupContext && !isGroupedWithParent.value && !props.parent && checkboxValue.value) {
+  if (groupContext && !isGroupedWithParent.value && !props.parent && checkboxValue.value !== undefined) {
     const currentValue = groupContext.value.value.slice()
     const nextValue = nextChecked
       ? Array.from(new Set([...currentValue, checkboxValue.value]))

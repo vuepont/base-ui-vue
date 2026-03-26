@@ -143,6 +143,33 @@ describe('<CheckboxRoot />', () => {
         expect(checkbox).toHaveAttribute('aria-checked', 'true')
       })
     })
+
+    it('treats an empty string value as a valid grouped child key', async () => {
+      const user = userEvent.setup()
+
+      render(createCheckboxApp({
+        setup() {
+          const value = ref<string[]>([''])
+          return { value }
+        },
+        template: `
+          <CheckboxGroup :value="value" @value-change="(nextValue) => value = nextValue">
+            <CheckboxRoot value="" data-testid="empty-value" />
+            <CheckboxRoot value="b" data-testid="other-value" />
+          </CheckboxGroup>
+        `,
+      }))
+
+      const emptyValueCheckbox = screen.getByTestId('empty-value')
+
+      expect(emptyValueCheckbox).toHaveAttribute('aria-checked', 'true')
+
+      await user.click(emptyValueCheckbox)
+      expect(emptyValueCheckbox).toHaveAttribute('aria-checked', 'false')
+
+      await user.click(emptyValueCheckbox)
+      expect(emptyValueCheckbox).toHaveAttribute('aria-checked', 'true')
+    })
   })
 
   describe('aRIA attributes', () => {
