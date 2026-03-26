@@ -1,6 +1,6 @@
 import userEvent from '@testing-library/user-event'
 import { render, screen, waitFor } from '@testing-library/vue'
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { defineComponent, ref } from 'vue'
 import { CheckboxIndicator, CheckboxRoot } from '..'
 
@@ -54,8 +54,15 @@ function createAnimationStub(finishedSignal: Promise<void>): Animation {
 }
 
 describe('<CheckboxIndicator />', () => {
-  afterEach(() => {
+  let originalAnimationsDisabled: unknown
+
+  beforeEach(() => {
+    originalAnimationsDisabled = (globalThis as any).BASE_UI_ANIMATIONS_DISABLED
     ;(globalThis as any).BASE_UI_ANIMATIONS_DISABLED = true
+  })
+
+  afterEach(() => {
+    ;(globalThis as any).BASE_UI_ANIMATIONS_DISABLED = originalAnimationsDisabled
   })
 
   it('should not render indicator by default', () => {
