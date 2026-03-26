@@ -446,13 +446,13 @@ function applyCheckedChange(
 ) {
   const details = createChangeEventDetails(REASONS.none, event)
 
-  groupProps.value.onCheckedChange?.(nextChecked, details)
   emit('checkedChange', nextChecked, details)
 
   if (details.isCanceled) {
     return false
   }
 
+  groupProps.value.onCheckedChange?.(nextChecked, details)
   onApplied?.()
   setCheckedState(nextChecked)
 

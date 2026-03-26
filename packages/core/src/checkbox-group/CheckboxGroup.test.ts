@@ -210,6 +210,48 @@ describe('<CheckboxGroup />', () => {
     expect(screen.getByTestId('parent')).toHaveAttribute('aria-checked', 'mixed')
   })
 
+  it('does not apply parent group changes when CheckedChange is canceled', async () => {
+    const user = userEvent.setup()
+
+    render(createGroupApp({
+      setup() {
+        const allValues = ['a', 'b', 'c']
+        const value = ref<string[]>([])
+
+        function onValueChange(nextValue: string[]) {
+          value.value = nextValue
+        }
+
+        function handleCheckedChange(_checked: boolean, details: { cancel: () => void }) {
+          details.cancel()
+        }
+
+        return { allValues, value, onValueChange, handleCheckedChange }
+      },
+      template: `
+        <CheckboxGroup
+          :all-values="allValues"
+          :value="value"
+          @value-change="onValueChange"
+        >
+          <CheckboxRoot parent data-testid="parent" @checked-change="handleCheckedChange">
+            <CheckboxIndicator />
+          </CheckboxRoot>
+          <CheckboxRoot value="a" data-testid="a" />
+          <CheckboxRoot value="b" data-testid="b" />
+          <CheckboxRoot value="c" data-testid="c" />
+        </CheckboxGroup>
+      `,
+    }))
+
+    await user.click(screen.getByTestId('parent'))
+
+    expect(screen.getByTestId('parent')).toHaveAttribute('aria-checked', 'false')
+    expect(screen.getByTestId('a')).toHaveAttribute('aria-checked', 'false')
+    expect(screen.getByTestId('b')).toHaveAttribute('aria-checked', 'false')
+    expect(screen.getByTestId('c')).toHaveAttribute('aria-checked', 'false')
+  })
+
   it('does not remain dirty when the selected values return to the initial set in a different order', async () => {
     const user = userEvent.setup()
 
