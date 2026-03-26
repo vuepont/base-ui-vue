@@ -472,6 +472,15 @@ function applyCheckedChange(
 
 function handleInputChange(event: Event) {
   const target = event.currentTarget as HTMLInputElement
+
+  if (props.readOnly || disabled.value || (!props.parent && props.indeterminate && !groupContext)) {
+    event.preventDefault()
+    event.stopPropagation()
+    target.checked = computedChecked.value
+    target.indeterminate = computedIndeterminate.value
+    return
+  }
+
   applyCheckedChange(target.checked, event)
 }
 

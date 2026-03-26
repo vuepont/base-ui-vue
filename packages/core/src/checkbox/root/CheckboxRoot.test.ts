@@ -426,6 +426,51 @@ describe('<CheckboxRoot />', () => {
       expect(checkbox).toHaveAttribute('aria-checked', 'true')
     })
 
+    it('should not toggle a readOnly checkbox when a wrapping <label> is clicked', async () => {
+      const user = userEvent.setup()
+
+      render(createCheckboxApp({
+        template: `
+          <label data-testid="label">
+            <CheckboxRoot read-only data-testid="checkbox" />
+            Toggle
+          </label>
+        `,
+      }))
+
+      const checkbox = screen.getByTestId('checkbox')
+      const hiddenInput = document.querySelector('input[type="checkbox"]') as HTMLInputElement
+
+      await user.click(screen.getByTestId('label'))
+      await nextTick()
+
+      expect(checkbox).toHaveAttribute('aria-checked', 'false')
+      expect(hiddenInput.checked).toBe(false)
+    })
+
+    it('should not toggle an indeterminate checkbox when a wrapping <label> is clicked', async () => {
+      const user = userEvent.setup()
+
+      render(createCheckboxApp({
+        template: `
+          <label data-testid="label">
+            <CheckboxRoot indeterminate data-testid="checkbox" />
+            Toggle
+          </label>
+        `,
+      }))
+
+      const checkbox = screen.getByTestId('checkbox')
+      const hiddenInput = document.querySelector('input[type="checkbox"]') as HTMLInputElement
+
+      await user.click(screen.getByTestId('label'))
+      await nextTick()
+
+      expect(checkbox).toHaveAttribute('aria-checked', 'mixed')
+      expect(hiddenInput.checked).toBe(false)
+      expect(hiddenInput.indeterminate).toBe(true)
+    })
+
     it('should associate `id` with the native button when `nativeButton=true`', async () => {
       render(createCheckboxApp({
         template: `
