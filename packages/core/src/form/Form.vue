@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { BaseUIComponentProps } from '../utils/types'
 import type { FormContext, FormErrors, FormField, FormValidationMode } from './FormContext'
-import { computed, provide, ref, shallowRef, useAttrs, watch } from 'vue'
+import { computed, nextTick, provide, ref, shallowRef, useAttrs, watch } from 'vue'
 import { EMPTY_OBJECT } from '../utils/empty'
 import { useRenderElement } from '../utils/useRenderElement'
 import { formContextKey } from './FormContext'
@@ -76,11 +76,13 @@ function focusControl(el: HTMLElement | null) {
   }
 }
 
-watch(internalErrors, () => {
+watch(internalErrors, async () => {
   if (!submittedRef.value)
     return
 
   submittedRef.value = false
+
+  await nextTick()
 
   const invalidFields = Array.from(formRef.value.fields.values()).filter(
     field => field.validityData.state.valid === false,
@@ -90,7 +92,7 @@ watch(internalErrors, () => {
     const controlRef = invalidFields[0].controlRef
     focusControl(controlRef.value)
   }
-})
+}, { flush: 'post' })
 
 function handleImperativeValidate(fieldName?: string) {
   const values = Array.from(formRef.value.fields.values())

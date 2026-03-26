@@ -8,6 +8,7 @@ export interface LabelableContext {
    * When `null` the association is implicit.
    */
   controlId: Readonly<Ref<string | null | undefined>>
+  registerControlId: (source: symbol, id: string | null | undefined) => void
   setControlId: (id: string | null | undefined) => void
   labelId: Readonly<Ref<string | undefined>>
   setLabelId: (id: string | undefined) => void
@@ -18,6 +19,7 @@ export interface LabelableContext {
 
 const defaultContext: LabelableContext = {
   controlId: shallowReadonly(shallowRef<string | null | undefined>(undefined)),
+  registerControlId: NOOP,
   setControlId: NOOP,
   labelId: shallowReadonly(shallowRef<string | undefined>(undefined)),
   setLabelId: NOOP,

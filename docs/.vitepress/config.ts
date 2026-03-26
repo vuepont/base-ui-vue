@@ -79,6 +79,8 @@ export default defineConfig({
           { text: 'Accordion', link: '/docs/components/accordion' },
           { text: 'Avatar', link: '/docs/components/avatar' },
           { text: 'Button', link: '/docs/components/button' },
+          { text: 'Checkbox', link: '/docs/components/checkbox' },
+          { text: 'Checkbox Group', link: '/docs/components/checkbox-group' },
           { text: 'Collapsible', link: '/docs/components/collapsible' },
           { text: 'Field', link: '/docs/components/field' },
           { text: 'Fieldset', link: '/docs/components/fieldset' },

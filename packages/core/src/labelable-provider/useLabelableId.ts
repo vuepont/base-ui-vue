@@ -8,21 +8,22 @@ export interface UseLabelableIdParameters {
 
 export function useLabelableId(params: UseLabelableIdParameters = {}) {
   const { id } = params
-  const { controlId, setControlId } = useLabelableContext()
+  const { controlId, registerControlId } = useLabelableContext()
+  const source = Symbol('labelable-id')
 
   const defaultId = useBaseUiId(id)
   const resolvedId = id ?? defaultId
 
   watchEffect((onCleanup) => {
     if (!resolvedId) {
-      setControlId(undefined)
+      registerControlId(source, undefined)
       return
     }
 
-    setControlId(resolvedId)
+    registerControlId(source, resolvedId)
 
     onCleanup(() => {
-      setControlId(undefined)
+      registerControlId(source, undefined)
     })
   })
 

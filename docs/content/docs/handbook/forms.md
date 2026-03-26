@@ -18,6 +18,7 @@ Form controls need an accessible name so assistive technologies can identify the
 Use [FieldLabel](/docs/components/field) or a native `<label>` to label controls such as:
 
 - text inputs rendered through `FieldControl`
+- [Checkbox](/docs/components/checkbox) when it is used as a standalone control
 - [Button](/docs/components/button) when it submits a form action
 - any custom control composed inside [Field](/docs/components/field)
 
@@ -56,7 +57,7 @@ import {
 
 ### Labeling control groups
 
-Use [Fieldset](/docs/components/fieldset) when a single label applies to multiple related controls.
+Use [Fieldset](/docs/components/fieldset) when a single label applies to multiple related controls, including [CheckboxGroup](/docs/components/checkbox-group).
 
 ```vue title="fieldset.vue"
 <script setup lang="ts">

@@ -1,0 +1,45 @@
+.Label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: #111827;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.Checkbox {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.35rem;
+  background: white;
+  color: #0f172a;
+  transition: border-color 150ms ease, background-color 150ms ease;
+}
+
+.Checkbox:hover {
+  border-color: #94a3b8;
+}
+
+.Checkbox[data-checked],
+.Checkbox[data-indeterminate] {
+  border-color: #0f172a;
+  background: #0f172a;
+  color: white;
+}
+
+.Checkbox:focus-visible {
+  outline: 2px solid #93c5fd;
+  outline-offset: 2px;
+}
+
+.Indicator {
+  display: flex;
+}
+
+.Icon {
+  display: block;
+}
