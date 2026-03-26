@@ -23,10 +23,6 @@ const registrations = new Map<symbol, string | null | undefined>()
 
 const parent = useLabelableContext()
 
-function setControlId(id: string | null | undefined) {
-  controlId.value = id
-}
-
 function registerControlId(source: symbol, id: string | null | undefined) {
   if (id === undefined) {
     registrations.delete(source)
@@ -61,7 +57,6 @@ function getDescriptionProps() {
 const contextValue: LabelableContext = {
   controlId,
   registerControlId,
-  setControlId,
   labelId,
   setLabelId,
   messageIds,
