@@ -1,7 +1,7 @@
 import type { Ref } from 'vue'
 import type { BaseUIChangeEventDetails } from '../utils/createBaseUIEventDetails'
 import type { REASONS } from '../utils/reasons'
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useBaseUiId } from '../utils/useBaseUiId'
 
 export interface UseCheckboxGroupParentParameters {
@@ -50,6 +50,16 @@ export function useCheckboxGroupParent(
   const checked = computed(() => value.value.length === resolvedAllValues.value.length)
   const indeterminate = computed(() =>
     value.value.length !== resolvedAllValues.value.length && value.value.length > 0,
+  )
+
+  watch(
+    () => value.value.slice(),
+    (nextValue) => {
+      if (nextValue.length > 0 && nextValue.length < resolvedAllValues.value.length) {
+        uncontrolledStateRef.value = nextValue
+      }
+    },
+    { flush: 'sync' },
   )
 
   function getParentProps() {

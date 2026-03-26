@@ -231,4 +231,62 @@ describe('useCheckboxGroupParent', () => {
     expect(checkboxA).toHaveAttribute('aria-checked', 'true')
     expect(checkboxB).toHaveAttribute('aria-checked', 'false')
   })
+
+  it('restores the latest mixed snapshot after an external controlled update', async () => {
+    const user = userEvent.setup()
+
+    render(defineComponent({
+      components: { CheckboxGroup, CheckboxRoot },
+      setup() {
+        const value = ref<string[]>(['a'])
+
+        function applyExternalMixedState() {
+          value.value = ['b']
+        }
+
+        return { allValues, value, applyExternalMixedState }
+      },
+      template: `
+        <div>
+          <CheckboxGroup :value="value" @value-change="(nextValue) => value = nextValue" :all-values="allValues">
+            <CheckboxRoot parent data-testid="parent" />
+            <CheckboxRoot value="a" data-testid="checkboxA" />
+            <CheckboxRoot value="b" data-testid="checkboxB" />
+            <CheckboxRoot value="c" data-testid="checkboxC" />
+          </CheckboxGroup>
+          <button type="button" @click="applyExternalMixedState">external</button>
+        </div>
+      `,
+    }))
+
+    const parent = screen.getByTestId('parent')
+    const checkboxA = screen.getByTestId('checkboxA')
+    const checkboxB = screen.getByTestId('checkboxB')
+    const checkboxC = screen.getByTestId('checkboxC')
+
+    expect(parent).toHaveAttribute('aria-checked', 'mixed')
+    expect(checkboxA).toHaveAttribute('aria-checked', 'true')
+
+    await user.click(screen.getByRole('button', { name: 'external' }))
+
+    expect(parent).toHaveAttribute('aria-checked', 'mixed')
+    expect(checkboxA).toHaveAttribute('aria-checked', 'false')
+    expect(checkboxB).toHaveAttribute('aria-checked', 'true')
+
+    await user.click(parent)
+    expect(checkboxA).toHaveAttribute('aria-checked', 'true')
+    expect(checkboxB).toHaveAttribute('aria-checked', 'true')
+    expect(checkboxC).toHaveAttribute('aria-checked', 'true')
+
+    await user.click(parent)
+    expect(checkboxA).toHaveAttribute('aria-checked', 'false')
+    expect(checkboxB).toHaveAttribute('aria-checked', 'false')
+    expect(checkboxC).toHaveAttribute('aria-checked', 'false')
+
+    await user.click(parent)
+    expect(parent).toHaveAttribute('aria-checked', 'mixed')
+    expect(checkboxA).toHaveAttribute('aria-checked', 'false')
+    expect(checkboxB).toHaveAttribute('aria-checked', 'true')
+    expect(checkboxC).toHaveAttribute('aria-checked', 'false')
+  })
 })
