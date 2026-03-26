@@ -27,7 +27,7 @@ export function useCheckboxGroupContext(
   optional: true,
 ): CheckboxGroupContext | undefined
 export function useCheckboxGroupContext(optional?: false): CheckboxGroupContext
-export function useCheckboxGroupContext(optional = true) {
+export function useCheckboxGroupContext(optional = false) {
   const context = inject(checkboxGroupContextKey, undefined)
   if (!context && !optional) {
     throw new Error(
