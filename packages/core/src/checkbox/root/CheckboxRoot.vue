@@ -439,16 +439,21 @@ function combineDescriptionProps(
   }
 }
 
-function applyCheckedChange(nextChecked: boolean, event: Event) {
+function applyCheckedChange(
+  nextChecked: boolean,
+  event: Event,
+  onApplied?: () => void,
+) {
   const details = createChangeEventDetails(REASONS.none, event)
 
   groupProps.value.onCheckedChange?.(nextChecked, details)
   emit('checkedChange', nextChecked, details)
 
   if (details.isCanceled) {
-    return
+    return false
   }
 
+  onApplied?.()
   setCheckedState(nextChecked)
 
   // Standalone children of a CheckboxGroup update the shared value array here;
@@ -461,6 +466,8 @@ function applyCheckedChange(nextChecked: boolean, event: Event) {
 
     groupContext.setValue(nextValue, details)
   }
+
+  return true
 }
 
 function handleInputChange(event: Event) {
@@ -477,12 +484,12 @@ function handleRootClick(event: MouseEvent | KeyboardEvent) {
 
   const nextChecked = !computedChecked.value
 
-  if (inputElementRef.value) {
-    // Keep the hidden native input in sync so form submission mirrors button state.
-    inputElementRef.value.checked = nextChecked
-  }
-
-  applyCheckedChange(nextChecked, event)
+  applyCheckedChange(nextChecked, event, () => {
+    if (inputElementRef.value) {
+      // Keep the hidden native input in sync so form submission mirrors button state.
+      inputElementRef.value.checked = nextChecked
+    }
+  })
 }
 
 function handleFocus() {

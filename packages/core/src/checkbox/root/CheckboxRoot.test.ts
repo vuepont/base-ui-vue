@@ -92,6 +92,32 @@ describe('<CheckboxRoot />', () => {
       expect(handleCheckedChange.mock.calls[0][0]).toBe(true)
     })
 
+    it('should not apply side effects when CheckedChange is canceled', async () => {
+      const user = userEvent.setup()
+
+      render(createCheckboxApp({
+        setup() {
+          function handleCheckedChange(_checked: boolean, details: { cancel: () => void }) {
+            details.cancel()
+          }
+
+          return { handleCheckedChange }
+        },
+        template: `<CheckboxRoot data-testid="checkbox" @checked-change="handleCheckedChange" />`,
+      }))
+
+      const checkbox = screen.getByTestId('checkbox')
+      const input = document.querySelector('input[type="checkbox"]') as HTMLInputElement
+
+      expect(checkbox).toHaveAttribute('aria-checked', 'false')
+      expect(input.checked).toBe(false)
+
+      await user.click(checkbox)
+
+      expect(checkbox).toHaveAttribute('aria-checked', 'false')
+      expect(input.checked).toBe(false)
+    })
+
     it('should report keyboard modifier event properties when calling CheckedChange', async () => {
       const user = userEvent.setup()
       const handleCheckedChange = vi.fn()
