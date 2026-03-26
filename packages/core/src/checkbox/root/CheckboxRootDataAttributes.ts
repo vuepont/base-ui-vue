@@ -47,4 +47,8 @@ export enum CheckboxRootDataAttributes {
    * Present when the checkbox is focused (when wrapped in FieldRoot).
    */
   focused = 'data-focused',
+  /**
+   * Present when the checkbox is acting as the parent checkbox for a group.
+   */
+  parent = 'data-parent',
 }

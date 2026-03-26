@@ -214,6 +214,14 @@ describe('<CheckboxRoot />', () => {
 
       expect(screen.getByTestId('required-checkbox')).toHaveAttribute('aria-required', 'true')
     })
+
+    it('sets data-parent when used as a parent checkbox', () => {
+      render(createCheckboxApp({
+        template: `<CheckboxRoot parent data-testid="checkbox" />`,
+      }))
+
+      expect(screen.getByTestId('checkbox')).toHaveAttribute('data-parent', '')
+    })
   })
 
   describe('extra props', () => {
