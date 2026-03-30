@@ -1,8 +1,10 @@
 <script setup lang="ts" generic="Metadata, State extends Record<string, any> = Record<string, any>">
 import type { StateAttributesMapping } from '../../utils/getStateAttributesProps'
 import type { BaseUIComponentProps } from '../../utils/types'
+import type { RenderRef } from '../../utils/useRenderElement'
 import { computed, useAttrs } from 'vue'
 import { EMPTY_OBJECT } from '../../utils/constants'
+import { useMergedRefs } from '../../utils/useMergedRefs'
 import { useRenderElement } from '../../utils/useRenderElement'
 import { useCompositeItem } from './useCompositeItem'
 
@@ -13,7 +15,7 @@ export interface CompositeItemProps<Metadata, State extends Record<string, any>>
   as?: string | any
   style?: BaseUIComponentProps<State>['style']
   metadata?: Metadata
-  refs?: Array<HTMLElement | null>
+  refs?: RenderRef[]
   props?: Array<Record<string, any> | (() => Record<string, any>)>
   stateAttributesMapping?: StateAttributesMapping<State>
   state?: State
@@ -63,7 +65,7 @@ const {
   props: externalProps,
   stateAttributesMapping: props.stateAttributesMapping,
   defaultTagName: 'div',
-  ref: compositeRef,
+  ref: props.refs?.length ? useMergedRefs(...props.refs, compositeRef) : compositeRef,
 })
 </script>
 
