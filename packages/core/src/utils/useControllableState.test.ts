@@ -163,13 +163,17 @@ describe('useControllableState', () => {
       expect(consoleError).not.toHaveBeenCalled()
     })
 
-    it('does not warn when NaN', () => {
+    it('does not warn when NaN', async () => {
       const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {})
 
-      mount(TestComponent, {
+      const wrapper = mount(TestComponent, {
         props: {
           defaultValue: Number.NaN,
         },
+      })
+
+      await wrapper.setProps({
+        defaultValue: Number.NaN,
       })
 
       expect(consoleError).not.toHaveBeenCalled()
