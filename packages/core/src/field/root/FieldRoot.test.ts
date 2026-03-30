@@ -1,8 +1,9 @@
 import userEvent from '@testing-library/user-event'
 import { fireEvent, render, screen } from '@testing-library/vue'
 import { describe, expect, it, vi } from 'vitest'
-import { defineComponent, nextTick, ref } from 'vue'
+import { defineComponent, nextTick, ref, watchEffect } from 'vue'
 import Form from '../../form/Form.vue'
+import { useLabelableContext } from '../../labelable-provider/LabelableContext'
 import { Slot } from '../../utils/slot'
 import FieldControl from '../control/FieldControl.vue'
 import FieldDescription from '../description/FieldDescription.vue'
@@ -10,12 +11,69 @@ import FieldError from '../error/FieldError.vue'
 import FieldLabel from '../label/FieldLabel.vue'
 import FieldRoot from './FieldRoot.vue'
 
+const TestControlRegistrant = defineComponent({
+  props: {
+    sourceName: {
+      type: String,
+      required: true,
+    },
+    controlId: {
+      type: String,
+      required: false,
+      default: undefined,
+    },
+    describedBy: {
+      type: String,
+      required: false,
+      default: undefined,
+    },
+    testId: {
+      type: String,
+      required: true,
+    },
+  },
+  setup(props) {
+    const labelable = useLabelableContext()
+    const source = Symbol(props.sourceName)
+
+    watchEffect((onCleanup) => {
+      labelable.registerControlId(source, props.controlId)
+
+      onCleanup(() => {
+        labelable.registerControlId(source, undefined)
+      })
+    })
+
+    return {
+      controlIdRef: labelable.controlId,
+      descriptionProps: labelable.getDescriptionProps,
+    }
+  },
+  template: `
+    <div
+      :id="controlId"
+      :data-testid="testId"
+      :data-control-id="controlIdRef ?? undefined"
+      :aria-labelledby="controlIdRef ? 'field-label' : undefined"
+      :aria-describedby="descriptionProps()['aria-describedby']"
+    />
+  `,
+})
+
 function createApp(options: {
   template: string
   setup?: () => Record<string, any>
 }) {
   return defineComponent({
-    components: { Form, FieldRoot, FieldControl, FieldLabel, FieldError, FieldDescription },
+    components: {
+      Form,
+      FieldRoot,
+      FieldControl,
+      FieldLabel,
+      FieldError,
+      FieldDescription,
+      TestControlRegistrant,
+    },
     setup: options.setup,
     template: options.template,
   })
@@ -94,6 +152,104 @@ describe('<FieldRoot />', () => {
     const labelId = label.getAttribute('id')
     expect(labelId).toBeTruthy()
     expect(input).toHaveAttribute('aria-labelledby', labelId)
+  })
+
+  it('keeps the first registered control id until it unregisters', async () => {
+    render(
+      createApp({
+        template: `
+          <FieldRoot>
+            <FieldLabel id="field-label">Name</FieldLabel>
+            <FieldDescription id="field-description">Help text</FieldDescription>
+            <TestControlRegistrant test-id="first" source-name="first" control-id="first-control" />
+            <TestControlRegistrant test-id="second" source-name="second" control-id="second-control" />
+          </FieldRoot>
+        `,
+      }),
+    )
+
+    await nextTick()
+
+    expect(screen.getByTestId('first')).toHaveAttribute('data-control-id', 'first-control')
+    expect(screen.getByTestId('second')).toHaveAttribute('data-control-id', 'first-control')
+    expect(screen.getByTestId('first')).toHaveAttribute('aria-labelledby', 'field-label')
+    expect(screen.getByTestId('first')).toHaveAttribute('aria-describedby', 'field-description')
+  })
+
+  it('falls back to the next registered control id when the first unregisters', async () => {
+    render(
+      createApp({
+        setup() {
+          const showFirst = ref(true)
+          return { showFirst }
+        },
+        template: `
+          <div>
+            <button type="button" @click="showFirst = false">remove first</button>
+            <FieldRoot>
+              <FieldLabel id="field-label">Name</FieldLabel>
+              <FieldDescription id="field-description">Help text</FieldDescription>
+              <TestControlRegistrant
+                v-if="showFirst"
+                test-id="first"
+                source-name="first"
+                control-id="first-control"
+              />
+              <TestControlRegistrant
+                test-id="second"
+                source-name="second"
+                control-id="second-control"
+              />
+            </FieldRoot>
+          </div>
+        `,
+      }),
+    )
+
+    await nextTick()
+    expect(screen.getByTestId('second')).toHaveAttribute('data-control-id', 'first-control')
+
+    fireEvent.click(screen.getByText('remove first'))
+    await nextTick()
+
+    expect(screen.getByTestId('second')).toHaveAttribute('data-control-id', 'second-control')
+    expect(screen.getByTestId('second')).toHaveAttribute('aria-labelledby', 'field-label')
+    expect(screen.getByTestId('second')).toHaveAttribute('aria-describedby', 'field-description')
+  })
+
+  it('clears the registered control id when all registrants unregister', async () => {
+    render(
+      createApp({
+        setup() {
+          const showControls = ref(true)
+          return { showControls }
+        },
+        template: `
+          <div>
+            <button type="button" @click="showControls = false">remove all</button>
+            <FieldRoot>
+              <FieldLabel id="field-label">Name</FieldLabel>
+              <FieldDescription id="field-description">Help text</FieldDescription>
+              <template v-if="showControls">
+                <TestControlRegistrant test-id="first" source-name="first" control-id="first-control" />
+                <TestControlRegistrant test-id="second" source-name="second" control-id="second-control" />
+              </template>
+              <TestControlRegistrant test-id="observer" source-name="observer" />
+            </FieldRoot>
+          </div>
+        `,
+      }),
+    )
+
+    await nextTick()
+    expect(screen.getByTestId('observer')).toHaveAttribute('data-control-id', 'first-control')
+
+    fireEvent.click(screen.getByText('remove all'))
+    await nextTick()
+
+    expect(screen.getByTestId('observer')).not.toHaveAttribute('data-control-id')
+    expect(screen.getByTestId('observer')).not.toHaveAttribute('aria-labelledby')
+    expect(screen.getByTestId('observer')).toHaveAttribute('aria-describedby', 'field-description')
   })
 
   it('renders description', () => {

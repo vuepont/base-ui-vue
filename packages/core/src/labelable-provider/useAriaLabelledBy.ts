@@ -1,6 +1,5 @@
-import type { Ref } from 'vue'
-import { computed, ref, watchEffect } from 'vue'
-import { useBaseUiId } from '../utils/useBaseUiId'
+import type { MaybeRefOrGetter, Ref } from 'vue'
+import { computed, ref, toValue, watchPostEffect } from 'vue'
 
 export interface UseAriaLabelledByParameters {
   /**
@@ -26,7 +25,7 @@ export interface UseAriaLabelledByParameters {
    * Optional base id used when generating an id
    * for an implicit label discovered in the DOM.
    */
-  labelSourceId?: string
+  labelSourceId?: MaybeRefOrGetter<string | undefined>
 }
 
 export function useAriaLabelledBy(params: UseAriaLabelledByParameters) {
@@ -34,23 +33,24 @@ export function useAriaLabelledBy(params: UseAriaLabelledByParameters) {
 
   const fallbackAriaLabelledBy = ref<string | undefined>(undefined)
 
-  const generatedLabelId = useBaseUiId(
-    labelSourceId ? `${labelSourceId}-label` : undefined,
-  )
+  const generatedLabelId = computed(() => {
+    const sourceId = toValue(labelSourceId)
+    return sourceId ? `${sourceId}-label` : undefined
+  })
 
   const resolvedAriaLabelledBy = computed(() => {
     const explicit = ariaLabelledBy?.value
     const fromContext = labelId?.value
     return explicit ?? fromContext ?? fallbackAriaLabelledBy.value
   })
-  watchEffect(() => {
+  watchPostEffect(() => {
     const explicitOrContext = ariaLabelledBy?.value || labelId?.value
     if (explicitOrContext || !enableFallback) {
       fallbackAriaLabelledBy.value = undefined
       return
     }
 
-    const next = getAriaLabelledBy(labelSourceRef.value, generatedLabelId)
+    const next = getAriaLabelledBy(labelSourceRef.value, generatedLabelId.value)
     if (fallbackAriaLabelledBy.value !== next) {
       fallbackAriaLabelledBy.value = next
     }

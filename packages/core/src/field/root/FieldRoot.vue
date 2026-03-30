@@ -125,9 +125,22 @@ const parentLabelable = useLabelableContext()
 const controlId = ref<string | null | undefined>(undefined)
 const labelId = ref<string | undefined>(undefined)
 const messageIds = ref<string[]>([])
+const controlIdRegistrations = new Map<symbol, string | null | undefined>()
 
-function setControlId(id: string | null | undefined) {
-  controlId.value = id
+function registerControlId(source: symbol, id: string | null | undefined) {
+  if (id === undefined) {
+    controlIdRegistrations.delete(source)
+  }
+  else {
+    controlIdRegistrations.set(source, id)
+  }
+
+  if (controlIdRegistrations.size === 0) {
+    controlId.value = undefined
+    return
+  }
+
+  controlId.value = controlIdRegistrations.values().next().value
 }
 
 function setLabelId(id: string | undefined) {
@@ -147,7 +160,7 @@ function getDescriptionProps() {
 
 const labelableContext: LabelableContext = {
   controlId,
-  setControlId,
+  registerControlId,
   labelId,
   setLabelId,
   messageIds,
