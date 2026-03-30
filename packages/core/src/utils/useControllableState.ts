@@ -3,10 +3,14 @@ import type { Ref } from 'vue'
 import { computed, ref, watch } from 'vue'
 import { error } from './error'
 
-type MaybeGetter<T> = T | (() => T)
+type AnyFunction = (...args: any[]) => any
+type NonFunction<T> = T extends AnyFunction ? never : T
+type Getter<T> = () => T
+type Updater<T> = (prevValue: T) => T
+type MaybeGetter<T> = T | Getter<T>
 
 function resolveValue<T>(value: MaybeGetter<T>): T {
-  return typeof value === 'function' ? (value as () => T)() : value
+  return typeof value === 'function' ? (value as Getter<T>)() : value
 }
 
 export interface UseControllableStateParameters<T> {
@@ -31,7 +35,7 @@ export interface UseControllableStateParameters<T> {
 
 export interface UseControllableStateReturnValue<T> {
   value: Readonly<Ref<T>>
-  setValue: (next: T | ((prevValue: T) => T)) => void
+  setValue: (next: T | Updater<T>) => void
 }
 
 /**
@@ -42,25 +46,28 @@ export interface UseControllableStateReturnValue<T> {
  *   and the internal ref drives the value.
  */
 export function useControllableState<T>(
-  params: UseControllableStateParameters<T>,
-): UseControllableStateReturnValue<T> {
+  params: UseControllableStateParameters<NonFunction<T>>,
+): UseControllableStateReturnValue<NonFunction<T>> {
+  type State = NonFunction<T>
+
   const stateName = params.state ?? 'value'
   const componentName = params.name ?? 'component'
 
-  const controlledValue = computed(() => params.controlled())
-  const defaultValue = computed(() => resolveValue(params.default))
+  const controlledValue = computed<State | undefined>(() => params.controlled())
+  const defaultValue = computed<State>(() => resolveValue(params.default))
   const isControlled = ref(controlledValue.value !== undefined)
-  const initialDefaultValue = JSON.stringify(defaultValue.value)
 
-  const internalValue = ref<T>(defaultValue.value) as Ref<T>
+  const internalValue = ref<State>(defaultValue.value) as Ref<State>
 
-  const value = computed<T>(() => {
+  const value = computed<State>(() => {
     return isControlled.value
-      ? controlledValue.value as T
+      ? controlledValue.value as State
       : internalValue.value
   })
 
   if (process.env.NODE_ENV !== 'production') {
+    const initialDefaultValue = JSON.stringify(defaultValue.value)
+
     watch(controlledValue, (nextControlledValue) => {
       const nextIsControlled = nextControlledValue !== undefined
 
@@ -87,13 +94,13 @@ export function useControllableState<T>(
     })
   }
 
-  function setValue(next: T | ((prevValue: T) => T)) {
+  function setValue(next: State | Updater<State>) {
     if (isControlled.value) {
       return
     }
 
     internalValue.value = typeof next === 'function'
-      ? (next as (prevValue: T) => T)(internalValue.value)
+      ? (next as Updater<State>)(internalValue.value)
       : next
   }
 

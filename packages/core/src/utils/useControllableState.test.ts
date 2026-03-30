@@ -175,13 +175,17 @@ describe('useControllableState', () => {
       expect(consoleError).not.toHaveBeenCalled()
     })
 
-    it('does not warn when an array', () => {
+    it('does not warn when an array', async () => {
       const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {})
 
-      mount(TestComponent, {
+      const wrapper = mount(TestComponent, {
         props: {
           defaultValue: [],
         },
+      })
+
+      await wrapper.setProps({
+        defaultValue: [],
       })
 
       expect(consoleError).not.toHaveBeenCalled()

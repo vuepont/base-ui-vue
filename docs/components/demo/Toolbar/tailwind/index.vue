@@ -22,7 +22,7 @@ import {
       </Toggle>
     </ToggleGroup>
     <ToolbarSeparator class="m-1 h-4 w-px bg-gray-300" />
-    <ToolbarGroup class="flex gap-1" aria-label="Alignment">
+    <ToolbarGroup class="flex gap-1" aria-label="Number format">
       <ToolbarButton class="flex size-8 items-center justify-center rounded-xs text-sm font-medium text-gray-600 hover:bg-gray-100 focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-blue-800 active:bg-gray-200 data-disabled:text-gray-500" aria-label="Format as currency">
         $
       </ToolbarButton>

@@ -125,7 +125,11 @@ function setGroupValue(
       newGroupValue.push(newValue)
     }
     else {
-      newGroupValue.splice(groupValue.value.indexOf(newValue), 1)
+      const valueIndex = groupValue.value.indexOf(newValue)
+
+      if (valueIndex >= 0) {
+        newGroupValue.splice(valueIndex, 1)
+      }
     }
   }
   else {

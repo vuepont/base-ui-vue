@@ -3,7 +3,7 @@ import { Toggle, ToggleGroup } from 'base-ui-vue'
 </script>
 
 <template>
-  <ToggleGroup :default-value="['left']" class="Panel">
+  <ToggleGroup :default-value="['left']" class="Panel" aria-label="Text alignment">
     <Toggle aria-label="Align left" value="left" class="Button">
       <svg class="Icon" width="16" height="16" viewBox="0 0 16 16" stroke="currentColor" stroke-linecap="round">
         <path d="M2.5 3.5H13.5" />
@@ -31,4 +31,4 @@ import { Toggle, ToggleGroup } from 'base-ui-vue'
   </ToggleGroup>
 </template>
 
-<style src="./styles.css"></style>
+<style scoped src="./styles.css"></style>
