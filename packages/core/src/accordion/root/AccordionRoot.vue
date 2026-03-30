@@ -55,7 +55,8 @@ const accordionItemRefs = _compositeRefs.elementsRef
 
 const { value: openValues, setValue: setOpenValues } = useControllableState<AccordionValue>({
   controlled: () => (isValueControlled.value ? props.value : undefined),
-  default: props.defaultValue ?? [],
+  default: () => props.defaultValue ?? [],
+  name: 'AccordionRoot',
 })
 
 function handleValueChange(newValue: any, nextOpen: boolean) {

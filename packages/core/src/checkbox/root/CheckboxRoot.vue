@@ -300,9 +300,13 @@ const { value: checked, setValue: setCheckedState } = useControllableState<boole
     return groupChecked.value
   },
   default:
-    groupContext && !props.parent && checkboxValue.value !== undefined
-      ? groupContext.defaultValue.value.includes(checkboxValue.value)
-      : props.defaultChecked,
+    () => (
+      groupContext && !props.parent && checkboxValue.value !== undefined
+        ? groupContext.defaultValue.value.includes(checkboxValue.value)
+        : props.defaultChecked
+    ),
+  name: 'CheckboxRoot',
+  state: 'checked',
 })
 
 const computedChecked = computed(() =>

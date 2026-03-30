@@ -109,7 +109,9 @@ export function useCollapsibleRoot(
 
   const { value: open, setValue: setOpen } = useControllableState<boolean>({
     controlled: () => (isControlled.value ? openParam?.() : undefined),
-    default: defaultOpen,
+    default: () => defaultOpen,
+    name: 'CollapsibleRoot',
+    state: 'open',
   })
 
   const { mounted, setMounted, transitionStatus } = useTransitionStatus(
