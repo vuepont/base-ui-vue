@@ -1,0 +1,44 @@
+.TogglePanel {
+  display: flex;
+  gap: 1px;
+  border: 1px solid var(--color-gray-200);
+  border-radius: 0.375rem;
+  background-color: var(--color-gray-50);
+  padding: 0.125rem;
+}
+
+.ToggleButton {
+  box-sizing: border-box;
+  display: flex;
+  width: 2rem;
+  height: 2rem;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 0.25rem;
+  background-color: transparent;
+  color: var(--color-gray-600);
+  user-select: none;
+}
+
+.ToggleButton:hover {
+  background-color: var(--color-gray-100);
+}
+
+.ToggleButton:focus-visible {
+  outline: 2px solid var(--color-blue);
+  outline-offset: -1px;
+}
+
+.ToggleButton:active {
+  background-color: var(--color-gray-200);
+}
+
+.ToggleButton[data-pressed] {
+  color: var(--color-gray-900);
+}
+
+.Icon {
+  width: 1.25rem;
+  height: 1.25rem;
+}

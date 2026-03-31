@@ -1,8 +1,7 @@
 <script setup lang="ts">
-// TODO: Replace this simplified formatting-toolbar demo with the richer React
-// docs example once the Vue package has companion components like ToggleGroup
-// and Select for a full editor-style toolbar composition.
 import {
+  Toggle,
+  ToggleGroup,
   ToolbarButton,
   ToolbarGroup,
   ToolbarInput,
@@ -14,24 +13,21 @@ import {
 
 <template>
   <ToolbarRoot class="Toolbar" aria-label="Text formatting">
-    <ToolbarGroup class="Group" aria-label="Text style">
-      <ToolbarButton class="Button" aria-label="Bold">
-        B
-      </ToolbarButton>
-      <ToolbarButton class="Button" aria-label="Italic">
-        I
-      </ToolbarButton>
-      <ToolbarButton class="Button" aria-label="Underline">
-        U
-      </ToolbarButton>
-    </ToolbarGroup>
+    <ToggleGroup class="Group" aria-label="Alignment">
+      <Toggle class="Button ButtonWide" value="align-left" aria-label="Align left">
+        Align Left
+      </Toggle>
+      <Toggle class="Button ButtonWide" value="align-right" aria-label="Align right">
+        Align Right
+      </Toggle>
+    </ToggleGroup>
     <ToolbarSeparator class="Separator" />
-    <ToolbarGroup class="Group" aria-label="Alignment">
-      <ToolbarButton class="Button ButtonWide" aria-label="Align left">
-        Left
+    <ToolbarGroup class="Group" aria-label="Numerical format">
+      <ToolbarButton class="Button" aria-label="Format as currency">
+        $
       </ToolbarButton>
-      <ToolbarButton class="Button ButtonWide" aria-label="Align center">
-        Center
+      <ToolbarButton class="Button" aria-label="Format as percent">
+        %
       </ToolbarButton>
     </ToolbarGroup>
     <ToolbarSeparator class="Separator" />

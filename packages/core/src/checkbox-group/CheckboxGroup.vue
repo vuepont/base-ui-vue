@@ -98,7 +98,8 @@ const disabled = computed(() => fieldDisabled.value || props.disabled)
 
 const { value, setValue: setValueUnwrapped } = useControllableState<string[]>({
   controlled: () => props.value,
-  default: props.defaultValue,
+  default: () => props.defaultValue,
+  name: 'CheckboxGroup',
 })
 
 const generatedId = useBaseUiId()

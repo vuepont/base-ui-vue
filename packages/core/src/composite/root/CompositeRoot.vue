@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { StateAttributesMapping } from '../../utils/getStateAttributesProps'
 import type { BaseUIComponentProps } from '../../utils/types'
 import type { Dimensions, ModifierKey } from '../composite'
 import type { CompositeMetadata } from '../list/CompositeList.vue'
@@ -10,6 +11,8 @@ import { compositeRootContextKey } from './CompositeRootContext'
 import { useCompositeRoot } from './useCompositeRoot'
 
 export interface CompositeRootProps extends BaseUIComponentProps<any> {
+  state?: Record<string, any>
+  stateAttributesMapping?: StateAttributesMapping<any>
   orientation?: 'horizontal' | 'vertical' | 'both'
   cols?: number
   loopFocus?: boolean
@@ -46,6 +49,13 @@ const props = withDefaults(defineProps<CompositeRootProps>(), {
 })
 
 const emit = defineEmits<CompositeRootEmits>()
+defineSlots<{
+  default?: (props: {
+    ref?: ((el: Element | null) => void)
+    props?: Record<string, any>
+    state: Record<string, any>
+  }) => any
+}>()
 const attrs = useAttrs()
 const direction = useDirection()
 
@@ -77,7 +87,7 @@ provide(
   }),
 )
 
-const state = computed(() => ({}))
+const state = computed(() => props.state ?? {})
 
 const {
   tag,
@@ -88,6 +98,7 @@ const {
   componentProps: props,
   state,
   props: computed(() => root.getRootProps(attrs)),
+  stateAttributesMapping: props.stateAttributesMapping,
   defaultTagName: 'div',
   ref: root.mergedRef,
 })
