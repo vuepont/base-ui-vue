@@ -1,4 +1,5 @@
 import type { TextDirection } from '../direction-provider'
+import type { Orientation } from '../utils/types'
 import userEvent from '@testing-library/user-event'
 import { render, screen } from '@testing-library/vue'
 import { flushPromises, mount } from '@vue/test-utils'
@@ -350,7 +351,9 @@ describe('<ToggleGroup />', () => {
         `,
       }))
 
-      expect(screen.getByRole('group')).toHaveAttribute('data-orientation', 'vertical')
+      const group = screen.getByRole('group')
+      expect(group).toHaveAttribute('data-orientation', 'vertical')
+      expect(group).toHaveAttribute('aria-orientation', 'vertical')
     })
   })
 
@@ -525,66 +528,74 @@ describe('<ToggleGroup />', () => {
     })
 
     ;[
-      ['ltr', 'ArrowRight', 'ArrowDown', 'ArrowLeft', 'ArrowUp'],
-      ['rtl', 'ArrowLeft', 'ArrowDown', 'ArrowRight', 'ArrowUp'],
+      ['ltr', 'horizontal', 'ArrowRight', 'ArrowLeft', 'ArrowDown', 'ArrowUp'],
+      ['ltr', 'vertical', 'ArrowDown', 'ArrowUp', 'ArrowRight', 'ArrowLeft'],
+      ['rtl', 'horizontal', 'ArrowLeft', 'ArrowRight', 'ArrowDown', 'ArrowUp'],
+      ['rtl', 'vertical', 'ArrowDown', 'ArrowUp', 'ArrowLeft', 'ArrowRight'],
     ].forEach((entry) => {
-      const [direction, horizontalNextKey, verticalNextKey, horizontalPrevKey, verticalPrevKey]
-        = entry as [TextDirection, string, string, string, string]
+      const [direction, orientation, nextKey, prevKey, ignoredNextKey, ignoredPrevKey]
+        = entry as [TextDirection, Orientation, string, string, string, string]
 
-      it(direction, async () => {
-        const user = userEvent.setup()
+      describe(direction, () => {
+        it(`orientation: ${orientation}`, async () => {
+          const user = userEvent.setup()
 
-        const wrapper = mount(createToggleGroupApp({
-          setup() {
-            return { direction }
-          },
-          template: `
+          const wrapper = mount(createToggleGroupApp({
+            setup() {
+              return { direction, orientation }
+            },
+            template: `
             <DirectionProvider :direction="direction">
-              <ToggleGroup>
+              <ToggleGroup :orientation="orientation">
                 <Toggle value="one" />
                 <Toggle value="two" />
                 <Toggle value="three" />
               </ToggleGroup>
             </DirectionProvider>
           `,
-        }), {
-          attachTo: document.body,
+          }), {
+            attachTo: document.body,
+          })
+
+          const [button1, button2, button3] = wrapper.findAll('button').map(
+            node => node.element as HTMLButtonElement,
+          )
+
+          await user.tab()
+
+          expect(button1).toHaveAttribute('tabindex', '0')
+          expect(document.activeElement).toBe(button1)
+
+          await user.keyboard(`[${nextKey}]`)
+          expect(button2).toHaveAttribute('tabindex', '0')
+          expect(document.activeElement).toBe(button2)
+
+          await user.keyboard(`[${nextKey}]`)
+          expect(button3).toHaveAttribute('tabindex', '0')
+          expect(document.activeElement).toBe(button3)
+
+          await user.keyboard(`[${nextKey}]`)
+          expect(button1).toHaveAttribute('tabindex', '0')
+          expect(document.activeElement).toBe(button1)
+
+          await user.keyboard(`[${prevKey}]`)
+          expect(button3).toHaveAttribute('tabindex', '0')
+          expect(document.activeElement).toBe(button3)
+
+          await user.keyboard(`[${prevKey}]`)
+          expect(button2).toHaveAttribute('tabindex', '0')
+          expect(document.activeElement).toBe(button2)
+
+          await user.keyboard(`[${ignoredNextKey}]`)
+          expect(button2).toHaveAttribute('tabindex', '0')
+          expect(document.activeElement).toBe(button2)
+
+          await user.keyboard(`[${ignoredPrevKey}]`)
+          expect(button2).toHaveAttribute('tabindex', '0')
+          expect(document.activeElement).toBe(button2)
+
+          wrapper.unmount()
         })
-
-        const [button1, button2, button3] = wrapper.findAll('button').map(
-          node => node.element as HTMLButtonElement,
-        )
-
-        await user.tab()
-
-        expect(button1).toHaveAttribute('tabindex', '0')
-        expect(document.activeElement).toBe(button1)
-
-        await user.keyboard(`[${horizontalNextKey}]`)
-        expect(button2).toHaveAttribute('tabindex', '0')
-        expect(document.activeElement).toBe(button2)
-
-        await user.keyboard(`[${horizontalNextKey}]`)
-        expect(button3).toHaveAttribute('tabindex', '0')
-        expect(document.activeElement).toBe(button3)
-
-        await user.keyboard(`[${verticalNextKey}]`)
-        expect(button1).toHaveAttribute('tabindex', '0')
-        expect(document.activeElement).toBe(button1)
-
-        await user.keyboard(`[${verticalNextKey}]`)
-        expect(button2).toHaveAttribute('tabindex', '0')
-        expect(document.activeElement).toBe(button2)
-
-        await user.keyboard(`[${horizontalPrevKey}]`)
-        expect(button1).toHaveAttribute('tabindex', '0')
-        expect(document.activeElement).toBe(button1)
-
-        await user.keyboard(`[${verticalPrevKey}]`)
-        expect(button3).toHaveAttribute('tabindex', '0')
-        expect(document.activeElement).toBe(button3)
-
-        wrapper.unmount()
       })
     })
   })

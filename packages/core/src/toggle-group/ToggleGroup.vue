@@ -205,6 +205,7 @@ const {
     :as="as"
     :class="props.class"
     :style="props.style"
+    :orientation="props.orientation"
     :state="state"
     :state-attributes-mapping="stateAttributesMapping"
     :loop-focus="props.loopFocus"
