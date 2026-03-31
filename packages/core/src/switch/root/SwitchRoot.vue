@@ -435,7 +435,7 @@ const inputProps = computed(() => {
     <slot :state="state" />
   </component>
   <input
-    v-if="!checked && name && uncheckedValue !== undefined"
+    v-if="!checked && !disabled && name && uncheckedValue !== undefined"
     type="hidden"
     :form="form"
     :name="name"

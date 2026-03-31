@@ -595,6 +595,22 @@ describe('<SwitchRoot />', () => {
       expect(formData.get('test-switch')).toBe('off')
     })
 
+    it('does not submit uncheckedValue when switch is disabled', () => {
+      render(createSwitchApp({
+        template: `
+          <Form data-testid="form">
+            <FieldRoot name="test-switch">
+              <SwitchRoot disabled unchecked-value="off" />
+            </FieldRoot>
+          </Form>
+        `,
+      }))
+
+      const form = screen.getByTestId('form') as HTMLFormElement
+      const formData = new FormData(form)
+      expect(formData.get('test-switch')).toBe(null)
+    })
+
     it('should submit uncheckedValue when switch is off and uncheckedValue is specified', async () => {
       const user = userEvent.setup()
       const submitSpy = vi.fn((event: Event) => {
