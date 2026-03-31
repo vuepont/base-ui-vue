@@ -19,6 +19,7 @@ import { useBaseUiId } from '../../utils/useBaseUiId'
 import { useControllableState } from '../../utils/useControllableState'
 import { useMergedRefs } from '../../utils/useMergedRefs'
 import { useRenderElement } from '../../utils/useRenderElement'
+import { visuallyHidden, visuallyHiddenInput } from '../../utils/visuallyHidden'
 import { useCheckboxStateAttributesMapping } from '../utils/useStateAttributesMapping'
 import { checkboxRootContextKey } from './CheckboxRootContext'
 
@@ -326,7 +327,7 @@ useField({
   // Grouped checkboxes defer validation state to the group container instead.
   enabled: computed(() => !groupContext),
   id: computed(() => rootElementId),
-  commit: validation.commit,
+  commit: (value: unknown) => validation.commit(value),
   value: checked,
   controlRef,
   name,
@@ -601,15 +602,7 @@ const inputProps = computed(() => {
       'tabindex': -1,
       // This hidden input carries the native form semantics while the rendered
       // root element exposes the custom checkbox interaction model.
-      // TODO: Add shared `visuallyHidden` and `visuallyHiddenInput` utilities
-      'style': {
-        position: 'absolute',
-        opacity: 0,
-        pointerEvents: 'none',
-        width: '1px',
-        height: '1px',
-        margin: 0,
-      },
+      'style': name.value ? visuallyHiddenInput : visuallyHidden,
       'onChange': handleInputChange,
       onFocus() {
         controlRef.value?.focus()

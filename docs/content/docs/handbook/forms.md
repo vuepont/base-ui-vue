@@ -19,6 +19,7 @@ Use [FieldLabel](/docs/components/field) or a native `<label>` to label controls
 
 - text inputs rendered through `FieldControl`
 - [Checkbox](/docs/components/checkbox) when it is used as a standalone control
+- [Switch](/docs/components/switch) when it is used as a standalone control
 - [Button](/docs/components/button) when it submits a form action
 - any custom control composed inside [Field](/docs/components/field)
 

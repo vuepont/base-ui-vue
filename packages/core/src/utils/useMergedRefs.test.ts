@@ -72,6 +72,47 @@ describe('useMergedRefs', () => {
     expect(innerRef.value?.textContent).toBe('child')
   })
 
+  it('prefers an exposed element over $el when both are present', () => {
+    const preferred = document.createElement('button')
+    const fallback = document.createElement('span')
+    const targetRef = ref<Element | null>(null)
+    const handleRef = useMergedRefs(targetRef)
+
+    handleRef?.({
+      element: preferred,
+      $el: fallback,
+    } as any)
+
+    expect(targetRef.value).toBe(preferred)
+  })
+
+  it('unwraps an exposed element ref before falling back to $el', () => {
+    const preferred = document.createElement('button')
+    const fallback = document.createElement('span')
+    const targetRef = ref<Element | null>(null)
+    const handleRef = useMergedRefs(targetRef)
+
+    handleRef?.({
+      element: ref(preferred),
+      $el: fallback,
+    } as any)
+
+    expect(targetRef.value).toBe(preferred)
+  })
+
+  it('falls back to $el when the exposed element is missing or not a DOM element', () => {
+    const fallback = document.createElement('span')
+    const targetRef = ref<Element | null>(null)
+    const handleRef = useMergedRefs(targetRef)
+
+    handleRef?.({
+      element: ref('not-an-element'),
+      $el: fallback,
+    } as any)
+
+    expect(targetRef.value).toBe(fallback)
+  })
+
   it('cleans up refs when component unmounts', async () => {
     const fnRef = vi.fn()
     const objRef = ref<Element | null>(null)

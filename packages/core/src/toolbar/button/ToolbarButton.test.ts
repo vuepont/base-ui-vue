@@ -2,6 +2,7 @@ import userEvent from '@testing-library/user-event'
 import { mount } from '@vue/test-utils'
 import { describe, expect, it, vi } from 'vitest'
 import { defineComponent, nextTick } from 'vue'
+import { SwitchRoot, SwitchThumb } from '../../switch'
 import { reset as resetErrors } from '../../utils/error'
 import { ToolbarButton, ToolbarRoot } from '../index'
 
@@ -25,9 +26,147 @@ describe('<ToolbarButton />', () => {
     expect(wrapper.get('[data-testid="button"]').attributes('type')).toBe('button')
   })
 
-  // TODO: Add composition coverage for rendering ToolbarButton as other Base UI
-  // primitives once the Vue package has those companion components:
-  // Switch, Menu, Select, Dialog, AlertDialog, Popover, Toggle, and ToggleGroup.
+  describe('rendering other Base UI components', () => {
+    describe('switch', () => {
+      it('renders a switch', async () => {
+        resetErrors()
+        const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {})
+
+        const TestComponent = defineComponent({
+          components: { SwitchRoot, ToolbarButton, ToolbarRoot },
+          template: `
+            <ToolbarRoot>
+              <ToolbarButton
+                :as="SwitchRoot"
+                data-testid="button"
+              />
+            </ToolbarRoot>
+          `,
+          setup() {
+            return { SwitchRoot }
+          },
+        })
+
+        const wrapper = mount(TestComponent)
+        await nextTick()
+
+        expect(consoleError).toHaveBeenCalledTimes(1)
+        expect(consoleError.mock.calls[0]?.[0]).toContain(
+          'A component that acts as a button expected a native <button>',
+        )
+        expect(wrapper.get('[data-testid="button"]').attributes('role')).toBe('switch')
+
+        consoleError.mockRestore()
+        wrapper.unmount()
+      })
+
+      it('handles interactions', async () => {
+        resetErrors()
+        const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {})
+        const user = userEvent.setup()
+        const handleCheckedChange = vi.fn()
+        const handleClick = vi.fn()
+
+        const TestComponent = defineComponent({
+          components: { SwitchRoot, SwitchThumb, ToolbarButton, ToolbarRoot },
+          setup() {
+            return { SwitchRoot, handleCheckedChange, handleClick }
+          },
+          template: `
+            <ToolbarRoot>
+              <ToolbarButton
+                :as="SwitchRoot"
+                @checked-change="handleCheckedChange"
+                @click="handleClick"
+              >
+                <SwitchThumb />
+              </ToolbarButton>
+            </ToolbarRoot>
+          `,
+        })
+
+        const wrapper = mount(TestComponent, { attachTo: document.body })
+        const switchElement = wrapper.get('[role="switch"]').element as HTMLElement
+
+        expect(consoleError).toHaveBeenCalledTimes(1)
+        expect(consoleError.mock.calls[0]?.[0]).toContain(
+          'A component that acts as a button expected a native <button>',
+        )
+        expect(switchElement).toHaveAttribute('data-unchecked')
+
+        await user.tab()
+        expect(switchElement).toHaveAttribute('tabindex', '0')
+
+        await user.click(switchElement)
+        expect(handleCheckedChange).toHaveBeenCalledTimes(1)
+        expect(handleClick).toHaveBeenCalledTimes(1)
+        expect(switchElement).toHaveAttribute('data-checked')
+
+        await user.keyboard('[Enter]')
+        expect(handleCheckedChange).toHaveBeenCalledTimes(2)
+        expect(handleClick).toHaveBeenCalledTimes(2)
+        expect(switchElement).toHaveAttribute('data-unchecked')
+
+        await user.keyboard('[Space]')
+        expect(handleCheckedChange).toHaveBeenCalledTimes(3)
+        expect(handleClick).toHaveBeenCalledTimes(3)
+        expect(switchElement).toHaveAttribute('data-checked')
+
+        consoleError.mockRestore()
+        wrapper.unmount()
+      })
+
+      it('disabled state', async () => {
+        resetErrors()
+        const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {})
+        const user = userEvent.setup()
+        const handleCheckedChange = vi.fn()
+        const handleClick = vi.fn()
+
+        const TestComponent = defineComponent({
+          components: { SwitchRoot, ToolbarButton, ToolbarRoot },
+          setup() {
+            return { SwitchRoot, handleCheckedChange, handleClick }
+          },
+          template: `
+            <ToolbarRoot>
+              <ToolbarButton
+                disabled
+                :as="SwitchRoot"
+                @checked-change="handleCheckedChange"
+                @click="handleClick"
+              />
+            </ToolbarRoot>
+          `,
+        })
+
+        const wrapper = mount(TestComponent, { attachTo: document.body })
+        const switchElement = wrapper.get('[role="switch"]').element as HTMLElement
+
+        expect(consoleError).toHaveBeenCalledTimes(1)
+        expect(consoleError.mock.calls[0]?.[0]).toContain(
+          'A component that acts as a button expected a native <button>',
+        )
+        expect(switchElement).not.toHaveAttribute('disabled')
+        expect(switchElement).toHaveAttribute('data-disabled')
+        expect(switchElement).toHaveAttribute('aria-disabled', 'true')
+
+        await user.tab()
+        expect(switchElement).toHaveAttribute('tabindex', '0')
+
+        await user.keyboard('[Enter]')
+        await user.keyboard('[Space]')
+        await user.click(switchElement)
+
+        expect(handleCheckedChange).not.toHaveBeenCalled()
+        expect(handleClick).not.toHaveBeenCalled()
+
+        consoleError.mockRestore()
+        wrapper.unmount()
+      })
+    })
+  })
+
   it('prevents interactions when disabled while remaining focusable by default', async () => {
     const user = userEvent.setup()
     const handleClick = vi.fn()
