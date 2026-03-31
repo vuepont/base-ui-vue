@@ -63,7 +63,7 @@ Native buttons with wrapping labels are supported by using renderless mode so th
 
 ```vue{7-14} title="Render callback"
 <script setup lang="ts">
-import { Slot, SwitchRoot } from 'base-ui-vue'
+import { Slot, SwitchRoot, SwitchThumb } from 'base-ui-vue'
 </script>
 
 <template>
@@ -73,7 +73,9 @@ import { Slot, SwitchRoot } from 'base-ui-vue'
     :native-button="true"
   >
     <label>
-      <button :ref="ref" v-bind="props" />
+      <button :ref="ref" v-bind="props">
+        <SwitchThumb />
+      </button>
       Notifications
     </label>
   </SwitchRoot>

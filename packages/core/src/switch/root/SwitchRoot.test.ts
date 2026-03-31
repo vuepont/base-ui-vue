@@ -358,7 +358,7 @@ describe('<SwitchRoot />', () => {
     expect(thumb).toHaveAttribute('data-readonly', '')
     expect(thumb).toHaveAttribute('data-required', '')
 
-    await render(createSwitchApp({
+    render(createSwitchApp({
       template: `
         <SwitchRoot data-testid="second-switch">
           <SwitchThumb data-testid="second-thumb" />

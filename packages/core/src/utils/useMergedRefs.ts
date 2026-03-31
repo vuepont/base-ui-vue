@@ -1,4 +1,5 @@
 import type { ComponentPublicInstance, Ref } from 'vue'
+import { unref } from 'vue'
 
 type Cleanup = () => void
 type MaybeRef<T>
@@ -45,13 +46,7 @@ export function useMergedRefs<T = Element>(...refs: MaybeRef<T>[]) {
   return (el: Element | ComponentPublicInstance | null) => {
     // Vue template refs on components return ComponentPublicInstance, not the DOM element.
     // Extract the focusable/root element if it's a component instance.
-    const instance = (
-      el && typeof el === 'object' && 'element' in el && el.element
-        ? el.element
-        : el && '$el' in el
-          ? el.$el
-          : el
-    ) as T | null
+    const instance = resolveRefTarget<T>(el)
 
     if (instance != null) {
       // Mount / update: set all refs and collect cleanup callbacks
@@ -94,4 +89,27 @@ export function useMergedRefs<T = Element>(...refs: MaybeRef<T>[]) {
       }
     }
   }
+}
+
+function resolveRefTarget<T>(el: Element | ComponentPublicInstance | null) {
+  if (el == null) {
+    return null
+  }
+
+  if (el instanceof Element) {
+    return el as T
+  }
+
+  if (typeof el === 'object' && 'element' in el) {
+    const exposedElement = unref(el.element)
+    if (exposedElement instanceof Element) {
+      return exposedElement as T
+    }
+  }
+
+  if ('$el' in el) {
+    return el.$el as T | null
+  }
+
+  return el as T
 }

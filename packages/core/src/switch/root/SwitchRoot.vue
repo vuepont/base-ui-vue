@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { Ref } from 'vue'
 import type { FieldRootState } from '../../field/root/FieldRoot.vue'
 import type { BaseUIChangeEventDetails } from '../../utils/createBaseUIEventDetails'
 import type { BaseUIComponentProps, NonNativeButtonProps } from '../../utils/types'
@@ -68,7 +69,7 @@ export interface SwitchRootProps
   /**
    * A ref to access the hidden `<input>` element.
    */
-  'inputRef'?: any
+  'inputRef'?: Ref<HTMLInputElement | null> | ((element: HTMLInputElement | null) => void) | null
   /**
    * Identifies the field when a form is submitted.
    */

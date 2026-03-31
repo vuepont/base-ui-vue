@@ -21,4 +21,19 @@ describe('<SwitchThumb />', () => {
     expect(thumb).toHaveAttribute('data-readonly', '')
     expect(thumb).toHaveAttribute('data-required', '')
   })
+
+  it('renders unchecked state attributes when not checked', () => {
+    render(defineComponent({
+      components: { SwitchRoot, SwitchThumb },
+      template: `
+        <SwitchRoot :default-checked="false">
+          <SwitchThumb data-testid="thumb" />
+        </SwitchRoot>
+      `,
+    }))
+
+    const thumb = screen.getByTestId('thumb')
+    expect(thumb).toHaveAttribute('data-unchecked', '')
+    expect(thumb).not.toHaveAttribute('data-checked')
+  })
 })
