@@ -3,6 +3,7 @@ import type { StateAttributesMapping } from '../../utils/getStateAttributesProps
 import type { BaseUIComponentProps } from '../../utils/types'
 import type { RenderRef } from '../../utils/useRenderElement'
 import { computed, useAttrs } from 'vue'
+import { mergeProps } from '../../merge-props/mergeProps'
 import { EMPTY_OBJECT } from '../../utils/constants'
 import { useMergedRefs } from '../../utils/useMergedRefs'
 import { useRenderElement } from '../../utils/useRenderElement'
@@ -43,15 +44,11 @@ const externalProps = computed(() => {
   if (props.props) {
     props.props.forEach((prop) => {
       const p = typeof prop === 'function' ? prop() : prop
-      externalProps = { ...externalProps, ...p }
+      externalProps = mergeProps(externalProps, p)
     })
   }
 
-  return {
-    ...attrs,
-    ...externalProps,
-    ...compositeProps.value,
-  }
+  return mergeProps(attrs, externalProps, compositeProps.value)
 })
 
 const {

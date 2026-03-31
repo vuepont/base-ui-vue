@@ -44,8 +44,14 @@ export function useMergedRefs<T = Element>(...refs: MaybeRef<T>[]) {
 
   return (el: Element | ComponentPublicInstance | null) => {
     // Vue template refs on components return ComponentPublicInstance, not the DOM element.
-    // Extract the root element if it's a component instance.
-    const instance = (el && '$el' in el ? el.$el : el) as T | null
+    // Extract the focusable/root element if it's a component instance.
+    const instance = (
+      el && typeof el === 'object' && 'element' in el && el.element
+        ? el.element
+        : el && '$el' in el
+          ? el.$el
+          : el
+    ) as T | null
 
     if (instance != null) {
       // Mount / update: set all refs and collect cleanup callbacks

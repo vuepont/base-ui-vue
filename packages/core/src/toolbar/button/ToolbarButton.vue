@@ -74,6 +74,11 @@ const state = computed<ToolbarButtonState>(() => ({
 }))
 
 const itemRefs = [buttonRef]
+const componentProps = computed(() =>
+  typeof props.as === 'string'
+    ? {}
+    : { disabled: disabled.value },
+)
 </script>
 
 <template>
@@ -85,8 +90,8 @@ const itemRefs = [buttonRef]
     :state="state"
     :refs="itemRefs"
     :props="[
-      attrs,
-      () => getButtonProps(),
+      componentProps,
+      () => getButtonProps(attrs as Record<string, any>),
     ]"
   >
     <slot :state="state" />

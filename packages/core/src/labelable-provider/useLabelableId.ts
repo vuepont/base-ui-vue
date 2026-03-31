@@ -1,9 +1,10 @@
-import { computed, watchEffect } from 'vue'
+import type { MaybeRefOrGetter } from 'vue'
+import { computed, toValue, watchEffect } from 'vue'
 import { useBaseUiId } from '../utils/useBaseUiId'
 import { useLabelableContext } from './LabelableContext'
 
 export interface UseLabelableIdParameters {
-  id?: string
+  id?: MaybeRefOrGetter<string | undefined>
 }
 
 export function useLabelableId(params: UseLabelableIdParameters = {}) {
@@ -11,21 +12,21 @@ export function useLabelableId(params: UseLabelableIdParameters = {}) {
   const { controlId, registerControlId } = useLabelableContext()
   const source = Symbol('labelable-id')
 
-  const defaultId = useBaseUiId(id)
-  const resolvedId = id ?? defaultId
+  const defaultId = useBaseUiId()
+  const resolvedId = computed(() => toValue(id) ?? defaultId)
 
   watchEffect((onCleanup) => {
-    if (!resolvedId) {
+    if (!resolvedId.value) {
       registerControlId(source, undefined)
       return
     }
 
-    registerControlId(source, resolvedId)
+    registerControlId(source, resolvedId.value)
 
     onCleanup(() => {
       registerControlId(source, undefined)
     })
   })
 
-  return computed(() => controlId.value ?? defaultId)
+  return computed(() => controlId.value ?? resolvedId.value)
 }
