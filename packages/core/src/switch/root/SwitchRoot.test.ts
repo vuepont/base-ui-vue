@@ -387,6 +387,24 @@ describe('<SwitchRoot />', () => {
     expect(switchElement).not.toHaveAttribute('name')
   })
 
+  it('uses visuallyHiddenInput styles when the hidden input has a name', () => {
+    render(createSwitchApp({
+      template: `<SwitchRoot name="switch-name" />`,
+    }))
+
+    const input = screen.getByRole('checkbox', { hidden: true }) as HTMLInputElement
+    expect(input.style.position).toBe('absolute')
+  })
+
+  it('uses visuallyHidden styles when the hidden input has no name', () => {
+    render(createSwitchApp({
+      template: `<SwitchRoot />`,
+    }))
+
+    const input = screen.getByRole('checkbox', { hidden: true }) as HTMLInputElement
+    expect(input.style.position).toBe('fixed')
+  })
+
   it('should not set the value attribute by default', () => {
     render(createSwitchApp({
       template: `<SwitchRoot />`,

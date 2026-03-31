@@ -235,12 +235,15 @@ const { getButtonProps, buttonRef } = useButton({
   native: computed(() => props.nativeButton),
 })
 
-function combineDescriptionProps(
-  localProps: Record<string, any>,
-  validationProps: Record<string, any>,
-) {
-  const localDescribedBy = localProps['aria-describedby']
-  const validationDescribedBy = validationProps['aria-describedby']
+function combineDescriptionProps<
+  LocalProps extends object,
+  ValidationProps extends object,
+>(
+  localProps: LocalProps,
+  validationProps: ValidationProps,
+): LocalProps & ValidationProps & { 'aria-describedby'?: string } {
+  const localDescribedBy = (localProps as { 'aria-describedby'?: unknown })['aria-describedby']
+  const validationDescribedBy = (validationProps as { 'aria-describedby'?: unknown })['aria-describedby']
   const describedBy = Array.from(
     new Set(
       [localDescribedBy, validationDescribedBy]

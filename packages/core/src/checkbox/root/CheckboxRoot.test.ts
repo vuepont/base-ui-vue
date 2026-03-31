@@ -389,6 +389,24 @@ describe('<CheckboxRoot />', () => {
     expect(checkbox).not.toHaveAttribute('name')
   })
 
+  it('uses visuallyHiddenInput styles when the hidden input has a name', () => {
+    render(createCheckboxApp({
+      template: `<CheckboxRoot name="checkbox-name" />`,
+    }))
+
+    const input = document.querySelector('input[type="checkbox"]') as HTMLInputElement
+    expect(input.style.position).toBe('absolute')
+  })
+
+  it('uses visuallyHidden styles when the hidden input has no name', () => {
+    render(createCheckboxApp({
+      template: `<CheckboxRoot />`,
+    }))
+
+    const input = document.querySelector('input[type="checkbox"]') as HTMLInputElement
+    expect(input.style.position).toBe('fixed')
+  })
+
   describe('with native <label>', () => {
     it('should toggle the checkbox when a wrapping <label> is clicked', async () => {
       const user = userEvent.setup()
