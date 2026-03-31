@@ -94,7 +94,7 @@ const emit = defineEmits<{
 }>()
 
 const attrs = useAttrs()
-const attrsObject = attrs as Record<string, any>
+const attrsObject = attrs as Record<string, unknown>
 const toolbarContext = useToolbarRootContext(true)
 
 const disabled = computed(
@@ -175,8 +175,9 @@ const forwardedAttrs = computed(() => {
 })
 
 const rootProps = computed<HTMLProps>(() => ({
-  role: 'group',
+  'role': 'group',
   ...forwardedAttrs.value,
+  'aria-orientation': props.orientation,
 }))
 
 const {

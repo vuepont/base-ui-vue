@@ -7,6 +7,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { defineComponent, ref } from 'vue'
 import { DirectionProvider } from '../direction-provider'
 import { Toggle } from '../toggle'
+import { ToolbarRoot } from '../toolbar'
 import { ToggleGroup } from './index'
 
 function createToggleGroupApp(options: {
@@ -348,6 +349,28 @@ describe('<ToggleGroup />', () => {
             <Toggle value="one" />
             <Toggle value="two" />
           </ToggleGroup>
+        `,
+      }))
+
+      const group = screen.getByRole('group')
+      expect(group).toHaveAttribute('data-orientation', 'vertical')
+      expect(group).toHaveAttribute('aria-orientation', 'vertical')
+    })
+
+    it('vertical within toolbar', () => {
+      render(defineComponent({
+        components: {
+          Toggle,
+          ToggleGroup,
+          ToolbarRoot,
+        },
+        template: `
+          <ToolbarRoot>
+            <ToggleGroup orientation="vertical">
+              <Toggle value="one" />
+              <Toggle value="two" />
+            </ToggleGroup>
+          </ToolbarRoot>
         `,
       }))
 
