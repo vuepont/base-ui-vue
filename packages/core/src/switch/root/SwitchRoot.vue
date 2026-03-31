@@ -184,7 +184,7 @@ const mergedInputRef = useMergedRefs(inputElementRef, props.inputRef)
 
 useField({
   id: computed(() => rootElementId),
-  commit: validation.commit,
+  commit: (value: unknown) => validation.commit(value),
   value: checked,
   controlRef,
   name,

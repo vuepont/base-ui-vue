@@ -145,7 +145,7 @@ function registerControlRef(element: HTMLElement | null) {
 useField({
   enabled: computed(() => Boolean(fieldName.value)),
   id,
-  commit: validation.commit,
+  commit: (value: unknown) => validation.commit(value),
   value,
   controlRef,
   name: fieldName,

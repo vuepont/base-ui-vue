@@ -327,7 +327,7 @@ useField({
   // Grouped checkboxes defer validation state to the group container instead.
   enabled: computed(() => !groupContext),
   id: computed(() => rootElementId),
-  commit: validation.commit,
+  commit: (value: unknown) => validation.commit(value),
   value: checked,
   controlRef,
   name,
