@@ -1,0 +1,34 @@
+.Control {
+  display: flex;
+  width: 14rem;
+  align-items: center;
+  padding-block: 0.75rem;
+  touch-action: none;
+  user-select: none;
+}
+
+.Track {
+  position: relative;
+  height: 0.25rem;
+  width: 100%;
+  border-radius: 0.125rem;
+  background: var(--color-gray-200, #e5e7eb);
+  box-shadow: inset 0 0 0 1px var(--color-gray-200, #e5e7eb);
+}
+
+.Indicator {
+  border-radius: 0.125rem;
+  background: var(--color-gray-700, #374151);
+}
+
+.Thumb {
+  height: 1rem;
+  width: 1rem;
+  border-radius: 9999px;
+  background: white;
+  outline: 1px solid var(--color-gray-300, #d1d5db);
+}
+
+.Thumb:has(:focus-visible) {
+  outline: 2px solid var(--color-blue-800, #1e40af);
+}

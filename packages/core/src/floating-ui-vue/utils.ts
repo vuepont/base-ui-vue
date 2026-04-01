@@ -1,2 +1,5 @@
 export * from './utils/composite'
+export * from './utils/constants'
+export * from './utils/element'
 export * from './utils/event'
+export * from './utils/shadowDom'

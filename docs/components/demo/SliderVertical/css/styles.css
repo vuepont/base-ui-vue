@@ -1,0 +1,12 @@
+@import "../../Slider/css/styles.css";
+
+.Control {
+  height: 8rem;
+  width: auto;
+  padding-inline: 0.75rem;
+}
+
+.VerticalTrack {
+  height: 100%;
+  width: 0.25rem;
+}
