@@ -36,7 +36,7 @@ export function contains(parent?: Element | null, child?: Element | null) {
 }
 
 export function getTarget(event: Event) {
-  if ('composedPath' in event) {
+  if ('composedPath' in event && typeof event.composedPath === 'function') {
     return event.composedPath()[0]
   }
 

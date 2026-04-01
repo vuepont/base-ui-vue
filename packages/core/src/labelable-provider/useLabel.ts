@@ -55,7 +55,7 @@ export function useLabel(params: UseLabelParameters = {}) {
       return
     }
 
-    const controlElement = ownerDocument(event.currentTarget as Element).getElementById(controlId)
+    const controlElement = ownerDocument(event.currentTarget as Element)?.getElementById(controlId)
     if (isHTMLElement(controlElement)) {
       focusElementWithVisible(controlElement)
     }

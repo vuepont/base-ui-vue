@@ -4,7 +4,7 @@ export function areArraysEqual<Item>(
   array1: readonly Item[],
   array2: readonly Item[],
   itemComparer: ItemComparer<Item> = (a, b) => a === b,
-) {
+): boolean {
   return (
     array1.length === array2.length
     && array1.every((value, index) => itemComparer(value, array2[index]))

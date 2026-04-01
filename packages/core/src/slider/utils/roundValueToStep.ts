@@ -10,6 +10,10 @@ function getDecimalPrecision(num: number) {
 }
 
 export function roundValueToStep(value: number, step: number, min: number) {
+  if (!Number.isFinite(step) || step <= 0) {
+    return value
+  }
+
   const nearest = Math.round((value - min) / step) * step + min
   return Number(nearest.toFixed(getDecimalPrecision(step)))
 }

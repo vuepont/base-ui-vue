@@ -251,6 +251,9 @@ function focusThumb(thumbIndex: number) {
 
 function stopListening() {
   const doc = ownerDocument(controlRef.value)
+  if (!doc) {
+    return
+  }
   doc.removeEventListener('pointermove', handleTouchMove)
   doc.removeEventListener('pointerup', handleTouchEnd)
   doc.removeEventListener('touchmove', handleTouchMove)
@@ -364,6 +367,9 @@ function handleTouchStart(nativeEvent: TouchEvent) {
 
   moveCountRef.value = 0
   const doc = ownerDocument(controlRef.value)
+  if (!doc) {
+    return
+  }
   doc.addEventListener('touchmove', handleTouchMove, { passive: true })
   doc.addEventListener('touchend', handleTouchEnd, { passive: true })
 }
@@ -424,7 +430,7 @@ const controlProps = computed(() => mergeProps(
           return
         }
 
-        const focusedElement = activeElement(ownerDocument(control))
+        const focusedElement = ownerDocument(control) ? activeElement(ownerDocument(control)!) : null
         const pressedOnFocusedThumb = contains(
           rootContext.thumbRefs.value[finger.thumbIndex],
           focusedElement as Element | null,
@@ -464,6 +470,9 @@ const controlProps = computed(() => mergeProps(
 
       moveCountRef.value = 0
       const doc = ownerDocument(control)
+      if (!doc) {
+        return
+      }
       doc.addEventListener('pointermove', handleTouchMove, { passive: true })
       doc.addEventListener('pointerup', handleTouchEnd, { once: true })
     },

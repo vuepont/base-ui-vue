@@ -40,14 +40,13 @@
     const thumbRect = thumb?.getBoundingClientRect()
 
     const controlSize = controlRect[side] - thumbRect[side]
-    const thumbValuePercent = ((value - min) * 100) / (max - min)
+    const thumbValuePercent = max === min ? 0 : ((value - min) * 100) / (max - min)
     const thumbOffsetFromControlEdge
       = thumbRect[side] / 2 + (controlSize * thumbValuePercent) / 100
     const percent = (thumbOffsetFromControlEdge / controlRect[side]) * 100
 
-    thumb.style.setProperty(`--position`, `${percent}%`)
-
     if (Number.isFinite(percent)) {
+      thumb.style.setProperty(`--position`, `${percent}%`)
       thumb.style.removeProperty('visibility')
 
       if (indicator) {

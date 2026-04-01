@@ -9,6 +9,9 @@ import { valueToPercent } from '../../utils/valueToPercent'
 import { useSliderRootContext } from '../root/SliderRootContext'
 import { sliderStateAttributesMapping } from '../root/stateAttributesMapping'
 
+export interface SliderIndicatorState extends SliderRootState {}
+export interface SliderIndicatorProps extends BaseUIComponentProps<SliderIndicatorState> {}
+
 /**
  * Visualizes the current value of the slider.
  * Renders a `<div>` element.
@@ -84,9 +87,6 @@ function getCenteredStyles(
   styles[mainSide] = `${end - start}%`
   return styles
 }
-
-export interface SliderIndicatorState extends SliderRootState {}
-export interface SliderIndicatorProps extends BaseUIComponentProps<SliderIndicatorState> {}
 
 const attrs = useAttrs()
 const rootContext = useSliderRootContext()

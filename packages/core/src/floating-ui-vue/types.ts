@@ -1,1 +1,1 @@
-export type { Coords, Dimensions } from '@floating-ui/vue'
+export type { Coords, Dimensions } from '@floating-ui/dom'

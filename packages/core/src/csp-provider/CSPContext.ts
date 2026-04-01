@@ -1,9 +1,9 @@
-import type { InjectionKey } from 'vue'
-import { inject } from 'vue'
+import type { InjectionKey, Ref } from 'vue'
+import { computed, inject } from 'vue'
 
 export interface CSPContextValue {
-  nonce?: string
-  disableStyleElements?: boolean
+  nonce: Readonly<Ref<string | undefined>>
+  disableStyleElements: Readonly<Ref<boolean>>
 }
 
 /**
@@ -14,7 +14,8 @@ export const cspContextKey = Symbol(
 ) as InjectionKey<CSPContextValue>
 
 const DEFAULT_CSP_CONTEXT_VALUE: CSPContextValue = {
-  disableStyleElements: false,
+  nonce: computed(() => undefined),
+  disableStyleElements: computed(() => false),
 }
 
 /**

@@ -66,6 +66,9 @@ importers:
 
   packages/core:
     dependencies:
+      '@floating-ui/dom':
+        specifier: ^1.7.6
+        version: 1.7.6
       '@floating-ui/utils':
         specifier: ^0.2.10
         version: 0.2.10

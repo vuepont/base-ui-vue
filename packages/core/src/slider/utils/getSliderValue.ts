@@ -8,7 +8,7 @@ export function getSliderValue(
   max: number,
   range: boolean,
   values: readonly number[],
-) {
+): number | number[] {
   let newValue: number | number[] = valueInput
 
   newValue = clamp(newValue, min, max)
@@ -17,7 +17,7 @@ export function getSliderValue(
     newValue = replaceArrayItemAtIndex(
       values,
       index,
-      clamp(newValue, values[index - 1] || -Infinity, values[index + 1] || Infinity),
+      clamp(newValue, values[index - 1] ?? -Infinity, values[index + 1] ?? Infinity),
     )
   }
 

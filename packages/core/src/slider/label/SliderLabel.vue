@@ -37,7 +37,7 @@ const label = useLabel({
   focusControl(_event, controlId) {
     if (controlId) {
       const controlElement = rootContext.controlRef.value
-        ? ownerDocument(rootContext.controlRef.value).getElementById(controlId)
+        ? ownerDocument(rootContext.controlRef.value)?.getElementById(controlId)
         : null
       if (isHTMLElement(controlElement)) {
         focusElementWithVisible(controlElement)

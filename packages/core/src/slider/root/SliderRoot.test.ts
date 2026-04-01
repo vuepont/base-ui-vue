@@ -17,7 +17,7 @@ import { createTouches, getHorizontalSliderRect } from '../utils/test-utils'
 
 function createSliderApp(options: {
   template: string
-  setup?: () => Record<string, any>
+  setup?: () => Record<string, unknown>
 }) {
   return defineComponent({
     components: {
@@ -69,7 +69,7 @@ describe('<SliderRoot />', () => {
   })
 
   describe('aRIA attributes', () => {
-    it('it has the correct aria attributes', () => {
+    it('has the correct ARIA attributes', () => {
       render(createSliderApp({
         template: `
           <SliderRoot default-value="30" aria-labelledby="labelId" data-testid="root">

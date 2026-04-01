@@ -70,6 +70,6 @@ describe('<SliderLabel />', () => {
 
     await user.click(screen.getByText('Volume'))
 
-    expect(screen.getAllByRole('slider').includes(document.activeElement as HTMLElement)).toBe(false)
+    expect(screen.getAllByRole('slider')).not.toContain(document.activeElement as HTMLElement)
   })
 })

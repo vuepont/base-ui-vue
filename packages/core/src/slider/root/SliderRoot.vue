@@ -121,9 +121,9 @@ export interface SliderRootProps<Value extends number | readonly number[] = numb
    */
   max?: number
   /**
-   * The maximum allowed value of the slider.
+   * The minimum allowed value of the slider.
    * Should not be equal to min.
-   * @default 100
+   * @default 0
    */
   min?: number
   /**
@@ -442,7 +442,7 @@ if (process.env.NODE_ENV !== 'production' && props.min >= props.max) {
 watch(
   () => disabled.value,
   (nextDisabled) => {
-    const activeEl = sliderRef.value ? activeElement(ownerDocument(sliderRef.value)) : null
+    const activeEl = sliderRef.value ? activeElement(ownerDocument(sliderRef.value)!) : null
     if (nextDisabled && activeEl instanceof HTMLElement && contains(sliderRef.value, activeEl)) {
       activeEl.blur()
     }

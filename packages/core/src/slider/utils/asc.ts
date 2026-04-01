@@ -1,3 +1,3 @@
-export function asc(a: number, b: number) {
+export function asc(a: number, b: number): number {
   return a - b
 }

@@ -45,4 +45,18 @@ describe('floating-ui-vue shadowDom utils', () => {
 
     expect(getTarget(event)).toBe(first)
   })
+
+  it('getTarget falls back to event.target when composedPath is not available', () => {
+    const target = document.createElement('button')
+    const event = new Event('click')
+
+    Object.defineProperty(event, 'target', {
+      value: target,
+    })
+    Object.defineProperty(event, 'composedPath', {
+      value: undefined,
+    })
+
+    expect(getTarget(event)).toBe(target)
+  })
 })

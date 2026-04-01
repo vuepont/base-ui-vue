@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { CSPContextValue } from './CSPContext'
-import { computed, provide } from 'vue'
+import { computed, provide, toRef } from 'vue'
 import { cspContextKey } from './CSPContext'
 
 export interface CSPProviderProps {
@@ -28,8 +28,8 @@ const props = withDefaults(defineProps<CSPProviderProps>(), {
 })
 
 const contextValue = computed<CSPContextValue>(() => ({
-  nonce: props.nonce,
-  disableStyleElements: props.disableStyleElements,
+  nonce: toRef(() => props.nonce),
+  disableStyleElements: toRef(() => props.disableStyleElements),
 }))
 
 provide(cspContextKey, contextValue.value)
