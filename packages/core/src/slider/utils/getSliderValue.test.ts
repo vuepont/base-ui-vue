@@ -25,7 +25,7 @@ describe('getSliderValue', () => {
 
 describe('replaceArrayItemAtIndex', () => {
   it('preserves other entries and sorts the output', () => {
-    expect(replaceArrayItemAtIndex([10, 40, 80], 1, 55)).toEqual([10, 55, 80])
+    expect(replaceArrayItemAtIndex([10, 40, 80], 1, 5)).toEqual([5, 10, 80])
   })
 
   it('throws for invalid indices', () => {

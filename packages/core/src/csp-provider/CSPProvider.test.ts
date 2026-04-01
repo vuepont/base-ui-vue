@@ -51,7 +51,14 @@ describe('<CSPProvider />', () => {
   })
 
   it('renders inline style tags by default', () => {
-    render(TestStyleConsumer)
+    render(defineComponent({
+      components: { CSPProvider, TestStyleConsumer },
+      template: `
+        <CSPProvider>
+          <TestStyleConsumer />
+        </CSPProvider>
+      `,
+    }))
 
     expect(document.querySelector('[data-testid="inline-style"]')).not.toBeNull()
   })
