@@ -5,7 +5,7 @@
   "description": "Vue port of Base UI",
   "author": "vuepont",
   "license": "MIT",
-  "homepage": "https://github.com/vuepont/base-ui-vue",
+  "homepage": "https://baseui-vue.com/",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/vuepont/base-ui-vue.git"
@@ -15,7 +15,8 @@
     "nuxt",
     "base-ui",
     "vue-component",
-    "unstyled"
+    "unstyled",
+    "a11y"
   ],
   "sideEffects": false,
   "exports": {
