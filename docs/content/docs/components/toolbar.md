@@ -7,6 +7,8 @@ description: A high-quality, unstyled Vue toolbar component for grouping buttons
 
 A container for grouping a set of buttons and controls.
 
+<ComponentPreview name="Toolbar" />
+
 ## Usage guidelines
 
 - **Use inputs sparingly**: In horizontal toolbars, arrow keys are used both for roving focus and for moving the text cursor inside inputs. Keep inputs to a minimum and place them near the end of the toolbar.
