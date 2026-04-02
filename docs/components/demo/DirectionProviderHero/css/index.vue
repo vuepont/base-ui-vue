@@ -1,14 +1,25 @@
 <script setup lang="ts">
-import { DirectionProvider } from 'base-ui-vue'
-import SliderPreview from './SliderPreview.vue'
-
-// TODO: Replace this docs-only slider illustration with Slider when the Vue package includes it.
+import {
+  DirectionProvider,
+  SliderControl,
+  SliderIndicator,
+  SliderRoot,
+  SliderThumb,
+  SliderTrack,
+} from 'base-ui-vue'
 </script>
 
 <template>
   <div dir="rtl">
     <DirectionProvider direction="rtl">
-      <SliderPreview />
+      <SliderRoot :default-value="25">
+        <SliderControl class="Control">
+          <SliderTrack class="Track">
+            <SliderIndicator class="Indicator" />
+            <SliderThumb aria-label="Value" class="Thumb" />
+          </SliderTrack>
+        </SliderControl>
+      </SliderRoot>
     </DirectionProvider>
   </div>
 </template>
