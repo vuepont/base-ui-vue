@@ -76,4 +76,30 @@ describe('<FieldLabel />', () => {
     await user.click(label)
     expect(control).toHaveFocus()
   })
+
+  it('uses an explicit id when provided', async () => {
+    const user = userEvent.setup()
+
+    render(
+      createApp({
+        template: `
+          <FieldRoot>
+            <FieldControl data-testid="control" />
+            <FieldLabel id="my-id" data-testid="label">Label</FieldLabel>
+          </FieldRoot>
+        `,
+      }),
+    )
+
+    await nextTick()
+
+    const label = screen.getByTestId('label')
+    const control = screen.getByTestId('control')
+
+    expect(label).toHaveAttribute('id', 'my-id')
+    expect(label).toHaveAttribute('for', control.id)
+
+    await user.click(label)
+    expect(control).toHaveFocus()
+  })
 })

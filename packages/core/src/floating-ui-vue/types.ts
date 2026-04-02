@@ -1,4 +1,1 @@
-export interface Dimensions {
-  width: number
-  height: number
-}
+export type { Coords, Dimensions } from '@floating-ui/dom'

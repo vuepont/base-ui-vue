@@ -86,6 +86,7 @@ type BaseUIChangeEventDetail<Reason extends string, CustomProperties extends obj
 } & CustomProperties
 
 export type BaseUIChangeEventDetails<Reason extends string, CustomProperties extends object = Record<string, never>> = Reason extends string ? BaseUIChangeEventDetail<Reason, CustomProperties> : never
+export type BaseUIGenericEventDetails<Reason extends string> = BaseUIChangeEventDetails<Reason>
 
 /**
  * Creates a Base UI event details object with the given reason and utilities
@@ -124,4 +125,12 @@ export function createChangeEventDetails<
   } as BaseUIChangeEventDetails<Reason> & CustomProperties
 
   return details
+}
+
+export function createGenericEventDetails<Reason extends string>(
+  reason: Reason,
+  event?: ReasonToEvent<Reason>,
+  trigger?: HTMLElement,
+): BaseUIGenericEventDetails<Reason> {
+  return createChangeEventDetails(reason, event, trigger)
 }

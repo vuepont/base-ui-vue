@@ -85,6 +85,7 @@ export default defineConfig({
           { text: 'Field', link: '/docs/components/field' },
           { text: 'Fieldset', link: '/docs/components/fieldset' },
           { text: 'Form', link: '/docs/components/form' },
+          { text: 'Slider', link: '/docs/components/slider' },
           { text: 'Switch', link: '/docs/components/switch' },
           { text: 'Toggle', link: '/docs/components/toggle' },
           { text: 'Toggle Group', link: '/docs/components/toggle-group' },

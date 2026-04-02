@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import type { BaseUIComponentProps } from '../../utils/types'
 import type { FieldRootState } from '../root/FieldRoot.vue'
-import { computed, useAttrs, watchEffect } from 'vue'
+import { computed, useAttrs } from 'vue'
 import { useLabelableContext } from '../../labelable-provider/LabelableContext'
-import { useBaseUiId } from '../../utils/useBaseUiId'
+import { useLabel } from '../../labelable-provider/useLabel'
 import { useRenderElement } from '../../utils/useRenderElement'
 import { useFieldRootContext } from '../root/FieldRootContext'
 import { fieldValidityMapping } from '../utils/constants'
@@ -35,60 +35,19 @@ const props = withDefaults(defineProps<FieldLabelProps>(), {
 const attrs = useAttrs()
 
 const fieldRootContext = useFieldRootContext(false)
-
-const { controlId, setLabelId, labelId: contextLabelId } = useLabelableContext()
-
-const generatedLabelId = useBaseUiId(props.id)
-const labelId = computed(() => props.id ?? contextLabelId.value ?? generatedLabelId)
-
-watchEffect((onCleanup) => {
-  const id = labelId.value
-  setLabelId(id)
-  onCleanup(() => setLabelId(undefined))
+const { labelId } = useLabelableContext()
+const label = useLabel({
+  id: computed(() => labelId.value ?? props.id),
+  native: computed(() => props.nativeLabel),
 })
-
-function handleInteraction(event: MouseEvent) {
-  const target = event.target as HTMLElement | null
-  if (target?.closest('button,input,select,textarea')) {
-    return
-  }
-
-  if (!event.defaultPrevented && event.detail > 1) {
-    event.preventDefault()
-  }
-
-  if (props.nativeLabel || !controlId.value) {
-    return
-  }
-
-  const controlElement = document.getElementById(controlId.value)
-  if (controlElement) {
-    controlElement.focus()
-  }
-}
 
 const { tag, mergedProps, renderless } = useRenderElement({
   componentProps: props,
   state: fieldRootContext.state,
-  props: computed(() => {
-    if (props.nativeLabel) {
-      return {
-        ...attrs,
-        id: labelId.value,
-        for: controlId.value ?? undefined,
-        onMousedown: handleInteraction,
-      }
-    }
-
-    return {
-      ...attrs,
-      id: labelId.value,
-      onClick: handleInteraction,
-      onPointerdown: (event: PointerEvent) => {
-        event.preventDefault()
-      },
-    }
-  }),
+  props: computed(() => ({
+    ...attrs,
+    ...label.props.value,
+  })),
   stateAttributesMapping: fieldValidityMapping,
   defaultTagName: 'label',
 })
