@@ -7,40 +7,27 @@
 }
 
 .Track {
-  position: relative;
   width: 100%;
-  height: 0.25rem;
-  border-radius: 0.25rem;
   background-color: var(--color-gray-200);
   box-shadow: inset 0 0 0 1px var(--color-gray-200);
+  height: 0.25rem;
+  border-radius: 0.25rem;
+  position: relative;
 }
 
 .Indicator {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
   border-radius: 0.25rem;
   background-color: var(--color-gray-700);
 }
 
 .Thumb {
-  position: absolute;
-  top: 50%;
   width: 1rem;
   height: 1rem;
-  border-radius: 9999px;
+  border-radius: 100%;
   background-color: white;
   outline: 1px solid var(--color-gray-300);
-  transform: translateY(-50%);
-  pointer-events: none;
 }
 
-.Input {
-  position: absolute;
-  inset: -0.5rem 0;
-  width: 100%;
-  margin: 0;
-  opacity: 0;
-  cursor: pointer;
+.Thumb:has(:focus-visible) {
+  outline: 2px solid var(--color-blue);
 }

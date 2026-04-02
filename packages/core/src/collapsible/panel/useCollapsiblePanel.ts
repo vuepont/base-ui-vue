@@ -3,6 +3,7 @@ import type { Ref } from 'vue'
 import type { CollapsibleChangeEventDetails } from '../collapsible.types'
 import type { AnimationType, Dimensions } from '../root/useCollapsibleRoot'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+import { AccordionRootDataAttributes } from '../../accordion/root/AccordionRootDataAttributes'
 import { createChangeEventDetails } from '../../utils/createBaseUIEventDetails'
 import { REASONS } from '../../utils/reasons'
 import {
@@ -167,7 +168,7 @@ export function useCollapsiblePanel(
        * Setting both to `0px` will break layout.
        */
       if (
-        element.getAttribute('data-orientation') === 'horizontal' // TODO: type AccordionRootDataAttributes.orientation
+        element.getAttribute(AccordionRootDataAttributes.orientation) === 'horizontal'
         || panelStyles.transitionProperty.includes('width')
       ) {
         transitionDimensionRef.value = 'width'
