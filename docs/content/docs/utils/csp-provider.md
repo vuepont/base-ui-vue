@@ -1,9 +1,9 @@
 ---
-title: CSPProvider
+title: CSP Provider
 description: A CSP provider component that configures CSP-related behavior for inline tags rendered by Base UI Vue components.
 ---
 
-# CSPProvider
+# CSP Provider
 
 Configures CSP-related behavior for inline tags rendered by Base UI Vue components.
 
