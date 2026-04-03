@@ -95,6 +95,7 @@ export default defineConfig({
       {
         text: 'Utils',
         items: [
+          { text: 'CSP Provider', link: '/docs/utils/csp-provider' },
           { text: 'Direction Provider', link: '/docs/utils/direction-provider' },
           { text: 'mergeProps', link: '/docs/utils/merge-props' },
           { text: 'useRender', link: '/docs/utils/use-render' },
