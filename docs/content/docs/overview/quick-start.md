@@ -41,6 +41,7 @@ If you need renderless or advanced composition, continue with:
 - [useRender](/docs/utils/use-render)
 - [mergeProps](/docs/utils/merge-props)
 - [DirectionProvider](/docs/utils/direction-provider)
+- [CSPProvider](/docs/utils/csp-provider)
 
 ## Next steps
 
