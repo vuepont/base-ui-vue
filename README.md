@@ -23,9 +23,13 @@ To see the latest updates, check out the [releases page](https://github.com/vuep
 - **Discord** For community support, questions, and tips, join our [Discord](https://discord.gg/SWzhwGMxsZ).
 - **X** To stay up-to-date on new releases and announcements, follow [Raymond on X](https://x.com/peoray_) and [Charlie on X](https://x.com/cwandev).
 
-## Support the project
+## Sponsors
 
-If Base UI Vue is useful to you, consider starring the repo, sharing it, or supporting the project through [GitHub Sponsors](https://github.com/sponsors/vuepont) or [Open Collective](https://opencollective.com/vuepont).
+Base UI Vue is an open-source project supported by our sponsors. If you'd like to support its development, consider becoming a sponsor, supporting us on [GitHub Sponsors](https://github.com/sponsors/vuepont), or contributing through [Open Collective](https://opencollective.com/vuepont).
+
+<a href="https://immitranslate.com/" target="_blank" rel="noopener noreferrer">
+  <img src="./docs/content/public/sponsors/immitranslate.svg" alt="ImmiTranslate" width="180" />
+</a>
 
 ## Team
 

@@ -12,6 +12,7 @@ import {
   github,
   npm,
 } from '../meta'
+import SponsorsSection from './SponsorsSection.vue'
 
 const docsLink = '/docs/overview/quick-start'
 const copyrightHolder = 'VuePont'
@@ -119,6 +120,8 @@ const faqs = [
           </div>
         </div>
       </section>
+
+      <SponsorsSection />
 
       <section class="space-y-12">
         <h2 class="text-xs font-bold tracking-[0.3em] text-zinc-500 uppercase dark:text-zinc-400">

@@ -3,6 +3,7 @@ import { useData } from 'vitepress'
 import DefaultTheme from 'vitepress/theme'
 import { computed } from 'vue'
 import HomePage from './HomePage.vue'
+import SponsorsSidebar from './SponsorsSidebar.vue'
 
 const { page } = useData()
 
@@ -11,5 +12,9 @@ const isHomePage = computed(() => page.value.relativePath === 'index.md')
 
 <template>
   <HomePage v-if="isHomePage" />
-  <DefaultTheme.Layout v-else />
+  <DefaultTheme.Layout v-else>
+    <template #aside-outline-after>
+      <SponsorsSidebar />
+    </template>
+  </DefaultTheme.Layout>
 </template>
