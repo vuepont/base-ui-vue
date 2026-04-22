@@ -106,10 +106,10 @@ Renders a `<div>` element.
 
 | Attribute | Description |
 | --------- | ----------- |
-| `role` | Always `"meter"`. |
+| `role` | Defaults to `"meter"` (can be overridden by user attributes). |
 | `aria-valuenow` | Reflects the current `value`. |
-| `aria-valuemin` | Reflects `min`. |
-| `aria-valuemax` | Reflects `max`. |
+| `aria-valuemin` | Defaults to `min` (can be overridden by user attributes). |
+| `aria-valuemax` | Defaults to `max` (can be overridden by user attributes). |
 | `aria-valuetext` | The human-readable value announced by screen readers. |
 | `aria-labelledby` | Points to the `<MeterLabel>` id when one is rendered. |
 
@@ -138,7 +138,7 @@ Renders a `<span>` element.
 
 | Slot prop | Type | Description |
 | --------- | ---- | ----------- |
-| `formatted-value` | `string` | The formatted current value of the meter. |
+| `formattedValue` | `string` | The formatted current value of the meter. |
 | `value` | `number` | The raw numeric current value. |
 
 ### Track
