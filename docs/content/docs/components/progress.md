@@ -134,7 +134,7 @@ Renders a `<div>` element.
 | `aria-valuemax` | Defaults to `max` (can be overridden by user attributes). |
 | `aria-valuetext` | The human-readable value announced by screen readers. |
 | `aria-labelledby` | Points to the `<ProgressLabel>` id when one is rendered. |
-| `data-progressing` | Present while the value is between `min` and `max` (exclusive of `max`). |
+| `data-progressing` | Present while determinate progress is not complete. |
 | `data-complete` | Present when the value equals `max`. |
 | `data-indeterminate` | Present when the value is `null` (or non-finite). |
 

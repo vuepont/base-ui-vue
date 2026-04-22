@@ -2,7 +2,7 @@
   box-sizing: border-box;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-row-gap: 0.5rem;
+  row-gap: 0.5rem;
   width: 14rem;
 }
 
@@ -33,6 +33,7 @@
 
 .Indicator {
   display: block;
+  height: inherit;
   background-color: var(--color-gray-500, #6b7280);
   transition: width 500ms;
 }
