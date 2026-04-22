@@ -78,10 +78,12 @@ Use `get-aria-value-text` to produce a human-readable announcement for assistive
 `MeterValue` exposes the formatted and raw values through its default slot so you can compose richer layouts:
 
 ```vue title="Meter with custom value rendering"
-<MeterValue v-slot="{ formattedValue, value }">
+<MeterRoot :value="24">
+  <MeterValue v-slot="{ formattedValue, value }">
   <strong>{{ formattedValue }}</strong>
   <span v-if="value < 20"> — low</span>
-</MeterValue>
+  </MeterValue>
+</MeterRoot>
 ```
 
 ## API reference

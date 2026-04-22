@@ -10,6 +10,11 @@ export interface MeterRootState {}
 
 export interface MeterRootProps extends BaseUIComponentProps<MeterRootState> {
   /**
+   * A string value that provides a user-friendly name for `aria-valuenow`,
+   * the current value of the meter.
+   */
+  ariaValuetext?: string
+  /**
    * Options to format the value.
    */
   format?: Intl.NumberFormatOptions
@@ -65,6 +70,10 @@ const formattedValue = computed(() =>
 )
 
 const ariaValueText = computed(() => {
+  if (props.ariaValuetext !== undefined) {
+    return props.ariaValuetext
+  }
+
   if (props.getAriaValueText) {
     return props.getAriaValueText(formattedValue.value, props.value)
   }
