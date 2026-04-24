@@ -1,0 +1,53 @@
+.Progress {
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  row-gap: 0.5rem;
+  width: 14rem;
+}
+
+.Label {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: 400;
+  color: var(--color-gray-900, #111827);
+}
+
+.Value {
+  grid-column-start: 2;
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  color: var(--color-gray-900, #111827);
+  text-align: right;
+}
+
+.Track {
+  grid-column: 1 / 3;
+  display: block;
+  overflow: hidden;
+  height: 0.5rem;
+  background-color: var(--color-gray-100, #f3f4f6);
+  box-shadow: inset 0 0 0 1px var(--color-gray-200, #e5e7eb);
+}
+
+.Indicator {
+  display: block;
+  height: inherit;
+  background-color: var(--color-gray-500, #6b7280);
+  transition: width 500ms;
+}
+
+.Progress[data-indeterminate] .Indicator {
+  width: 40%;
+  animation: progress-indeterminate 1.2s ease-in-out infinite;
+}
+
+@keyframes progress-indeterminate {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(350%);
+  }
+}
