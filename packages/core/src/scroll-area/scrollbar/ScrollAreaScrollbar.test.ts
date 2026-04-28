@@ -8,7 +8,7 @@ import ScrollAreaScrollbar from './ScrollAreaScrollbar.vue'
 
 function createApp(options: {
   template: string
-  setup?: () => Record<string, any>
+  setup?: () => Record<string, unknown>
 }) {
   return defineComponent({
     components: { ScrollAreaRoot, ScrollAreaThumb, ScrollAreaViewport, ScrollAreaScrollbar },

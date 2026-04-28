@@ -6,7 +6,7 @@ import ScrollAreaViewport from './ScrollAreaViewport.vue'
 
 function createApp(options: {
   template: string
-  setup?: () => Record<string, any>
+  setup?: () => Record<string, unknown>
 }) {
   return defineComponent({
     components: { ScrollAreaRoot, ScrollAreaViewport },
@@ -68,7 +68,7 @@ describe('<ScrollAreaViewport />', () => {
     expect(screen.getByTestId('viewport')).toHaveClass('base-ui-disable-scrollbar')
   })
 
-  it('has tabindex=0 by default (no content overflow in JSDOM)', () => {
+  it('has tabindex=-1 by default when JSDOM reports no overflow', () => {
     render(
       createApp({
         template: `

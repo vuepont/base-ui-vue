@@ -138,6 +138,12 @@ A vertical or horizontal scrollbar track. Renders a `<div>` element.
 | `data-orientation` | `'vertical' \| 'horizontal'` | The scrollbar orientation. |
 | `data-hovering` | | Present when the pointer is over the scroll area. |
 | `data-scrolling` | | Present when the user is scrolling on this axis. |
+| `data-has-overflow-x` | | Present when horizontal overflow exists. |
+| `data-has-overflow-y` | | Present when vertical overflow exists. |
+| `data-overflow-x-start` | | Present when there is overflow at the horizontal start. |
+| `data-overflow-x-end` | | Present when there is overflow at the horizontal end. |
+| `data-overflow-y-start` | | Present when there is overflow at the vertical start. |
+| `data-overflow-y-end` | | Present when there is overflow at the vertical end. |
 
 ### Thumb
 

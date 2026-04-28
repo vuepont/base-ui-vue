@@ -133,11 +133,12 @@ function computeThumbPosition() {
   if (!scrollbarXHidden) {
     let rawScrollLeftFromStart = 0
     if (direction.value === 'rtl') {
-      rawScrollLeftFromStart = clamp(-scrollLeft, 0, maxScrollLeft)
+      rawScrollLeftFromStart = scrollLeft < 0 ? -scrollLeft : maxScrollLeft - scrollLeft
     }
     else {
-      rawScrollLeftFromStart = clamp(scrollLeft, 0, maxScrollLeft)
+      rawScrollLeftFromStart = scrollLeft
     }
+    rawScrollLeftFromStart = clamp(rawScrollLeftFromStart, 0, maxScrollLeft)
     scrollLeftFromStart = normalizeScrollOffset(rawScrollLeftFromStart, maxScrollLeft)
     scrollLeftFromEnd = maxScrollLeft - scrollLeftFromStart
   }
@@ -186,9 +187,9 @@ function computeThumbPosition() {
   if (scrollbarXEl && thumbXEl) {
     const maxThumbOffsetX = scrollbarXEl.offsetWidth - clampedNextWidth - scrollbarXOffset - thumbXOffset
     const scrollRangeX = scrollableContentWidth - viewportWidth
-    const scrollRatioX = scrollRangeX === 0 ? 0 : scrollLeft / scrollRangeX
+    const scrollRatioX = scrollRangeX === 0 ? 0 : scrollLeftFromStart / scrollRangeX
     const thumbOffsetX = direction.value === 'rtl'
-      ? clamp(scrollRatioX * maxThumbOffsetX, -maxThumbOffsetX, 0)
+      ? -clamp(scrollRatioX * maxThumbOffsetX, 0, maxThumbOffsetX)
       : clamp(scrollRatioX * maxThumbOffsetX, 0, maxThumbOffsetX)
     thumbXEl.style.transform = `translate3d(${thumbOffsetX}px,0,0)`
   }
@@ -333,7 +334,6 @@ onMounted(() => {
         return
       Promise.allSettled(animations.map(a => a.finished))
         .then(computeThumbPosition)
-        .catch(() => {})
     }, 0)
   }
 })

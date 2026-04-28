@@ -66,6 +66,7 @@ const cornerRef = shallowRef<HTMLDivElement | null>(null)
 let scrollYTimeoutId: ReturnType<typeof setTimeout> | undefined
 let scrollXTimeoutId: ReturnType<typeof setTimeout> | undefined
 
+// Pointer drag baselines are mutable so move events don't trigger Vue renders.
 const thumbDragging = { current: false }
 const startY = { current: 0 }
 const startX = { current: 0 }

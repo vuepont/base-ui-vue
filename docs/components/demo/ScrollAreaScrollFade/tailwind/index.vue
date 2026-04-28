@@ -10,7 +10,7 @@ import {
 
 <template>
   <ScrollAreaRoot class="box-border h-48 w-96 max-w-[calc(100vw-8rem)] rounded-lg bg-gray-50">
-    <ScrollAreaViewport class="h-full rounded-md bg-gray-50 mask-linear-[to_bottom,transparent_0,black_min(40px,var(--scroll-area-overflow-y-start)),black_calc(100%-min(40px,var(--scroll-area-overflow-y-end,40px))),transparent_100%] mask-no-repeat focus-visible:outline-2 focus-visible:outline-blue-800">
+    <ScrollAreaViewport class="h-full rounded-md bg-gray-50 mask-linear-[to_bottom,transparent_0,black_min(40px,var(--scroll-area-overflow-y-start,0px)),black_calc(100%-min(40px,var(--scroll-area-overflow-y-end,40px))),transparent_100%] mask-no-repeat focus-visible:outline-2 focus-visible:outline-blue-800">
       <ScrollAreaContent class="flex flex-col gap-4 py-3 pl-4 pr-6 text-sm leading-5.5 text-gray-900">
         <p>
           Vernacular architecture is building done outside any academic tradition, and without

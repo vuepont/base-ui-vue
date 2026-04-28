@@ -9,13 +9,14 @@
 
 .Viewport {
   --fade-size: 40px;
+
   height: 100%;
   border-radius: 0.375rem;
   background: var(--color-gray-50);
   mask-image: linear-gradient(
     to bottom,
     transparent 0,
-    black min(var(--fade-size), var(--scroll-area-overflow-y-start)),
+    black min(var(--fade-size), var(--scroll-area-overflow-y-start, 0px)),
     black calc(100% - min(var(--fade-size), var(--scroll-area-overflow-y-end, var(--fade-size)))),
     transparent 100%
   );

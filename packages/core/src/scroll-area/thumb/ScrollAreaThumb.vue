@@ -78,7 +78,7 @@ function setThumbElement(element: Element | ComponentPublicInstance | null) {
 }
 
 const elementProps = computed(() => mergeProps(
-  attrs as Record<string, any>,
+  attrs,
   {
     onPointerdown: handlePointerDown,
     onPointermove: handlePointerMove,

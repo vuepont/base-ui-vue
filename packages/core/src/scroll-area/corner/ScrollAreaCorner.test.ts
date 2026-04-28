@@ -7,7 +7,7 @@ import ScrollAreaCorner from './ScrollAreaCorner.vue'
 
 function createApp(options: {
   template: string
-  setup?: () => Record<string, any>
+  setup?: () => Record<string, unknown>
 }) {
   return defineComponent({
     components: { ScrollAreaRoot, ScrollAreaViewport, ScrollAreaCorner },

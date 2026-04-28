@@ -3,6 +3,7 @@ import type { ScrollAreaRootState } from './ScrollAreaRootContext'
 import { ScrollAreaRootDataAttributes } from './ScrollAreaRootDataAttributes'
 
 export const scrollAreaStateAttributesMapping: StateAttributesMapping<ScrollAreaRootState> = {
+  scrolling: value => (value ? { [ScrollAreaRootDataAttributes.scrolling]: '' } : null),
   hasOverflowX: value => (value ? { [ScrollAreaRootDataAttributes.hasOverflowX]: '' } : null),
   hasOverflowY: value => (value ? { [ScrollAreaRootDataAttributes.hasOverflowY]: '' } : null),
   overflowXStart: value => (value ? { [ScrollAreaRootDataAttributes.overflowXStart]: '' } : null),

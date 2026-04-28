@@ -5,9 +5,9 @@ export interface ScrollAreaScrollbarContext {
   orientation: ComputedRef<'horizontal' | 'vertical'>
 }
 
-export const scrollAreaScrollbarContextKey = Symbol(
+export const scrollAreaScrollbarContextKey: InjectionKey<ScrollAreaScrollbarContext> = Symbol(
   'ScrollAreaScrollbarContext',
-) as InjectionKey<ScrollAreaScrollbarContext>
+)
 
 export function useScrollAreaScrollbarContext(): ScrollAreaScrollbarContext {
   const context = inject(scrollAreaScrollbarContextKey)

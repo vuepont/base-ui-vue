@@ -104,13 +104,13 @@ function setupWheelHandler() {
   function handleWheel(event: WheelEvent) {
     if (!viewportEl || !scrollbarEl || event.ctrlKey)
       return
-    event.preventDefault()
 
     if (props.orientation === 'vertical') {
       if (viewportEl.scrollTop === 0 && event.deltaY < 0)
         return
       if (viewportEl.scrollTop === viewportEl.scrollHeight - viewportEl.clientHeight && event.deltaY > 0)
         return
+      event.preventDefault()
       viewportEl.scrollTop += event.deltaY
     }
     else {
@@ -118,6 +118,7 @@ function setupWheelHandler() {
         return
       if (viewportEl.scrollLeft === viewportEl.scrollWidth - viewportEl.clientWidth && event.deltaX > 0)
         return
+      event.preventDefault()
       viewportEl.scrollLeft += event.deltaX
     }
   }
