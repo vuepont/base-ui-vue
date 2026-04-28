@@ -26,13 +26,13 @@ function getToggleProps(props: Record<string, unknown>) {
     <div class="ToggleRow">
       <div class="Panel">
         <Toggle
-          v-slot="{ props, state, ref }"
+          v-slot="{ props, state, ref: setRef }"
           aria-label="Favorite"
           :pressed="pressed"
           :as="Slot"
           @pressed-change="(nextPressed) => pressed = nextPressed"
         >
-          <button :ref="ref" v-bind="getToggleProps(props)">
+          <button :ref="setRef" v-bind="getToggleProps(props)">
             <svg
               v-if="state.pressed"
               class="Icon"
