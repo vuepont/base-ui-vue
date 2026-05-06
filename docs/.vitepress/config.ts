@@ -85,6 +85,7 @@ export default defineConfig({
           { text: 'Field', link: '/docs/components/field' },
           { text: 'Fieldset', link: '/docs/components/fieldset' },
           { text: 'Form', link: '/docs/components/form' },
+          { text: 'Input', link: '/docs/components/input' },
           { text: 'Meter', link: '/docs/components/meter' },
           { text: 'Progress', link: '/docs/components/progress' },
           { text: 'Separator', link: '/docs/components/separator' },
