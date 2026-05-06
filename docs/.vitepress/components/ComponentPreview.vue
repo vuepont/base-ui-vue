@@ -55,8 +55,7 @@ const fileNames = computed(() =>
   <div class="demo-root">
     <div class="demo-playground">
       <div class="demo-playground-inner">
-        <slot v-if="currentFramework === 'tailwind'" name="demo-tailwind" />
-        <slot v-else name="demo-css" />
+        <slot name="demo-tailwind" />
       </div>
     </div>
 
