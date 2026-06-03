@@ -80,6 +80,28 @@ describe('<NumberFieldRoot />', () => {
     expect(screen.getByRole('textbox')).toHaveValue('10')
   })
 
+  it('keeps the controlled value visible when a step change is rejected', async () => {
+    const user = userEvent.setup()
+    const onValueChange = vi.fn()
+
+    render(
+      createApp({
+        setup: () => ({ value: ref(5), onValueChange }),
+        template: `
+          <FieldRoot>
+            <NumberFieldRoot :value="value" @value-change="onValueChange">${GROUP}</NumberFieldRoot>
+          </FieldRoot>
+        `,
+      }),
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Increase' }))
+    await flushPromises()
+
+    expect(onValueChange.mock.lastCall?.[0]).toBe(6)
+    expect(screen.getByRole('textbox')).toHaveValue('5')
+  })
+
   describe('increment / decrement', () => {
     it('increments the value when the increment button is pressed', async () => {
       const user = userEvent.setup()

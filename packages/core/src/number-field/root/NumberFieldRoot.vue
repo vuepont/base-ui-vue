@@ -411,8 +411,13 @@ function setValue(unvalidatedValue: number | null, details: NumberFieldRootChang
   lastChangedValueRef.value = validatedValue
 
   // Keep the visible input in sync immediately when programmatic changes occur.
+  // In controlled mode, the prop remains the source of truth if the parent rejects the change.
   if (allowInputSyncRef.value) {
-    setInputValue(formatNumber(validatedValue, locale.value, format.value))
+    const nextInputValue = props.value !== undefined
+      ? getControlledInputValue(value.value)
+      : formatNumber(validatedValue, locale.value, format.value)
+
+    setInputValue(nextInputValue)
   }
 
   return shouldFireChange
