@@ -55,7 +55,7 @@ Set `mask` to hide entered characters, rendering each slot as a password input:
 </OtpFieldRoot>
 ```
 
-## Auto submit
+## Auto-submit
 
 Set `auto-submit` to submit the owning form automatically once every slot is filled:
 

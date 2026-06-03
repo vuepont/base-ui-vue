@@ -270,7 +270,6 @@ describe('<OtpFieldRoot />', () => {
 
       render(
         createApp({
-          setup: () => ({ value: ref('12') }),
           template: `
             <FieldRoot>
               <OtpFieldRoot :length="6" :default-value="'123'">${SIX_INPUTS}</OtpFieldRoot>
