@@ -55,6 +55,42 @@ describe('<OtpFieldInput />', () => {
     expect(screen.getByTestId('slot')).toHaveAttribute('type', 'password')
   })
 
+  it('preserves an explicitly provided input type', () => {
+    render(
+      createApp({
+        template: `
+          <FieldRoot>
+            <OtpFieldRoot :length="3">
+              <OtpFieldInput data-testid="slot" type="tel" />
+              <OtpFieldInput />
+              <OtpFieldInput />
+            </OtpFieldRoot>
+          </FieldRoot>
+        `,
+      }),
+    )
+
+    expect(screen.getByTestId('slot')).toHaveAttribute('type', 'tel')
+  })
+
+  it('renders non-BMP characters as one slot when validation is disabled', () => {
+    render(
+      createApp({
+        template: `
+          <FieldRoot>
+            <OtpFieldRoot :length="2" default-value="😀a" validation-type="none">
+              <OtpFieldInput data-testid="slot-0" />
+              <OtpFieldInput data-testid="slot-1" />
+            </OtpFieldRoot>
+          </FieldRoot>
+        `,
+      }),
+    )
+
+    expect(screen.getByTestId('slot-0')).toHaveValue('😀')
+    expect(screen.getByTestId('slot-1')).toHaveValue('a')
+  })
+
   it('only allows the active slot to be tab-focusable', () => {
     render(
       createApp({

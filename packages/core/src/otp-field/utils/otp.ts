@@ -85,6 +85,18 @@ export function normalizeOTPValue(
   return normalizeOTPValueWithDetails(value, length, validationType, normalizeValue)[0]
 }
 
+export function getOTPCharacters(value: string | null | undefined) {
+  return Array.from(value ?? '')
+}
+
+export function getOTPValueLength(value: string | null | undefined) {
+  return getOTPCharacters(value).length
+}
+
+export function getOTPCharacter(value: string | null | undefined, index: number) {
+  return getOTPCharacters(value)[index] ?? ''
+}
+
 /**
  * Replaces characters starting at the provided slot index, then re-normalizes the final OTP value
  * so paste and multi-character edits stay contiguous and length-bounded.
@@ -98,8 +110,10 @@ export function replaceOTPValue(
   normalizeValue?: ((value: string) => string) | undefined,
 ) {
   const normalizedValue = normalizeOTPValue(nextValue, length, validationType, normalizeValue)
-  const prefix = currentValue.slice(0, index)
-  const suffix = currentValue.slice(index + normalizedValue.length)
+  const characters = getOTPCharacters(currentValue)
+  const replacementLength = getOTPValueLength(normalizedValue)
+  const prefix = characters.slice(0, index).join('')
+  const suffix = characters.slice(index + replacementLength).join('')
 
   return normalizeOTPValue(
     `${prefix}${normalizedValue}${suffix}`,
@@ -110,9 +124,12 @@ export function replaceOTPValue(
 }
 
 export function removeOTPCharacter(currentValue: string, index: number) {
-  if (index < 0 || index >= currentValue.length) {
+  const characters = getOTPCharacters(currentValue)
+
+  if (index < 0 || index >= characters.length) {
     return currentValue
   }
 
-  return `${currentValue.slice(0, index)}${currentValue.slice(index + 1)}`
+  characters.splice(index, 1)
+  return characters.join('')
 }

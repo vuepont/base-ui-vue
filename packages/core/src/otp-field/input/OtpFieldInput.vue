@@ -11,7 +11,7 @@ import { createChangeEventDetails, createGenericEventDetails } from '../../utils
 import { REASONS } from '../../utils/reasons'
 import { useRenderElement } from '../../utils/useRenderElement'
 import { getOtpFieldInputState, useOtpFieldRootContext } from '../root/OtpFieldRootContext'
-import { normalizeOTPValueWithDetails, removeOTPCharacter, replaceOTPValue } from '../utils/otp'
+import { getOTPCharacter, getOTPValueLength, normalizeOTPValueWithDetails, removeOTPCharacter, replaceOTPValue } from '../utils/otp'
 import { inputStateAttributesMapping } from '../utils/stateAttributesMapping'
 
 export interface OtpFieldInputState extends Omit<OtpFieldRootState, 'filled' | 'value'> {
@@ -73,7 +73,7 @@ const { ref: listItemRef, index } = useCompositeListItem({
 const inputRef = ref<HTMLInputElement | null>(null)
 const direction = useDirection()
 
-const slotValue = computed(() => value.value[index.value] ?? '')
+const slotValue = computed(() => getOTPCharacter(value.value, index.value))
 const inputState = computed(() => getOtpFieldInputState(state.value, slotValue.value, index.value))
 
 const externalAriaLabel = computed(() => attrs['aria-label'] as string | undefined)
@@ -136,8 +136,9 @@ function onInput(event: Event) {
         createChangeEventDetails(REASONS.inputClear, event),
       )
     }
-    else if (slotValue.value !== '') {
-      target.value = slotValue.value
+    target.value = slotValue.value
+
+    if (slotValue.value !== '') {
       target.select()
     }
     return
@@ -155,7 +156,7 @@ function onInput(event: Event) {
   const committedValue = setValue(nextValue, createChangeEventDetails(REASONS.inputChange, event))
 
   if (committedValue != null) {
-    const nextInput = Math.min(index.value + nextDigits.length, length.value - 1)
+    const nextInput = Math.min(index.value + getOTPValueLength(nextDigits), length.value - 1)
     queueFocusInput(nextInput, committedValue)
   }
 }
@@ -167,7 +168,7 @@ function onKeydown(event: KeyboardEvent) {
 
   const firstIndex = 0
   const lastIndex = Math.max(length.value - 1, firstIndex)
-  const endTargetIndex = Math.min(value.value.length, lastIndex)
+  const endTargetIndex = Math.min(getOTPValueLength(value.value), lastIndex)
   const hasBoundaryModifier = (event.ctrlKey || event.metaKey) && !event.altKey
   const isRtl = direction.value === 'rtl'
   const previousKey = isRtl ? 'ArrowRight' : 'ArrowLeft'
@@ -225,7 +226,7 @@ function onKeydown(event: KeyboardEvent) {
   const inputValue = target.value
   const fullSelection = target.selectionStart === 0 && target.selectionEnd === inputValue.length
 
-  if (event.key.length === 1 && fullSelection && slotValue.value === event.key) {
+  if (getOTPValueLength(event.key) === 1 && fullSelection && slotValue.value === event.key) {
     stopEvent(event)
     if (index.value < length.value - 1) {
       focusInput(index.value + 1)
@@ -278,7 +279,7 @@ function onPaste(event: ClipboardEvent) {
   )
 
   if (committedValue != null) {
-    const nextInput = Math.min(index.value + nextDigits.length, length.value - 1)
+    const nextInput = Math.min(index.value + getOTPValueLength(nextDigits), length.value - 1)
     queueFocusInput(nextInput, committedValue)
   }
 }
@@ -288,7 +289,7 @@ const inputProps = computed(() => mergeProps(
   {
     'id': getInputId(index.value),
     'value': slotValue.value,
-    'type': mask.value ? 'password' : 'text',
+    'type': attrsObject.type ?? (mask.value ? 'password' : 'text'),
     'inputmode': inputMode.value,
     'autocomplete': index.value === 0 ? autoComplete.value : 'off',
     'autocorrect': 'off',

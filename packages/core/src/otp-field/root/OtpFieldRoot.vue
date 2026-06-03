@@ -25,7 +25,7 @@ import { useRenderElement } from '../../utils/useRenderElement'
 import { useValueChanged } from '../../utils/useValueChanged'
 import { visuallyHidden, visuallyHiddenInput } from '../../utils/visuallyHidden'
 import { warn } from '../../utils/warn'
-import { getOTPValidationConfig, normalizeOTPValue, normalizeOTPValueWithDetails } from '../utils/otp'
+import { getOTPValidationConfig, getOTPValueLength, normalizeOTPValue, normalizeOTPValueWithDetails } from '../utils/otp'
 import { rootStateAttributesMapping } from '../utils/stateAttributesMapping'
 import { otpFieldRootContextKey } from './OtpFieldRootContext'
 
@@ -204,6 +204,7 @@ const { value: valueUnwrapped, setValue: setValueUnwrapped } = useControllableSt
 const value = computed(() =>
   normalizeOTPValue(valueUnwrapped.value, length.value, validationType.value, normalizeValueProp.value),
 )
+const valueLength = computed(() => getOTPValueLength(value.value))
 const filled = computed(() => value.value !== '')
 
 const rootRef = ref<HTMLElement | null>(null)
@@ -222,7 +223,7 @@ let pendingFocus: { index: number, value: string } | null = null
 let pendingCompleteValue: { value: string, eventDetails: OtpFieldRootCompleteEventDetails } | null = null
 
 const inputCount = ref(0)
-const focusedIndex = ref(Math.min(value.value.length, length.value - 1))
+const focusedIndex = ref(Math.min(valueLength.value, length.value - 1))
 const focused = ref(false)
 
 const id = useLabelableId({ id: computed(() => props.id) })
@@ -255,7 +256,7 @@ const hasValidLength = computed(() => Number.isInteger(length.value) && length.v
 const activeIndex = computed(() =>
   focused.value
     ? Math.min(focusedIndex.value, Math.max(length.value - 1, 0))
-    : Math.min(value.value.length, length.value - 1),
+    : Math.min(valueLength.value, length.value - 1),
 )
 
 watchEffect(() => {
@@ -329,9 +330,10 @@ function setValue(nextValue: string, details: OtpFieldRootChangeEventDetails): s
     validationType.value,
     normalizeValueProp.value,
   )
+  const normalizedValueLength = getOTPValueLength(normalizedValue)
   const completeEventDetails
-    = normalizedValue.length === length.value
-      && (currentValue.length !== length.value || details.reason === REASONS.inputPaste)
+    = normalizedValueLength === length.value
+      && (getOTPValueLength(currentValue) !== length.value || details.reason === REASONS.inputPaste)
       ? getCompleteEventDetails(details)
       : null
 
@@ -354,7 +356,7 @@ function setValue(nextValue: string, details: OtpFieldRootChangeEventDetails): s
   if (completeEventDetails != null) {
     pendingCompleteValue = { value: normalizedValue, eventDetails: completeEventDetails }
   }
-  else if (normalizedValue.length !== length.value) {
+  else if (normalizedValueLength !== length.value) {
     pendingCompleteValue = null
   }
 
@@ -366,8 +368,8 @@ function reportValueInvalid(invalidValue: string, details: OtpFieldRootInvalidEv
 }
 
 function handleInputFocus(index: number, event: FocusEvent) {
-  if (index > value.value.length) {
-    focusInput(Math.min(value.value.length, length.value - 1))
+  if (index > valueLength.value) {
+    focusInput(Math.min(valueLength.value, length.value - 1))
     return
   }
 
@@ -426,7 +428,7 @@ useValueChanged(value, () => {
 
 const state = computed<OtpFieldRootState>(() => ({
   ...fieldState.value,
-  complete: value.value.length === length.value,
+  complete: valueLength.value === length.value,
   disabled: disabled.value,
   filled: filled.value,
   focused: focused.value,
@@ -533,7 +535,7 @@ function handleHiddenInput(event: Event) {
   )
 
   if (committedValue != null && committedValue !== '') {
-    queueFocusInput(committedValue.length - 1, committedValue)
+    queueFocusInput(getOTPValueLength(committedValue) - 1, committedValue)
   }
 }
 

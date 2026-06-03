@@ -144,6 +144,7 @@ describe('<OtpFieldRoot />', () => {
 
       expect(onValueInvalid).toHaveBeenCalled()
       expect(onValueChange).not.toHaveBeenCalled()
+      expect(inputs[0]).toHaveValue('')
     })
 
     it('accepts letters when validationType is alpha', async () => {
@@ -199,6 +200,33 @@ describe('<OtpFieldRoot />', () => {
 
       expect(onValueComplete).toHaveBeenCalled()
       expect(onValueComplete.mock.lastCall?.[0]).toBe('123')
+    })
+
+    it('treats non-BMP characters as one slot when validation is disabled', async () => {
+      const user = userEvent.setup()
+      const onValueComplete = vi.fn()
+
+      render(
+        createApp({
+          setup: () => ({ onValueComplete }),
+          template: `
+            <FieldRoot>
+              <OtpFieldRoot :length="1" validation-type="none" @value-complete="onValueComplete">
+                <OtpFieldInput />
+              </OtpFieldRoot>
+            </FieldRoot>
+          `,
+        }),
+      )
+
+      const input = screen.getByRole('textbox') as HTMLInputElement
+      await user.click(input)
+      await user.paste('😀')
+      await flushPromises()
+
+      expect(onValueComplete).toHaveBeenCalled()
+      expect(onValueComplete.mock.lastCall?.[0]).toBe('😀')
+      expect(input).toHaveValue('😀')
     })
   })
 
