@@ -88,6 +88,7 @@ export default defineConfig({
           { text: 'Input', link: '/docs/components/input' },
           { text: 'Meter', link: '/docs/components/meter' },
           { text: 'Number Field', link: '/docs/components/number-field' },
+          { text: 'OTP Field', link: '/docs/components/otp-field' },
           { text: 'Progress', link: '/docs/components/progress' },
           { text: 'Separator', link: '/docs/components/separator' },
           { text: 'Slider', link: '/docs/components/slider' },
