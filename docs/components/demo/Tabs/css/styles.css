@@ -1,0 +1,116 @@
+.Tabs {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 20rem;
+  --tabs-text-color: oklch(43.9% 0 0deg);
+  --tabs-strong-color: oklch(14.5% 0 0deg);
+  --tabs-surface-color: white;
+}
+
+.dark .Tabs {
+  --tabs-text-color: oklch(87% 0 0deg);
+  --tabs-strong-color: white;
+  --tabs-surface-color: oklch(14.5% 0 0deg);
+}
+
+.Tabs .List {
+  display: flex;
+  position: relative;
+  z-index: 1;
+  gap: 0.25rem;
+  margin-bottom: -1px;
+}
+
+.Tabs .Tab {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  margin: 0;
+  outline: 0;
+  background: none;
+  color: var(--tabs-text-color);
+  font-family: inherit;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: 400;
+  -webkit-user-select: none;
+  user-select: none;
+  white-space: nowrap;
+  word-break: keep-all;
+  padding-inline: 0.5rem;
+  padding-block: 0;
+  height: calc(2rem + 1px);
+
+  @media (hover: hover) {
+    &:hover {
+      color: var(--tabs-strong-color);
+    }
+  }
+
+  &[data-active] {
+    color: var(--tabs-strong-color);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--tabs-strong-color);
+    outline-offset: -1px;
+  }
+}
+
+.Tabs .Indicator {
+  box-sizing: border-box;
+  position: absolute;
+  z-index: -1;
+  left: 0;
+  top: 0;
+  translate: var(--active-tab-left);
+  width: var(--active-tab-width);
+  height: 100%;
+  transition-property: translate, width;
+  transition-duration: 150ms;
+  transition-timing-function: ease-in-out;
+  border-top: 1px solid var(--tabs-strong-color);
+  border-inline: 1px solid var(--tabs-strong-color);
+  background-color: var(--tabs-surface-color);
+}
+
+.Tabs .PanelViewport {
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  width: 100%;
+  min-height: 8rem;
+  border: 1px solid var(--tabs-strong-color);
+}
+
+.Tabs .Panel {
+  box-sizing: border-box;
+  grid-area: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 1rem;
+  outline: 0;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  text-align: center;
+  color: var(--tabs-strong-color);
+  background-color: var(--tabs-surface-color);
+
+  &:focus-visible {
+    outline: 2px solid var(--tabs-strong-color);
+    outline-offset: -1px;
+    z-index: 1;
+  }
+
+  &[hidden] {
+    display: none;
+  }
+}
+
+.Tabs .Paragraph {
+  margin: 0;
+}

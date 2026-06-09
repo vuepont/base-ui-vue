@@ -95,6 +95,7 @@ export default defineConfig({
           { text: 'Slider', link: '/docs/components/slider' },
           { text: 'Switch', link: '/docs/components/switch' },
           { text: 'Scroll Area', link: '/docs/components/scroll-area' },
+          { text: 'Tabs', link: '/docs/components/tabs' },
           { text: 'Toggle', link: '/docs/components/toggle' },
           { text: 'Toggle Group', link: '/docs/components/toggle-group' },
           { text: 'Toolbar', link: '/docs/components/toolbar' },
