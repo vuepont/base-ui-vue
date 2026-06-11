@@ -1,9 +1,10 @@
-<script setup lang="ts" generic="Value = any">
-import type { Ref } from 'vue'
+<script setup lang="ts" generic="Value = unknown">
+import type { InjectionKey, Ref } from 'vue'
 import type { FieldRootState } from '../field/root/FieldRoot.vue'
 import type { BaseUIChangeEventDetails } from '../utils/createBaseUIEventDetails'
 import type { REASONS } from '../utils/reasons'
 import type { BaseUIComponentProps } from '../utils/types'
+import type { RadioGroupContext } from './RadioGroupContext'
 import { computed, provide, ref, useAttrs, watch } from 'vue'
 import { SHIFT } from '../composite/composite'
 import CompositeRoot from '../composite/root/CompositeRoot.vue'
@@ -35,7 +36,7 @@ export interface RadioGroupState extends FieldRootState {
   required: boolean
 }
 
-export interface RadioGroupProps<Value = any> extends BaseUIComponentProps<RadioGroupState> {
+export interface RadioGroupProps<Value = unknown> extends BaseUIComponentProps<RadioGroupState> {
   /**
    * Whether the component should ignore user interaction.
    * @default false
@@ -116,7 +117,7 @@ const emit = defineEmits<{
 const MODIFIER_KEYS = [SHIFT]
 
 const attrs = useAttrs()
-const attrsObject = attrs as Record<string, any>
+const attrsObject = attrs as Record<string, unknown>
 
 const {
   disabled: fieldDisabled,
@@ -144,9 +145,9 @@ const name = computed(() => fieldName.value ?? props.name)
 const groupId = useBaseUiId(props.id)
 const id = computed(() => props.id ?? groupId)
 
-const { value: checkedValue, setValue: setCheckedValueState } = useControllableState<any>({
-  controlled: () => props.value as any,
-  default: () => props.defaultValue as any,
+const { value: checkedValue, setValue: setCheckedValueState } = useControllableState<unknown>({
+  controlled: () => props.value,
+  default: () => props.defaultValue,
   name: 'RadioGroup',
   state: 'value',
 })
@@ -227,12 +228,12 @@ function getFormValue() {
 }
 
 function combineDescriptionProps(
-  ...sources: Array<Record<string, any>>
+  ...sources: object[]
 ) {
   const describedBy = Array.from(
     new Set(
       sources
-        .map(source => source['aria-describedby'])
+        .map(source => (source as { 'aria-describedby'?: unknown })['aria-describedby'])
         .filter(Boolean)
         .flatMap(value => String(value).split(/\s+/).filter(Boolean)),
     ),
@@ -273,7 +274,6 @@ watch(
       assignInputRef(fallbackInput)
     }
   },
-  { flush: 'sync' },
 )
 
 function handleFocusIn() {
@@ -309,13 +309,13 @@ const state = computed<RadioGroupState>(() => ({
   required: props.required,
 }))
 
-provide(radioGroupContextKey, {
+const contextValue: RadioGroupContext<Value> = {
   disabled,
   readOnly: computed(() => props.readOnly),
   required: computed(() => props.required),
   form: computed(() => props.form),
   name,
-  checkedValue,
+  checkedValue: checkedValue as Readonly<Ref<Value | undefined>>,
   touched,
   validation,
   setCheckedValue,
@@ -324,7 +324,9 @@ provide(radioGroupContextKey, {
   },
   registerControlRef,
   registerInputRef,
-})
+}
+
+provide(radioGroupContextKey as InjectionKey<RadioGroupContext<Value>>, contextValue)
 
 const forwardedAttrs = computed(() => {
   const {

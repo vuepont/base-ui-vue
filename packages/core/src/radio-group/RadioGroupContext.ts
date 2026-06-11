@@ -4,7 +4,7 @@ import type { BaseUIChangeEventDetails } from '../utils/createBaseUIEventDetails
 import type { REASONS } from '../utils/reasons'
 import { inject } from 'vue'
 
-export interface RadioGroupContext<Value = any> {
+export interface RadioGroupContext<Value = unknown> {
   disabled: Readonly<Ref<boolean | undefined>>
   readOnly: Readonly<Ref<boolean | undefined>>
   required: Readonly<Ref<boolean | undefined>>
@@ -22,16 +22,16 @@ export interface RadioGroupContext<Value = any> {
   registerInputRef: (element: HTMLInputElement | null, checked?: boolean) => void
 }
 
-export const radioGroupContextKey: InjectionKey<RadioGroupContext<any>> = Symbol(
+export const radioGroupContextKey: InjectionKey<RadioGroupContext<unknown>> = Symbol(
   'RadioGroupContext',
 )
 
-export function useRadioGroupContext(
+export function useRadioGroupContext<Value = unknown>(
   optional: true,
-): RadioGroupContext | undefined
-export function useRadioGroupContext(optional?: false): RadioGroupContext
-export function useRadioGroupContext(optional = false) {
-  const context = inject(radioGroupContextKey, undefined)
+): RadioGroupContext<Value> | undefined
+export function useRadioGroupContext<Value = unknown>(optional?: false): RadioGroupContext<Value>
+export function useRadioGroupContext<Value = unknown>(optional = false) {
+  const context = inject(radioGroupContextKey, undefined) as RadioGroupContext<Value> | undefined
   if (!context && !optional) {
     throw new Error(
       'Base UI Vue: RadioGroupContext is missing. Radio parts must be placed within a radio group.',

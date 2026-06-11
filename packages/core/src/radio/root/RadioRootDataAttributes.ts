@@ -36,7 +36,7 @@ export enum RadioRootDataAttributes {
    */
   dirty = 'data-dirty',
   /**
-   * Present when the radio is checked.
+   * Present when the radio field has a value.
    */
   filled = 'data-filled',
   /**

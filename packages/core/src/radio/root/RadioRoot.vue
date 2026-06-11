@@ -1,4 +1,4 @@
-<script setup lang="ts" generic="Value = any">
+<script setup lang="ts" generic="Value = unknown">
 import type { Ref } from 'vue'
 import type { FieldRootState } from '../../field/root/FieldRoot.vue'
 import type { BaseUIChangeEventDetails } from '../../utils/createBaseUIEventDetails'
@@ -50,7 +50,7 @@ export interface RadioRootState extends FieldRootState {
 export type RadioRootChangeEventReason = typeof REASONS.none
 export type RadioRootChangeEventDetails = BaseUIChangeEventDetails<RadioRootChangeEventReason>
 
-export interface RadioRootProps<Value = any>
+export interface RadioRootProps<Value = unknown>
   extends NonNativeButtonProps, BaseUIComponentProps<RadioRootState> {
   /**
    * The id of the radio control.
@@ -107,7 +107,7 @@ const props = withDefaults(defineProps<RadioRootProps<Value>>(), {
 })
 
 const attrs = useAttrs()
-const attrsObject = attrs as Record<string, any>
+const attrsObject = attrs as Record<string, unknown>
 
 const { clearErrors } = useFormContext()
 const {
@@ -125,7 +125,7 @@ const {
 } = useFieldRootContext()
 const fieldItemContext = useFieldItemContext()
 const labelableContext = useLabelableContext()
-const groupContext = useRadioGroupContext(true)
+const groupContext = useRadioGroupContext<Value>(true)
 
 const disabled = computed(() =>
   fieldDisabled.value
@@ -237,7 +237,6 @@ watch(
       void validation.commit(nextValue, true)
     }
   },
-  { flush: 'sync' },
 )
 
 const { getButtonProps, buttonRef } = useButton({

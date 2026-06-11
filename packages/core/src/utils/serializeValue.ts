@@ -8,7 +8,8 @@ export function serializeValue(value: unknown): string {
   }
 
   try {
-    return JSON.stringify(value)
+    const serializedValue = JSON.stringify(value)
+    return serializedValue === undefined ? 'null' : serializedValue
   }
   catch {
     return String(value)

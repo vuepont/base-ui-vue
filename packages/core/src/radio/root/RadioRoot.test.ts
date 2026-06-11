@@ -368,7 +368,7 @@ describe('<RadioRoot />', () => {
     expect(radio).toHaveAttribute('data-checked', '')
   })
 
-  it('uses the standalone React fallback checked state for an empty value', () => {
+  it('uses the standalone fallback checked state for an empty value', () => {
     render(createRadioApp({
       template: `<RadioRoot value="" data-testid="radio" />`,
     }))
