@@ -23,4 +23,8 @@ describe('serializeValue', () => {
     expect(serializeValue(unstringifiable)).toBe('null')
     expect(serializeValue(Symbol('value'))).toBe('null')
   })
+
+  it('returns a fallback string when JSON serialization throws', () => {
+    expect(serializeValue(1n)).toBe('1')
+  })
 })
