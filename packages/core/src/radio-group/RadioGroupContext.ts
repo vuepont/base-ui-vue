@@ -19,7 +19,7 @@ export interface RadioGroupContext<Value = any> {
   ) => void
   setTouched: (value: boolean) => void
   registerControlRef: (element: HTMLElement | null, disabled?: boolean) => void
-  registerInputRef: (element: HTMLInputElement | null) => void
+  registerInputRef: (element: HTMLInputElement | null, checked?: boolean) => void
 }
 
 export const radioGroupContextKey: InjectionKey<RadioGroupContext<any>> = Symbol(

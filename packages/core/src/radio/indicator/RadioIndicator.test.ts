@@ -1,9 +1,59 @@
 import userEvent from '@testing-library/user-event'
-import { render, screen, waitFor } from '@testing-library/vue'
+import { fireEvent, render, screen, waitFor } from '@testing-library/vue'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { defineComponent, ref } from 'vue'
 import { RadioIndicator, RadioRoot } from '..'
+import { RadioGroup } from '../../radio-group'
 import { Slot } from '../../utils/slot'
+
+function createDeferred() {
+  let resolve!: () => void
+  const promise = new Promise<void>((res) => {
+    resolve = res
+  })
+  return { promise, resolve }
+}
+
+function createAnimationStub(finishedSignal: Promise<void>): Animation {
+  let animation!: Animation
+
+  const ready = Promise.resolve().then(() => animation)
+  const finished = finishedSignal.then(() => animation)
+
+  animation = {
+    currentTime: null,
+    effect: null,
+    finished,
+    id: '',
+    oncancel: null,
+    onfinish: null,
+    onremove: null,
+    playState: 'running',
+    playbackRate: 1,
+    pending: false,
+    ready,
+    replaceState: 'active',
+    startTime: null,
+    timeline: null,
+    cancel() {},
+    commitStyles() {},
+    finish() {},
+    pause() {},
+    persist() {},
+    play() {
+      return Promise.resolve(animation)
+    },
+    reverse() {},
+    updatePlaybackRate() {},
+    addEventListener() {},
+    removeEventListener() {},
+    dispatchEvent() {
+      return true
+    },
+  }
+
+  return animation
+}
 
 describe('<RadioIndicator />', () => {
   let originalAnimationsDisabled: unknown
@@ -95,31 +145,168 @@ describe('<RadioIndicator />', () => {
     expect(indicator).toHaveAttribute('data-checked', '')
   })
 
-  it('removes the indicator when unchecked after being checked', async () => {
+  it('should remove the indicator when there is no exit animation defined', async () => {
     const user = userEvent.setup()
 
     render(defineComponent({
-      components: { RadioIndicator, RadioRoot },
+      components: { RadioGroup, RadioIndicator, RadioRoot },
       setup() {
-        const value = ref('')
+        const value = ref('a')
         return { value }
       },
       template: `
         <div>
-          <button type="button" @click="value = 'a'">Uncheck</button>
-          <RadioRoot :value="value">
-            <RadioIndicator data-testid="indicator" />
-          </RadioRoot>
+          <button type="button" @click="value = 'b'">Close</button>
+          <RadioGroup :value="value">
+            <RadioRoot value="a">
+              <RadioIndicator data-testid="indicator-a" />
+            </RadioRoot>
+            <RadioRoot value="a">
+              <RadioIndicator />
+            </RadioRoot>
+          </RadioGroup>
         </div>
       `,
     }))
 
-    expect(screen.getByTestId('indicator')).toBeDefined()
+    expect(screen.getByTestId('indicator-a')).toBeDefined()
 
-    await user.click(screen.getByRole('button', { name: 'Uncheck' }))
+    await user.click(screen.getByRole('button', { name: 'Close' }))
 
     await waitFor(() => {
-      expect(screen.queryByTestId('indicator')).toBeNull()
+      expect(screen.queryByTestId('indicator-a')).toBeNull()
+    })
+  })
+
+  it('should remove the indicator when the animation finishes', async () => {
+    const user = userEvent.setup()
+    ;(globalThis as any).BASE_UI_ANIMATIONS_DISABLED = false
+
+    const deferred = createDeferred()
+
+    render(defineComponent({
+      components: { RadioGroup, RadioIndicator, RadioRoot },
+      setup() {
+        const value = ref('a')
+        return { value }
+      },
+      template: `
+        <div>
+          <button type="button" @click="value = 'b'">Close</button>
+          <RadioGroup :value="value">
+            <RadioRoot value="a">
+              <RadioIndicator data-testid="indicator-a" />
+            </RadioRoot>
+            <RadioRoot value="a">
+              <RadioIndicator />
+            </RadioRoot>
+          </RadioGroup>
+        </div>
+      `,
+    }))
+
+    const indicator = screen.getByTestId('indicator-a')
+    indicator.getAnimations = () => [createAnimationStub(deferred.promise)]
+
+    await user.click(screen.getByRole('button', { name: 'Close' }))
+
+    await waitFor(() => {
+      expect(screen.getByTestId('indicator-a')).toHaveAttribute('data-ending-style')
+    })
+
+    deferred.resolve()
+
+    await waitFor(() => {
+      expect(screen.queryByTestId('indicator-a')).toBeNull()
+    })
+  })
+
+  describe('animations', () => {
+    afterEach(() => {
+      ;(globalThis as any).BASE_UI_ANIMATIONS_DISABLED = true
+    })
+
+    it('triggers enter animation via data-starting-style when mounting', async () => {
+      ;(globalThis as any).BASE_UI_ANIMATIONS_DISABLED = false
+
+      render(defineComponent({
+        components: { RadioGroup, RadioIndicator, RadioRoot },
+        setup() {
+          const value = ref('b')
+          return { value }
+        },
+        template: `
+          <div>
+            <button type="button" @click="value = 'a'">Select a</button>
+            <RadioGroup :value="value">
+              <RadioRoot value="a">
+                <RadioIndicator data-testid="indicator-a" />
+              </RadioRoot>
+              <RadioRoot value="b">
+                <RadioIndicator data-testid="indicator-b" />
+              </RadioRoot>
+            </RadioGroup>
+          </div>
+        `,
+      }))
+
+      expect(screen.queryByTestId('indicator-a')).toBeNull()
+
+      await fireEvent.click(screen.getByText('Select a'))
+
+      const indicator = screen.getByTestId('indicator-a')
+      expect(indicator).toHaveAttribute('data-starting-style')
+
+      await waitFor(() => {
+        expect(indicator).not.toHaveAttribute('data-starting-style')
+      })
+
+      expect(screen.getByTestId('indicator-a')).toBeDefined()
+    })
+
+    it('applies data-ending-style before unmount', async () => {
+      const user = userEvent.setup()
+      ;(globalThis as any).BASE_UI_ANIMATIONS_DISABLED = false
+
+      const deferred = createDeferred()
+
+      render(defineComponent({
+        components: { RadioGroup, RadioIndicator, RadioRoot },
+        setup() {
+          const value = ref('a')
+          return { value }
+        },
+        template: `
+          <div>
+            <button type="button" @click="value = 'b'">Select b</button>
+            <RadioGroup :value="value">
+              <RadioRoot value="a">
+                <RadioIndicator data-testid="indicator-a" />
+              </RadioRoot>
+              <RadioRoot value="b">
+                <RadioIndicator data-testid="indicator-b" />
+              </RadioRoot>
+            </RadioGroup>
+          </div>
+        `,
+      }))
+
+      const indicator = screen.getByTestId('indicator-a')
+      indicator.getAnimations = () => [createAnimationStub(deferred.promise)]
+
+      await user.click(screen.getByText('Select b'))
+
+      await waitFor(() => {
+        expect(screen.getByTestId('indicator-a')).toHaveAttribute('data-ending-style')
+      })
+
+      expect(screen.getByTestId('indicator-a')).toBeDefined()
+
+      deferred.resolve()
+
+      await waitFor(() => {
+        expect(screen.queryByTestId('indicator-a')).toBeNull()
+      })
     })
   })
 })

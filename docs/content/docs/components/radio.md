@@ -12,7 +12,7 @@ An easily stylable radio button component.
 ## Usage guidelines
 
 - **Radio buttons must be grouped**: Use `RadioGroup` to provide shared value state, keyboard navigation, and form behavior.
-- **Form controls must have an accessible name**: Label the group with `aria-labelledby`, `Fieldset`, or `Field`, and label each radio with a `<label>` element. See the [forms guide](/docs/handbook/forms).
+- **Form controls must have an accessible name**: Label the radio group with `aria-labelledby` or `FieldsetLegend`, and label each radio with a native `<label>` or `FieldLabel`. See [Labeling a radio group](#labeling-a-radio-group) and the [forms guide](/docs/handbook/forms).
 
 ## Anatomy
 
@@ -24,8 +24,8 @@ import { RadioGroup, RadioIndicator, RadioRoot } from 'base-ui-vue'
 </script>
 
 <template>
-  <RadioGroup default-value="ssd">
-    <RadioRoot value="ssd">
+  <RadioGroup>
+    <RadioRoot>
       <RadioIndicator />
     </RadioRoot>
   </RadioGroup>
@@ -111,6 +111,8 @@ Use [Field](/docs/components/field) and [Fieldset](/docs/components/fieldset) fo
 ```vue title="Using Radio in a form"
 <script setup lang="ts">
 import {
+  FieldItem,
+  FieldLabel,
   FieldRoot,
   FieldsetLegend,
   FieldsetRoot,
@@ -125,14 +127,18 @@ import {
     <FieldRoot name="storageType">
       <FieldsetRoot :as="RadioGroup" default-value="ssd">
         <FieldsetLegend>Storage type</FieldsetLegend>
-        <label>
-          <RadioRoot value="ssd" />
-          SSD
-        </label>
-        <label>
-          <RadioRoot value="hdd" />
-          HDD
-        </label>
+        <FieldItem>
+          <FieldLabel>
+            <RadioRoot value="ssd" />
+            SSD
+          </FieldLabel>
+        </FieldItem>
+        <FieldItem>
+          <FieldLabel>
+            <RadioRoot value="hdd" />
+            HDD
+          </FieldLabel>
+        </FieldItem>
       </FieldsetRoot>
     </FieldRoot>
   </Form>
@@ -142,6 +148,8 @@ import {
 ## API reference
 
 ### Group
+
+Provides a shared state to a series of radio buttons. Renders a `<div>` element.
 
 | Prop | Type | Default | Description |
 | ---- | ---- | ------- | ----------- |
@@ -175,6 +183,8 @@ import {
 
 ### Root
 
+Represents the radio button itself. Renders a `<span>` element and a hidden `<input>` beside.
+
 | Prop | Type | Default | Description |
 | ---- | ---- | ------- | ----------- |
 | `as` | `string \| Component` | `'span'` | The element or component used for the radio root. |
@@ -202,6 +212,8 @@ import {
 | `data-focused` | Present when the radio is focused. |
 
 ### Indicator
+
+Indicates whether the radio button is selected. Renders a `<span>` element.
 
 | Prop | Type | Default | Description |
 | ---- | ---- | ------- | ----------- |

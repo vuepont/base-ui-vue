@@ -14,11 +14,11 @@ import { useFieldsetRootContext } from '../fieldset/root/FieldsetRootContext'
 import { useFormContext } from '../form/FormContext'
 import { useLabelableContext } from '../labelable-provider/LabelableContext'
 import { mergeProps } from '../merge-props/mergeProps'
-import { radioGroupContextKey } from '../radio/RadioGroupContext'
 import { Slot } from '../utils/slot'
 import { useBaseUiId } from '../utils/useBaseUiId'
 import { useControllableState } from '../utils/useControllableState'
 import { useMergedRefs } from '../utils/useMergedRefs'
+import { radioGroupContextKey } from './RadioGroupContext'
 
 export interface RadioGroupState extends FieldRootState {
   /**
@@ -154,7 +154,8 @@ const { value: checkedValue, setValue: setCheckedValueState } = useControllableS
 const touched = ref(false)
 const controlRef = ref<HTMLElement | null>(null)
 const groupInputRef = ref<HTMLInputElement | null>(null)
-const firstEnabledInputRef = ref<HTMLInputElement | null>(null)
+let currentInputElement: HTMLInputElement | null = null
+let firstEnabledInputElement: HTMLInputElement | null = null
 const setInputRef = useMergedRefs(
   groupInputRef,
   props.inputRef,
@@ -164,6 +165,11 @@ const setInputRef = useMergedRefs(
 )
 
 function assignInputRef(element: HTMLInputElement | null) {
+  if (currentInputElement === element) {
+    return
+  }
+
+  currentInputElement = element
   setInputRef?.(element)
 }
 
@@ -197,28 +203,45 @@ function registerControlRef(element: HTMLElement | null, isDisabled = false) {
   }
 }
 
-function registerInputRef(input: HTMLInputElement | null) {
+function registerInputRef(input: HTMLInputElement | null, checked = Boolean(input?.checked)) {
   if (!input || input.disabled) {
     return
   }
 
-  if (!firstEnabledInputRef.value) {
-    firstEnabledInputRef.value = input
+  if (!firstEnabledInputElement) {
+    firstEnabledInputElement = input
   }
 
-  const currentInput = groupInputRef.value
-  if (input.checked || currentInput == null || currentInput.disabled) {
+  if (checked || currentInputElement == null || currentInputElement.disabled) {
     assignInputRef(input)
   }
 }
 
 function getFormValue() {
-  const input = groupInputRef.value
+  const input = currentInputElement
   if (!input || input.disabled || !input.checked) {
     return null
   }
 
   return checkedValue.value ?? null
+}
+
+function combineDescriptionProps(
+  ...sources: Array<Record<string, any>>
+) {
+  const describedBy = Array.from(
+    new Set(
+      sources
+        .map(source => source['aria-describedby'])
+        .filter(Boolean)
+        .flatMap(value => String(value).split(/\s+/).filter(Boolean)),
+    ),
+  ).join(' ') || undefined
+
+  return {
+    ...Object.assign({}, ...sources),
+    'aria-describedby': describedBy,
+  }
 }
 
 useField({
@@ -245,7 +268,7 @@ watch(
       void validation.commit(nextValue, true)
     }
 
-    const fallbackInput = firstEnabledInputRef.value
+    const fallbackInput = firstEnabledInputElement
     if (nextValue == null && fallbackInput && !fallbackInput.disabled) {
       assignInputRef(fallbackInput)
     }
@@ -274,7 +297,6 @@ function handleFocusOut(event: FocusEvent) {
 
 function handleKeydownCapture(event: KeyboardEvent) {
   if (event.key.startsWith('Arrow')) {
-    setFieldTouched(true)
     touched.value = true
     setFocused(true)
   }
@@ -305,14 +327,21 @@ provide(radioGroupContextKey, {
 })
 
 const forwardedAttrs = computed(() => {
-  const { class: _class, style: _style, ...rest } = attrsObject
+  const {
+    class: _class,
+    style: _style,
+    'aria-describedby': _ariaDescribedBy,
+    ...rest
+  } = attrsObject
   return rest
 })
 
 const rootProps = computed(() => mergeProps(
-  forwardedAttrs.value,
-  labelableContext.getDescriptionProps(),
-  validation.getValidationProps(),
+  combineDescriptionProps(
+    { 'aria-describedby': attrsObject['aria-describedby'] },
+    labelableContext.getDescriptionProps(),
+    validation.getValidationProps(),
+  ),
   {
     'id': id.value,
     'role': 'radiogroup',
@@ -324,6 +353,7 @@ const rootProps = computed(() => mergeProps(
     'onFocusout': handleFocusOut,
     'onKeydownCapture': handleKeydownCapture,
   },
+  forwardedAttrs.value,
 ))
 </script>
 

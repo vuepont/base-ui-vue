@@ -42,11 +42,22 @@ describe('<RadioRoot />', () => {
     expect(radio.tagName).toBe('SPAN')
     expect(radio).toHaveAttribute('role', 'radio')
     expect(radio).toHaveAttribute('aria-checked', 'true')
-    expect(radio).not.toHaveAttribute('value')
     expect(input).toBeInstanceOf(HTMLInputElement)
     expect(input.name).toBe('choice')
     expect(input.value).toBe('a')
     expect(input.checked).toBe(true)
+  })
+
+  it('does not forward `value` prop', () => {
+    render(createRadioApp({
+      template: `
+        <RadioGroup>
+          <RadioRoot value="test" data-testid="radio-root" />
+        </RadioGroup>
+      `,
+    }))
+
+    expect(screen.getByTestId('radio-root')).not.toHaveAttribute('value')
   })
 
   it('updates checked state through the group context when clicked', async () => {
@@ -73,7 +84,7 @@ describe('<RadioRoot />', () => {
     expect(radioB).toHaveAttribute('aria-checked', 'true')
   })
 
-  it('allows a null value in a group', async () => {
+  it('allows `null` value', async () => {
     const user = userEvent.setup()
 
     render(createRadioApp({
@@ -202,7 +213,7 @@ describe('<RadioRoot />', () => {
     expect(radioB).toHaveAttribute('aria-checked', 'true')
   })
 
-  it('associates the id with the native button when native-button=true', async () => {
+  it('associates `id` with the native button when `nativeButton=true`', async () => {
     const user = userEvent.setup()
 
     render(createRadioApp({
@@ -228,7 +239,7 @@ describe('<RadioRoot />', () => {
     expect(radioA).toHaveAttribute('aria-checked', 'true')
   })
 
-  it('sets aria-labelledby from a sibling label associated with the hidden input', async () => {
+  it('sets `aria-labelledby` from a sibling label associated with the hidden input', async () => {
     render(createRadioApp({
       template: `
         <div>
@@ -246,7 +257,7 @@ describe('<RadioRoot />', () => {
     expect(screen.getByRole('radio')).toHaveAttribute('aria-labelledby', label.id)
   })
 
-  it('updates fallback aria-labelledby when the hidden input id changes', async () => {
+  it('updates fallback `aria-labelledby` when the hidden input id changes', async () => {
     const user = userEvent.setup()
 
     render(createRadioApp({

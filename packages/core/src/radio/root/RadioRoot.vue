@@ -14,17 +14,17 @@ import { useLabelableContext } from '../../labelable-provider/LabelableContext'
 import { useAriaLabelledBy } from '../../labelable-provider/useAriaLabelledBy'
 import { useLabelableId } from '../../labelable-provider/useLabelableId'
 import { mergeProps } from '../../merge-props/mergeProps'
+import { useRadioGroupContext } from '../../radio-group/RadioGroupContext'
 import { useButton } from '../../use-button'
 import { createChangeEventDetails } from '../../utils/createBaseUIEventDetails'
 import { EMPTY_OBJECT } from '../../utils/empty'
 import { ownerWindow } from '../../utils/owner'
 import { REASONS } from '../../utils/reasons'
+import { serializeValue } from '../../utils/serializeValue'
 import { useBaseUiId } from '../../utils/useBaseUiId'
 import { useMergedRefs } from '../../utils/useMergedRefs'
 import { useRenderElement } from '../../utils/useRenderElement'
 import { visuallyHidden, visuallyHiddenInput } from '../../utils/visuallyHidden'
-import { useRadioGroupContext } from '../RadioGroupContext'
-import { serializeValue } from '../utils/serializeValue'
 import { stateAttributesMapping } from '../utils/stateAttributesMapping'
 import { radioRootContextKey } from './RadioRootContext'
 
@@ -154,6 +154,7 @@ const inputId = computed(() => (props.nativeButton ? undefined : controlId.value
 const controlRef = ref<HTMLElement | null>(null)
 const inputElementRef = ref<HTMLInputElement | null>(null)
 const mergedInputRef = useMergedRefs(inputElementRef, props.inputRef)
+let pendingInputClickEvent: Event | null = null
 
 useField({
   enabled: computed(() => !groupContext),
@@ -186,12 +187,14 @@ watchEffect((onCleanup) => {
   }
 
   if (groupContext) {
-    if (disabled.value && checked.value) {
+    const isChecked = checked.value
+
+    if (disabled.value && isChecked) {
       groupContext.registerInputRef(null)
       return
     }
 
-    groupContext.registerInputRef(input)
+    groupContext.registerInputRef(input, isChecked)
 
     onCleanup(() => {
       groupContext.registerInputRef(null)
@@ -248,12 +251,15 @@ function combineDescriptionProps<
 >(
   localProps: LocalProps,
   validationProps: ValidationProps,
+  externalProps: { 'aria-describedby'?: unknown } = {},
 ): LocalProps & ValidationProps & { 'aria-describedby'?: string } {
-  const localDescribedBy = (localProps as { 'aria-describedby'?: unknown })['aria-describedby']
-  const validationDescribedBy = (validationProps as { 'aria-describedby'?: unknown })['aria-describedby']
   const describedBy = Array.from(
     new Set(
-      [localDescribedBy, validationDescribedBy]
+      [
+        externalProps['aria-describedby'],
+        (localProps as { 'aria-describedby'?: unknown })['aria-describedby'],
+        (validationProps as { 'aria-describedby'?: unknown })['aria-describedby'],
+      ]
         .filter(Boolean)
         .flatMap(value => String(value).split(/\s+/).filter(Boolean)),
     ),
@@ -289,20 +295,25 @@ function applyCheckedValue(event: Event) {
     return false
   }
 
-  const details = createChangeEventDetails(REASONS.none, event)
+  const details = createChangeEventDetails(REASONS.none, pendingInputClickEvent ?? event)
 
   if (details.isCanceled) {
     return false
   }
 
+  if (groupContext) {
+    groupContext.setCheckedValue(props.value, details)
+    if (details.isCanceled) {
+      return false
+    }
+
+    setFieldTouched(true)
+    return !details.isCanceled
+  }
+
   setFieldTouched(true)
   setDirty(props.value !== validityData.value.initialValue)
   setFilled(true)
-
-  if (groupContext) {
-    groupContext.setCheckedValue(props.value, details)
-    return !details.isCanceled
-  }
 
   clearErrors(name.value)
 
@@ -316,6 +327,16 @@ function applyCheckedValue(event: Event) {
   return !details.isCanceled
 }
 
+function handleInputClick(event: MouseEvent) {
+  pendingInputClickEvent = event
+
+  queueMicrotask(() => {
+    if (pendingInputClickEvent === event) {
+      pendingInputClickEvent = null
+    }
+  })
+}
+
 function handleInputChange(event: Event) {
   if (event.defaultPrevented) {
     return
@@ -323,6 +344,7 @@ function handleInputChange(event: Event) {
 
   const target = event.currentTarget as HTMLInputElement
   const applied = applyCheckedValue(event)
+  pendingInputClickEvent = null
 
   if (!applied) {
     target.checked = checked.value
@@ -412,6 +434,7 @@ const passthroughAttrs = computed(() => {
     onKeyup,
     onMousedown,
     onPointerdown,
+    'aria-describedby': _ariaDescribedBy,
     ...rest
   } = attrsObject
 
@@ -430,7 +453,11 @@ const rootProps = computed(() => {
 
   return mergeProps(
     buttonProps,
-    combineDescriptionProps(localDescriptionProps, validationProps),
+    combineDescriptionProps(
+      localDescriptionProps,
+      validationProps,
+      { 'aria-describedby': attrsObject['aria-describedby'] },
+    ),
     {
       'id': props.nativeButton ? controlId.value : rootElementId,
       'role': 'radio',
@@ -482,6 +509,7 @@ const inputProps = computed(() => {
       'aria-hidden': true,
       'tabindex': -1,
       'style': name.value ? visuallyHiddenInput : visuallyHidden,
+      'onClick': handleInputClick,
       'onChange': handleInputChange,
       onFocus() {
         controlRef.value?.focus()
