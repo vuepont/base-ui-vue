@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import type { ComponentPublicInstance } from 'vue'
-import type { BaseUIComponentProps, Orientation } from '../../utils/types'
+import type { BaseUIComponentProps } from '../../utils/types'
 import type { TransitionStatus } from '../../utils/useTransitionStatus'
 import type { TabsRootState } from '../root/TabsRoot.vue'
-import type { TabsTabActivationDirection, TabsTabValue } from '../tab/TabsTab.vue'
+import type { TabsTabValue } from '../tab/TabsTab.vue'
 import { computed, ref, useAttrs, watch } from 'vue'
 import { useCompositeListItem } from '../../composite/list/useCompositeListItem'
+import { mergeProps } from '../../merge-props/mergeProps'
 import { transitionStatusMapping } from '../../utils/transitionStatusMapping'
 import { useBaseUiId } from '../../utils/useBaseUiId'
 import { useOpenChangeComplete } from '../../utils/useOpenChangeComplete'
@@ -13,6 +14,7 @@ import { useRenderElement } from '../../utils/useRenderElement'
 import { useTransitionStatus } from '../../utils/useTransitionStatus'
 import { tabsStateAttributesMapping } from '../root/stateAttributesMapping'
 import { useTabsRootContext } from '../root/TabsRootContext'
+import { areTabValuesEqual } from '../utils/areTabValuesEqual'
 import { TabsPanelDataAttributes } from './TabsPanelDataAttributes'
 
 export interface TabsPanelMetadata {
@@ -29,14 +31,6 @@ export interface TabsPanelState extends TabsRootState {
    * The transition status of the component.
    */
   transitionStatus: TransitionStatus
-  /**
-   * The component orientation.
-   */
-  orientation: Orientation
-  /**
-   * The direction used for tab activation.
-   */
-  tabActivationDirection: TabsTabActivationDirection
 }
 
 export interface TabsPanelProps extends BaseUIComponentProps<TabsPanelState> {
@@ -85,7 +79,7 @@ const { ref: listItemRef, index } = useCompositeListItem<TabsPanelMetadata>({
   metadata: () => metadata.value,
 })
 
-const open = computed(() => props.value === rootCtx.value.value)
+const open = computed(() => areTabValuesEqual(props.value, rootCtx.value.value))
 const { mounted, transitionStatus, setMounted } = useTransitionStatus(open)
 const hidden = computed(() => !mounted.value)
 const correspondingTabId = computed(() => rootCtx.getTabIdByPanelValue(props.value))
@@ -128,16 +122,18 @@ watch(
 
 const shouldRender = computed(() => props.keepMounted || mounted.value)
 
-const panelProps = computed(() => ({
-  ...attrs,
-  'aria-labelledby': correspondingTabId.value,
-  'hidden': hidden.value ? true : undefined,
-  id,
-  'inert': !open.value ? '' : undefined,
-  'role': 'tabpanel',
-  'tabindex': open.value ? 0 : -1,
-  [TabsPanelDataAttributes.index]: index.value,
-}))
+const panelProps = computed(() => mergeProps(
+  {
+    'aria-labelledby': correspondingTabId.value,
+    'hidden': hidden.value ? true : undefined,
+    id,
+    'inert': !open.value ? '' : undefined,
+    'role': 'tabpanel',
+    'tabindex': open.value ? 0 : -1,
+    [TabsPanelDataAttributes.index]: index.value,
+  },
+  attrs as Record<string, unknown>,
+))
 
 const stateAttributesMapping = {
   ...tabsStateAttributesMapping,

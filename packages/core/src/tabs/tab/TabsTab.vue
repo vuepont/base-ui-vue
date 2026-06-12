@@ -17,6 +17,7 @@ import { useRenderElement } from '../../utils/useRenderElement'
 import { useTabsListContext } from '../list/TabsListContext'
 import { tabsStateAttributesMapping } from '../root/stateAttributesMapping'
 import { useTabsRootContext } from '../root/TabsRootContext'
+import { areTabValuesEqual } from '../utils/areTabValuesEqual'
 
 export type TabsTabValue = any | null
 export type TabsTabActivationDirection = 'left' | 'right' | 'up' | 'down' | 'none'
@@ -110,7 +111,7 @@ const {
   metadata: () => tabMetadata.value,
 })
 
-const active = computed(() => props.value === rootCtx.value.value)
+const active = computed(() => areTabValuesEqual(props.value, rootCtx.value.value))
 const isNavigating = ref(false)
 const isPressing = ref(false)
 const isMainButton = ref(false)
@@ -174,7 +175,7 @@ function createTabDetails(event?: Event) {
 }
 
 function handleClick(event: MouseEvent) {
-  if (active.value || props.disabled) {
+  if (event.button !== 0 || active.value || props.disabled) {
     return
   }
 

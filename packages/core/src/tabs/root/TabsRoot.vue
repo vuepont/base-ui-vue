@@ -4,12 +4,13 @@ import type { CompositeMetadata } from '../../composite/list/CompositeList.vue'
 import type { BaseUIChangeEventDetails } from '../../utils/createBaseUIEventDetails'
 import type { BaseUIComponentProps, Orientation } from '../../utils/types'
 import type { TabsTabActivationDirection, TabsTabMetadata, TabsTabValue } from '../tab/TabsTab.vue'
-import { computed, getCurrentInstance, provide, ref, shallowRef, useAttrs, watch } from 'vue'
+import { computed, provide, ref, shallowRef, useAttrs, watch } from 'vue'
 import CompositeList from '../../composite/list/CompositeList.vue'
 import { createChangeEventDetails } from '../../utils/createBaseUIEventDetails'
 import { REASONS } from '../../utils/reasons'
 import { useControllableState } from '../../utils/useControllableState'
 import { useRenderElement } from '../../utils/useRenderElement'
+import { areTabValuesEqual } from '../utils/areTabValuesEqual'
 import { tabsStateAttributesMapping } from './stateAttributesMapping'
 import { tabsRootContextKey } from './TabsRootContext'
 
@@ -85,36 +86,34 @@ const emit = defineEmits<{
 }>()
 
 const attrs = useAttrs()
-const instance = getCurrentInstance()
-const vnodeProps = instance?.vnode.props as Record<string, unknown> | null | undefined
 
 const isValueControlled = computed(() => props.value !== undefined)
-const hasExplicitDefaultValueProp = Boolean(
-  vnodeProps
-  && (
-    Object.prototype.hasOwnProperty.call(vnodeProps, 'defaultValue')
-    || Object.prototype.hasOwnProperty.call(vnodeProps, 'default-value')
-  ),
-)
+const hasExplicitDefaultValueProp = props.defaultValue !== undefined
 
-const initialDefaultValue = props.defaultValue ?? 0
+const initialDefaultValue = props.defaultValue === undefined ? 0 : props.defaultValue
+const initialValue = isValueControlled.value ? props.value : initialDefaultValue
 const tabPanelRefs = ref<Array<HTMLElement | null>>([])
 const tabPanelRefsHolder = { elementsRef: tabPanelRefs }
 const tabMap = shallowRef<Map<Element, CompositeMetadata<TabsTabMetadata> | null>>(new Map())
+const lastKnownTabElementRef = shallowRef<Element | undefined>(undefined)
 const mountedTabPanels = shallowRef(new Map<TabsTabValue | number, string>())
 const activationDirectionState = ref<{
   previousValue: TabsTabValue
   tabActivationDirection: TabsTabActivationDirection
 }>({
-  previousValue: initialDefaultValue,
+  previousValue: initialValue,
   tabActivationDirection: 'none',
 })
 
 const { value, setValue } = useControllableState<TabsTabValue>({
   controlled: () => (isValueControlled.value ? props.value : undefined),
-  default: () => props.defaultValue ?? 0,
+  default: () => props.defaultValue === undefined ? 0 : props.defaultValue,
   name: 'TabsRoot',
 })
+
+function setTabValue(nextValue: TabsTabValue) {
+  setValue(() => nextValue)
+}
 
 function getTabElementBySelectedValue(selectedValue: TabsTabValue | undefined) {
   if (selectedValue === undefined) {
@@ -122,7 +121,7 @@ function getTabElementBySelectedValue(selectedValue: TabsTabValue | undefined) {
   }
 
   for (const [tabElement, tabMetadata] of tabMap.value.entries()) {
-    if (tabMetadata != null && selectedValue === (tabMetadata.value ?? tabMetadata.index)) {
+    if (tabMetadata != null && areTabValuesEqual(selectedValue, tabMetadata.value ?? tabMetadata.index)) {
       return tabElement as HTMLElement
     }
   }
@@ -132,7 +131,7 @@ function getTabElementBySelectedValue(selectedValue: TabsTabValue | undefined) {
 
 function getTabIdByPanelValue(panelValue: TabsTabValue) {
   for (const tabMetadata of tabMap.value.values()) {
-    if (tabMetadata != null && tabMetadata.value === panelValue) {
+    if (tabMetadata != null && areTabValuesEqual(tabMetadata.value, panelValue)) {
       return tabMetadata.id
     }
   }
@@ -140,26 +139,47 @@ function getTabIdByPanelValue(panelValue: TabsTabValue) {
 }
 
 function getTabPanelIdByValue(tabValue: TabsTabValue) {
-  return mountedTabPanels.value.get(tabValue)
+  for (const [panelValue, panelId] of mountedTabPanels.value.entries()) {
+    if (areTabValuesEqual(panelValue, tabValue)) {
+      return panelId
+    }
+  }
+  return undefined
 }
 
 function registerMountedTabPanel(panelValue: TabsTabValue | number, panelId: string) {
-  if (mountedTabPanels.value.get(panelValue) === panelId) {
-    return
+  for (const [mountedPanelValue, mountedPanelId] of mountedTabPanels.value.entries()) {
+    if (areTabValuesEqual(mountedPanelValue, panelValue) && mountedPanelId === panelId) {
+      return
+    }
   }
 
   const next = new Map(mountedTabPanels.value)
+  for (const mountedPanelValue of next.keys()) {
+    if (areTabValuesEqual(mountedPanelValue, panelValue)) {
+      next.delete(mountedPanelValue)
+    }
+  }
   next.set(panelValue, panelId)
   mountedTabPanels.value = next
 }
 
 function unregisterMountedTabPanel(panelValue: TabsTabValue | number, panelId: string) {
-  if (!mountedTabPanels.value.has(panelValue) || mountedTabPanels.value.get(panelValue) !== panelId) {
+  let keyToDelete: TabsTabValue | number | undefined
+
+  for (const [mountedPanelValue, mountedPanelId] of mountedTabPanels.value.entries()) {
+    if (areTabValuesEqual(mountedPanelValue, panelValue) && mountedPanelId === panelId) {
+      keyToDelete = mountedPanelValue
+      break
+    }
+  }
+
+  if (keyToDelete === undefined) {
     return
   }
 
   const next = new Map(mountedTabPanels.value)
-  next.delete(panelValue)
+  next.delete(keyToDelete)
   mountedTabPanels.value = next
 }
 
@@ -177,18 +197,6 @@ function notifyAutomaticValueChange(nextValue: TabsTabValue, reason: TabsRootCha
   )
 }
 
-function setActivationDirection(previousValue: TabsTabValue, nextValue: TabsTabValue) {
-  activationDirectionState.value = {
-    previousValue: nextValue,
-    tabActivationDirection: computeActivationDirection(
-      previousValue,
-      nextValue,
-      props.orientation,
-      tabMap.value,
-    ),
-  }
-}
-
 function onValueChange(newValue: TabsTabValue, eventDetails: TabsRootChangeEventDetails) {
   const activationDirection = computeActivationDirection(
     value.value,
@@ -204,18 +212,33 @@ function onValueChange(newValue: TabsTabValue, eventDetails: TabsRootChangeEvent
     return
   }
 
-  activationDirectionState.value = {
-    previousValue: newValue,
-    tabActivationDirection: activationDirection,
-  }
-  setValue(newValue)
+  setTabValue(newValue)
 }
 
 watch(
-  value,
-  (nextValue, previousValue) => {
-    if (nextValue !== previousValue) {
-      setActivationDirection(previousValue, nextValue)
+  [value, tabMap, () => props.orientation],
+  () => {
+    const previousValue = activationDirectionState.value.previousValue
+    const nextValue = value.value
+
+    if (areTabValuesEqual(nextValue, previousValue)) {
+      return
+    }
+
+    const tabActivationDirection = computeActivationDirection(
+      previousValue,
+      nextValue,
+      props.orientation,
+      tabMap.value,
+    )
+    const directionComputationIncomplete
+      = previousValue != null
+        && nextValue != null
+        && getTabElementBySelectedValue(nextValue) == null
+
+    activationDirectionState.value = {
+      previousValue: directionComputationIncomplete ? previousValue : nextValue,
+      tabActivationDirection,
     }
   },
   { flush: 'sync' },
@@ -223,7 +246,7 @@ watch(
 
 const selectedTabMetadata = computed(() => {
   for (const tabMetadata of tabMap.value.values()) {
-    if (tabMetadata != null && tabMetadata.value === value.value) {
+    if (tabMetadata != null && areTabValuesEqual(tabMetadata.value, value.value)) {
       return tabMetadata
     }
   }
@@ -242,7 +265,6 @@ const firstEnabledTabValue = computed(() => {
 const shouldNotifyInitialValueChange = ref(!hasExplicitDefaultValueProp)
 const shouldHonorDisabledDefaultValue = ref(hasExplicitDefaultValueProp)
 const didRegisterTabs = ref(false)
-const lastKnownTabElement = ref<Element | undefined>()
 
 watch(
   [tabMap, value, selectedTabMetadata, firstEnabledTabValue],
@@ -255,7 +277,7 @@ watch(
       fallbackValue: TabsTabValue,
       fallbackReason: TabsRootChangeEventReason,
     ) {
-      setValue(fallbackValue)
+      setTabValue(fallbackValue)
       activationDirectionState.value = {
         previousValue: fallbackValue,
         tabActivationDirection: 'none',
@@ -268,7 +290,7 @@ watch(
       if (
         didRegisterTabs.value
         && value.value !== null
-        && !lastKnownTabElement.value?.isConnected
+        && !lastKnownTabElementRef.value?.isConnected
       ) {
         commitAutomaticValueChange(null, REASONS.missing)
       }
@@ -276,19 +298,19 @@ watch(
     }
 
     didRegisterTabs.value = true
-    lastKnownTabElement.value = tabMap.value.keys().next().value
+    lastKnownTabElementRef.value = tabMap.value.keys().next().value
 
     const selectionIsDisabled = selectedTabMetadata.value?.disabled
     const selectionIsMissing = selectedTabMetadata.value == null && value.value !== null
 
-    if (!selectionIsDisabled && value.value === initialDefaultValue) {
+    if (!selectionIsDisabled && areTabValuesEqual(value.value, initialDefaultValue)) {
       shouldHonorDisabledDefaultValue.value = false
     }
 
     if (
       shouldHonorDisabledDefaultValue.value
       && selectionIsDisabled
-      && value.value === initialDefaultValue
+      && areTabValuesEqual(value.value, initialDefaultValue)
     ) {
       return
     }
@@ -296,7 +318,7 @@ watch(
     if (selectionIsDisabled || selectionIsMissing) {
       const fallbackValue = firstEnabledTabValue.value ?? null
 
-      if (value.value === fallbackValue) {
+      if (areTabValuesEqual(value.value, fallbackValue)) {
         shouldNotifyInitialValueChange.value = false
         return
       }
@@ -378,10 +400,10 @@ function computeActivationDirection(
     }
 
     const tabValue = tabMetadata.value ?? tabMetadata.index
-    if (oldValue === tabValue) {
+    if (areTabValuesEqual(oldValue, tabValue)) {
       oldTab = tabElement as HTMLElement
     }
-    if (newValue === tabValue) {
+    if (areTabValuesEqual(newValue, tabValue)) {
       newTab = tabElement as HTMLElement
     }
     if (oldTab != null && newTab != null) {

@@ -41,7 +41,7 @@ import {
 
 Set `as="a"` and `:native-button="false"` on `<TabsTab>` to render tabs as links.
 
-```vue{10} title="Tabs as links"
+```vue{8-10} title="Tabs as links"
 <script setup lang="ts">
 import { TabsList, TabsRoot, TabsTab } from 'base-ui-vue'
 </script>
@@ -61,7 +61,7 @@ import { TabsList, TabsRoot, TabsTab } from 'base-ui-vue'
 
 Use the `value` prop and `value-change` event for controlled behavior.
 
-```vue{10,17} title="Controlled tabs"
+```vue{9} title="Controlled tabs"
 <script setup lang="ts">
 import { ref } from 'vue'
 import { TabsList, TabsPanel, TabsRoot, TabsTab } from 'base-ui-vue'

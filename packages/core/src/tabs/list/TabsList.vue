@@ -11,6 +11,7 @@ import { useDirection } from '../../direction-provider/DirectionContext'
 import { useRenderElement } from '../../utils/useRenderElement'
 import { tabsStateAttributesMapping } from '../root/stateAttributesMapping'
 import { useTabsRootContext } from '../root/TabsRootContext'
+import { areTabValuesEqual } from '../utils/areTabValuesEqual'
 import { tabsListContextKey } from './TabsListContext'
 
 export interface TabsListState extends TabsRootState {}
@@ -133,7 +134,7 @@ function setHighlightedTabIndex(index: number) {
 }
 
 function onTabActivation(newValue: TabsTabValue, eventDetails: Parameters<typeof rootCtx.onValueChange>[1]) {
-  if (newValue !== rootCtx.value.value) {
+  if (!areTabValuesEqual(newValue, rootCtx.value.value)) {
     rootCtx.onValueChange(newValue, eventDetails)
   }
 }
@@ -153,12 +154,18 @@ const state = computed<TabsListState>(() => ({
   tabActivationDirection: rootCtx.tabActivationDirection.value,
 }))
 
-const rootProps = computed<HTMLProps>(() =>
-  root.getRootProps({
+const rootProps = computed<HTMLProps>(() => {
+  const externalProps = {
     ...attrs,
     role: 'tablist',
-  }),
-)
+  }
+  const compositeProps = root.getRootProps(externalProps)
+
+  compositeProps['aria-orientation']
+    = rootCtx.orientation.value === 'vertical' ? 'vertical' : undefined
+
+  return compositeProps
+})
 
 const {
   tag,

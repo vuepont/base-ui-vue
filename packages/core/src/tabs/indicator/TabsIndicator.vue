@@ -3,12 +3,15 @@ import type { StyleValue } from 'vue'
 import type { BaseUIComponentProps, Orientation } from '../../utils/types'
 import type { TabsRootState } from '../root/TabsRoot.vue'
 import type { TabsTabActivationDirection, TabsTabPosition, TabsTabSize } from '../tab/TabsTab.vue'
-import { computed, onBeforeUnmount, ref, useAttrs } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, useAttrs } from 'vue'
+import { useCSPContext } from '../../csp-provider/CSPContext'
+import { mergeProps } from '../../merge-props/mergeProps'
 import { getCssDimensions } from '../../utils/getCssDimensions'
 import { useRenderElement } from '../../utils/useRenderElement'
 import { useTabsListContext } from '../list/TabsListContext'
 import { tabsStateAttributesMapping } from '../root/stateAttributesMapping'
 import { useTabsRootContext } from '../root/TabsRootContext'
+import { script as prehydrationScript } from './prehydrationScript.min'
 import { TabsIndicatorCssVars } from './TabsIndicatorCssVars'
 
 export interface TabsIndicatorState extends TabsRootState {
@@ -30,7 +33,14 @@ export interface TabsIndicatorState extends TabsRootState {
   tabActivationDirection: TabsTabActivationDirection
 }
 
-export interface TabsIndicatorProps extends BaseUIComponentProps<TabsIndicatorState> {}
+export interface TabsIndicatorProps extends BaseUIComponentProps<TabsIndicatorState> {
+  /**
+   * Whether to render itself before Vue hydrates.
+   * This minimizes the time that the indicator isn't visible after server-side rendering.
+   * @default false
+   */
+  renderBeforeHydration?: boolean
+}
 
 /**
  * A visual indicator that can be styled to match the position of the currently active tab.
@@ -45,15 +55,22 @@ defineOptions({
 
 const props = withDefaults(defineProps<TabsIndicatorProps>(), {
   as: 'span',
+  renderBeforeHydration: false,
 })
 
 const attrs = useAttrs()
+const { nonce } = useCSPContext()
 const rootCtx = useTabsRootContext()
 const listCtx = useTabsListContext()
 const layoutTick = ref(0)
+const isMounted = ref(false)
 
 const cleanupIndicatorListener = listCtx.registerIndicatorUpdateListener(() => {
   layoutTick.value += 1
+})
+
+onMounted(() => {
+  isMounted.value = true
 })
 
 onBeforeUnmount(() => {
@@ -137,12 +154,15 @@ const indicatorStyle = computed<StyleValue | undefined>(() => {
   } as StyleValue
 })
 
-const indicatorProps = computed(() => ({
-  ...attrs,
-  role: 'presentation',
-  style: indicatorStyle.value,
-  hidden: !displayIndicator.value,
-}))
+const indicatorProps = computed(() => mergeProps(
+  {
+    role: 'presentation',
+    style: indicatorStyle.value,
+    hidden: !displayIndicator.value,
+    suppressHydrationWarning: props.renderBeforeHydration || undefined,
+  },
+  attrs as Record<string, unknown>,
+))
 
 const stateAttributesMapping = {
   ...tabsStateAttributesMapping,
@@ -165,6 +185,17 @@ const {
 </script>
 
 <template>
-  <slot v-if="renderless && rootCtx.value.value !== null" :ref="renderRef" :props="mergedProps" :state="state" />
-  <component :is="tag" v-else-if="rootCtx.value.value !== null" :ref="renderRef" v-bind="mergedProps" />
+  <template v-if="rootCtx.value.value !== null">
+    <slot v-if="renderless" :ref="renderRef" :props="mergedProps" :state="state" />
+    <component :is="tag" v-else :ref="renderRef" v-bind="mergedProps" />
+    <!-- eslint-disable-next-line vue/require-component-is -->
+    <component
+      is="script"
+      v-if="props.renderBeforeHydration && !isMounted"
+      :nonce="nonce"
+      :suppress-hydration-warning="true"
+    >
+      {{ prehydrationScript }}
+    </component>
+  </template>
 </template>
