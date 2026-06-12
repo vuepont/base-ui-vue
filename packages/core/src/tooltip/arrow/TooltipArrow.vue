@@ -1,10 +1,19 @@
 <script setup lang="ts">
-import type { TooltipArrowProps, TooltipArrowState } from '../tooltip.types'
+import type { BaseUIComponentProps } from '../../utils/types'
+import type { Align, Side } from '../../utils/useAnchorPositioning'
+import type { TooltipInstantType } from '../root/TooltipRoot.vue'
 import { computed, useAttrs } from 'vue'
+import { popupStateMapping } from '../../utils/popupStateMapping'
 import { useRenderElement } from '../../utils/useRenderElement'
+import { useTooltipPositionerContext } from '../positioner/TooltipPositionerContext'
 import { useTooltipRootContext } from '../root/TooltipRootContext'
-import { popupStateMapping } from '../utils/popupStateMapping'
 
+/**
+ * Displays an element positioned against the tooltip anchor.
+ * Renders a `<div>` element.
+ *
+ * Documentation: [Base UI Vue Tooltip](https://baseui-vue.com/docs/components/tooltip)
+ */
 defineOptions({
   name: 'TooltipArrow',
   inheritAttrs: false,
@@ -16,21 +25,18 @@ const props = withDefaults(defineProps<TooltipArrowProps>(), {
 
 const attrs = useAttrs()
 const ctx = useTooltipRootContext()
+const positioner = useTooltipPositionerContext()
 
 const state = computed<TooltipArrowState>(() => ({
   open: ctx.open.value,
-  side: ctx.side.value,
-  align: ctx.align.value,
-  uncentered: ctx.arrowUncentered.value,
+  side: positioner.side.value,
+  align: positioner.align.value,
+  uncentered: positioner.arrowUncentered.value,
   instant: ctx.instantType.value,
 }))
 
 const arrowStyle = computed(() => {
-  return {
-    position: 'absolute',
-    left: ctx.arrowX.value == null ? undefined : `${ctx.arrowX.value}px`,
-    top: ctx.arrowY.value == null ? undefined : `${ctx.arrowY.value}px`,
-  }
+  return positioner.arrowStyles.value
 })
 
 const arrowProps = computed(() => {
@@ -67,8 +73,35 @@ const {
     },
   },
   defaultTagName: 'div',
-  ref: ctx.arrowRef,
+  ref: positioner.arrowRef,
 })
+</script>
+
+<script lang="ts">
+export interface TooltipArrowState {
+  /**
+   * Whether the tooltip is currently open.
+   */
+  open: boolean
+  /**
+   * The side of the anchor the component is placed on.
+   */
+  side: Side
+  /**
+   * The alignment of the component relative to the anchor.
+   */
+  align: Align
+  /**
+   * Whether the arrow cannot be centered on the anchor.
+   */
+  uncentered: boolean
+  /**
+   * Whether transitions should be skipped.
+   */
+  instant: TooltipInstantType
+}
+
+export interface TooltipArrowProps extends BaseUIComponentProps<TooltipArrowState> {}
 </script>
 
 <template>

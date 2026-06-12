@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import type { TooltipProviderProps } from '../tooltip.types'
 import { computed, provide, shallowRef, toRef } from 'vue'
 import { OPEN_DELAY } from '../utils/constants'
 import { tooltipProviderContextKey } from './TooltipProviderContext'
@@ -45,6 +44,27 @@ provide(tooltipProviderContextKey, {
     lastCloseTime.value = Date.now()
   },
 })
+</script>
+
+<script lang="ts">
+export interface TooltipProviderState {}
+
+export interface TooltipProviderProps {
+  /**
+   * How long to wait before opening a tooltip. Specified in milliseconds.
+   */
+  delay?: number
+  /**
+   * How long to wait before closing a tooltip. Specified in milliseconds.
+   */
+  closeDelay?: number
+  /**
+   * Another tooltip will open instantly if the previous tooltip
+   * is closed within this timeout. Specified in milliseconds.
+   * @default 400
+   */
+  timeout?: number
+}
 </script>
 
 <template>

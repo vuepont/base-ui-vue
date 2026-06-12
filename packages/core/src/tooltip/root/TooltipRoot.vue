@@ -1,10 +1,8 @@
 <script setup lang="ts" generic="Payload = unknown">
-import type {
-  TooltipInstantType,
-  TooltipRootActions,
-  TooltipRootChangeEventDetails,
-  TooltipRootProps,
-} from '../tooltip.types'
+import type { BaseUIChangeEventDetails } from '../../utils/createBaseUIEventDetails'
+import type { REASONS as TooltipReasons } from '../../utils/reasons'
+import type { BaseUIComponentProps } from '../../utils/types'
+import type { TooltipHandle } from '../store/TooltipHandle'
 import type { TooltipRootContext } from './TooltipRootContext'
 import { computed, getCurrentInstance, onScopeDispose, provide, shallowRef, toRef, watch } from 'vue'
 import { REASONS } from '../../utils/reasons'
@@ -74,6 +72,7 @@ const disabled = toRef(props, 'disabled')
 const disableHoverablePopup = toRef(props, 'disableHoverablePopup')
 const trackCursorAxis = toRef(props, 'trackCursorAxis')
 const open = computed(() => !disabled.value && openState.value)
+const hasViewport = shallowRef(false)
 
 const { mounted, setMounted, transitionStatus } = useTransitionStatus(open, true, true)
 
@@ -83,21 +82,6 @@ const preventUnmountOnClose = shallowRef(false)
 const popupId = shallowRef<string | undefined>(undefined)
 const popupRef = shallowRef<HTMLElement | null>(null)
 const positionerRef = shallowRef<HTMLElement | null>(null)
-const arrowRef = shallowRef<HTMLElement | null>(null)
-
-const side = shallowRef<'top' | 'right' | 'bottom' | 'left'>('top')
-const align = shallowRef<'start' | 'center' | 'end'>('center')
-const anchorHidden = shallowRef(false)
-const arrowX = shallowRef<number | undefined>(undefined)
-const arrowY = shallowRef<number | undefined>(undefined)
-const arrowUncentered = shallowRef(false)
-
-const positionerWidth = shallowRef<number | undefined>(undefined)
-const positionerHeight = shallowRef<number | undefined>(undefined)
-const availableWidth = shallowRef<number | undefined>(undefined)
-const availableHeight = shallowRef<number | undefined>(undefined)
-const anchorWidth = shallowRef<number | undefined>(undefined)
-const anchorHeight = shallowRef<number | undefined>(undefined)
 const popupWidth = shallowRef<number | undefined>(undefined)
 const popupHeight = shallowRef<number | undefined>(undefined)
 
@@ -157,9 +141,6 @@ function requestOpenChange(
 
     if (details.reason === REASONS.triggerFocus) {
       instantType.value = 'focus'
-    }
-    else if (instantType.value !== 'delay' && trackCursorAxis.value !== 'none') {
-      instantType.value = 'tracking-cursor'
     }
     else if (details.reason !== REASONS.triggerHover) {
       instantType.value = undefined
@@ -271,6 +252,7 @@ const context: TooltipRootContext<Payload> = {
   disabled,
   disableHoverablePopup,
   trackCursorAxis,
+  hasViewport,
   instantType,
   activeTriggerId,
   activeTrigger,
@@ -278,19 +260,6 @@ const context: TooltipRootContext<Payload> = {
   popupId,
   popupRef,
   positionerRef,
-  arrowRef,
-  side,
-  align,
-  anchorHidden,
-  arrowX,
-  arrowY,
-  arrowUncentered,
-  positionerWidth,
-  positionerHeight,
-  availableWidth,
-  availableHeight,
-  anchorWidth,
-  anchorHeight,
   popupWidth,
   popupHeight,
   requestOpenChange,
@@ -303,20 +272,8 @@ const context: TooltipRootContext<Payload> = {
   setPopupId(id: string | undefined) {
     popupId.value = id
   },
-  setPositionerSize(size: {
-    width?: number
-    height?: number
-    availableWidth?: number
-    availableHeight?: number
-    anchorWidth?: number
-    anchorHeight?: number
-  }) {
-    positionerWidth.value = size.width
-    positionerHeight.value = size.height
-    availableWidth.value = size.availableWidth
-    availableHeight.value = size.availableHeight
-    anchorWidth.value = size.anchorWidth
-    anchorHeight.value = size.anchorHeight
+  setHasViewport(next: boolean) {
+    hasViewport.value = next
   },
 }
 
@@ -326,6 +283,80 @@ defineExpose<TooltipRootActions>({
   close,
   unmount: forceUnmount,
 })
+</script>
+
+<script lang="ts">
+export type TooltipInstantType = 'delay' | 'dismiss' | 'focus' | undefined
+export type TooltipTrackCursorAxis = 'none' | 'x' | 'y' | 'both'
+
+export interface TooltipRootState {}
+
+export interface TooltipRootProps<Payload = unknown>
+  extends BaseUIComponentProps<TooltipRootState> {
+  /**
+   * Whether the tooltip is initially open.
+   *
+   * To render a controlled tooltip, use the `open` prop instead.
+   * @default false
+   */
+  defaultOpen?: boolean
+  /**
+   * Whether the tooltip is currently open.
+   */
+  open?: boolean
+  /**
+   * Whether the tooltip contents can be hovered without closing the tooltip.
+   * @default false
+   */
+  disableHoverablePopup?: boolean
+  /**
+   * Determines which axis the tooltip should track the cursor on.
+   * @default 'none'
+   */
+  trackCursorAxis?: TooltipTrackCursorAxis
+  /**
+   * Whether the tooltip is disabled.
+   * @default false
+   */
+  disabled?: boolean
+  /**
+   * A handle to associate the tooltip with a trigger.
+   * If specified, allows external triggers to control the tooltip's open state.
+   * Can be created with the `createTooltipHandle()` function.
+   */
+  handle?: TooltipHandle<Payload>
+  /**
+   * ID of the trigger that the tooltip is associated with.
+   * This is useful in conjunction with the `open` prop to create a controlled tooltip.
+   * There's no need to specify this prop when the tooltip is uncontrolled (that is, when the `open` prop is not set).
+   */
+  triggerId?: string | null
+  /**
+   * ID of the trigger that the tooltip is associated with.
+   * This is useful in conjunction with the `defaultOpen` prop to create an initially open tooltip.
+   */
+  defaultTriggerId?: string | null
+}
+
+export interface TooltipRootActions {
+  unmount: () => void
+  close: () => void
+}
+
+export type TooltipRootChangeEventReason
+  = | typeof TooltipReasons.triggerHover
+    | typeof TooltipReasons.triggerFocus
+    | typeof TooltipReasons.triggerPress
+    | typeof TooltipReasons.outsidePress
+    | typeof TooltipReasons.escapeKey
+    | typeof TooltipReasons.disabled
+    | typeof TooltipReasons.imperativeAction
+    | typeof TooltipReasons.none
+
+export type TooltipRootChangeEventDetails
+  = BaseUIChangeEventDetails<TooltipRootChangeEventReason, {
+    preventUnmountOnClose: () => void
+  }>
 </script>
 
 <template>

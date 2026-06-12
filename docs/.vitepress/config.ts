@@ -98,8 +98,8 @@ export default defineConfig({
           { text: 'Tabs', link: '/docs/components/tabs' },
           { text: 'Toggle', link: '/docs/components/toggle' },
           { text: 'Toggle Group', link: '/docs/components/toggle-group' },
-          { text: 'Tooltip', link: '/docs/components/tooltip' },
           { text: 'Toolbar', link: '/docs/components/toolbar' },
+          { text: 'Tooltip', link: '/docs/components/tooltip' },
         ],
       },
       {

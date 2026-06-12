@@ -1,15 +1,20 @@
 <script setup lang="ts">
-import type { TooltipPopupProps, TooltipPopupState } from '../tooltip.types'
+import type { BaseUIComponentProps } from '../../utils/types'
+import type { Align, Side } from '../../utils/useAnchorPositioning'
+import type { TransitionStatus } from '../../utils/useTransitionStatus'
+import type { TooltipInstantType } from '../root/TooltipRoot.vue'
 import { computed, nextTick, onBeforeUnmount, onMounted, shallowRef, useAttrs, watch } from 'vue'
+import { useDirection } from '../../direction-provider/DirectionContext'
+import { popupStateMapping } from '../../utils/popupStateMapping'
 import { REASONS } from '../../utils/reasons'
 import { transitionStatusMapping } from '../../utils/stateAttributesMapping'
 import { useBaseUiId } from '../../utils/useBaseUiId'
 import { useMergedRefs } from '../../utils/useMergedRefs'
 import { useOpenChangeComplete } from '../../utils/useOpenChangeComplete'
 import { useRenderElement } from '../../utils/useRenderElement'
+import { useTooltipPositionerContext } from '../positioner/TooltipPositionerContext'
 import { useTooltipRootContext } from '../root/TooltipRootContext'
 import { createTooltipChangeEventDetails } from '../store/TooltipHandle'
-import { popupStateMapping } from '../utils/popupStateMapping'
 
 defineOptions({
   name: 'TooltipPopup',
@@ -22,13 +27,15 @@ const props = withDefaults(defineProps<TooltipPopupProps>(), {
 
 const attrs = useAttrs()
 const ctx = useTooltipRootContext()
+const positioner = useTooltipPositionerContext()
+const direction = useDirection()
 const generatedId = useBaseUiId(props.id)
 const localPopupRef = shallowRef<HTMLElement | null>(null)
 
 const state = computed<TooltipPopupState>(() => ({
   open: ctx.open.value,
-  side: ctx.side.value,
-  align: ctx.align.value,
+  side: positioner.side.value,
+  align: positioner.align.value,
   instant: ctx.instantType.value,
   transitionStatus: ctx.transitionStatus.value,
 }))
@@ -89,7 +96,11 @@ const popupProps = computed(() => {
       {
         '--popup-width': toCssPixel(ctx.popupWidth.value),
         '--popup-height': toCssPixel(ctx.popupHeight.value),
-        '--transform-origin': getTransformOrigin(ctx.side.value, ctx.align.value),
+        '--transform-origin': getTransformOrigin(
+          positioner.side.value,
+          positioner.align.value,
+          direction.value,
+        ),
       },
       resolvedStyle,
     ],
@@ -153,7 +164,8 @@ function toCssPixel(value: number | undefined) {
   return value === undefined ? undefined : `${value}px`
 }
 
-function getTransformOrigin(side: string, align: string) {
+function getTransformOrigin(side: Side, align: Align, direction: 'ltr' | 'rtl') {
+  const physicalSide = getPhysicalSide(side, direction)
   const oppositeSide: Record<string, string> = {
     top: 'bottom',
     right: 'left',
@@ -162,14 +174,57 @@ function getTransformOrigin(side: string, align: string) {
   }
 
   if (align === 'center') {
-    return oppositeSide[side] ?? 'center'
+    return oppositeSide[physicalSide] ?? 'center'
   }
 
-  if (side === 'top' || side === 'bottom') {
-    return `${align} ${oppositeSide[side]}`
+  if (physicalSide === 'top' || physicalSide === 'bottom') {
+    return `${align} ${oppositeSide[physicalSide]}`
   }
 
-  return `${oppositeSide[side]} ${align}`
+  return `${oppositeSide[physicalSide]} ${align}`
+}
+
+function getPhysicalSide(side: Side, direction: 'ltr' | 'rtl') {
+  return {
+    'top': 'top',
+    'right': 'right',
+    'bottom': 'bottom',
+    'left': 'left',
+    'inline-end': direction === 'rtl' ? 'left' : 'right',
+    'inline-start': direction === 'rtl' ? 'right' : 'left',
+  }[side]
+}
+</script>
+
+<script lang="ts">
+export interface TooltipPopupState {
+  /**
+   * Whether the tooltip is currently open.
+   */
+  open: boolean
+  /**
+   * The side of the anchor the component is placed on.
+   */
+  side: Side
+  /**
+   * The alignment of the component relative to the anchor.
+   */
+  align: Align
+  /**
+   * Whether transitions should be skipped.
+   */
+  instant: TooltipInstantType
+  /**
+   * The transition status of the component.
+   */
+  transitionStatus: TransitionStatus
+}
+
+export interface TooltipPopupProps extends BaseUIComponentProps<TooltipPopupState> {
+  /**
+   * The popup id used by the trigger while open.
+   */
+  id?: string
 }
 </script>
 

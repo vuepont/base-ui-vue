@@ -1,15 +1,11 @@
-import type { InjectionKey, Ref, ShallowRef } from 'vue'
-import type { TooltipAlign, TooltipSide } from '../tooltip.types'
+import type { InjectionKey } from 'vue'
+import type { UseAnchorPositioningReturnValue } from '../../utils/useAnchorPositioning'
 import { inject } from 'vue'
 
-export interface TooltipPositionerContext {
-  side: Ref<TooltipSide>
-  align: Ref<TooltipAlign>
-  arrowRef: Ref<HTMLElement | null>
-  arrowX: ShallowRef<number | undefined>
-  arrowY: ShallowRef<number | undefined>
-  arrowUncentered: Ref<boolean>
-}
+export type TooltipPositionerContext = Pick<
+  UseAnchorPositioningReturnValue,
+  'side' | 'align' | 'arrowRef' | 'arrowUncentered' | 'arrowStyles'
+>
 
 export const tooltipPositionerContextKey: InjectionKey<TooltipPositionerContext>
   = Symbol('TooltipPositionerContext')

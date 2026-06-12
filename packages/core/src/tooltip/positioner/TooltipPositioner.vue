@@ -1,23 +1,27 @@
 <script setup lang="ts">
-import type { Middleware, Padding, Placement } from '@floating-ui/vue'
-import type { TooltipAlign, TooltipPositionerProps, TooltipPositionerState, TooltipSide } from '../tooltip.types'
-import {
-  arrow,
-  autoUpdate,
-  flip,
-  hide,
-  offset,
-  shift,
-  size,
-  useFloating,
-} from '@floating-ui/vue'
-import { computed, provide, shallowRef, useAttrs, watchEffect } from 'vue'
+import type {
+  Padding,
+  Placement,
+  Strategy,
+  VirtualElement,
+} from '../../floating-ui-vue'
+import type { BaseUIComponentProps } from '../../utils/types'
+import type {
+  Align,
+  Boundary,
+  CollisionAvoidance,
+  OffsetFunction,
+  Side,
+} from '../../utils/useAnchorPositioning'
+import type { TooltipInstantType } from '../root/TooltipRoot.vue'
+import { computed, provide, useAttrs } from 'vue'
+import { adaptiveOrigin } from '../../utils/adaptiveOriginMiddleware'
+import { popupStateMapping } from '../../utils/popupStateMapping'
+import { POPUP_COLLISION_AVOIDANCE, useAnchorPositioning } from '../../utils/useAnchorPositioning'
 import { useRenderElement } from '../../utils/useRenderElement'
 import { useTooltipPortalContext } from '../portal/TooltipPortalContext'
 import { useTooltipRootContext } from '../root/TooltipRootContext'
-import { popupStateMapping } from '../utils/popupStateMapping'
 import { tooltipPositionerContextKey } from './TooltipPositionerContext'
-import { TooltipPositionerCssVars } from './TooltipPositionerCssVars'
 
 defineOptions({
   name: 'TooltipPositioner',
@@ -31,117 +35,52 @@ const props = withDefaults(defineProps<TooltipPositionerProps>(), {
   align: 'center',
   sideOffset: 0,
   alignOffset: 0,
+  collisionBoundary: 'clipping-ancestors',
   collisionPadding: 5,
   arrowPadding: 5,
   sticky: false,
   disableAnchorTracking: false,
+  collisionAvoidance: () => POPUP_COLLISION_AVOIDANCE,
 })
 
 const attrs = useAttrs()
 const ctx = useTooltipRootContext()
 const portalKeepMounted = useTooltipPortalContext()
 
-const positionerRef = shallowRef<HTMLElement | null>(null)
-
 const reference = computed(() => props.anchor ?? ctx.activeTrigger.value?.element ?? null)
 
-const placement = computed<Placement>(() => {
-  if (props.align === 'center') {
-    return props.side
-  }
-
-  return `${props.side}-${props.align}` as Placement
+const positioning = useAnchorPositioning({
+  anchor: reference,
+  positionMethod: () => props.positionMethod,
+  mounted: () => ctx.mounted.value,
+  keepMounted: () => portalKeepMounted?.value,
+  side: () => props.side,
+  sideOffset: () => props.sideOffset,
+  align: () => props.align,
+  alignOffset: () => props.alignOffset,
+  collisionBoundary: () => props.collisionBoundary,
+  collisionPadding: () => props.collisionPadding,
+  sticky: () => props.sticky,
+  arrowPadding: () => props.arrowPadding,
+  disableAnchorTracking: () => props.disableAnchorTracking,
+  collisionAvoidance: () => props.collisionAvoidance,
+  adaptiveOrigin: () => ctx.hasViewport.value ? adaptiveOrigin : undefined,
+  autoUpdateOptions: () => ({
+    animationFrame: ctx.trackCursorAxis.value === 'both',
+  }),
 })
 
-const middleware = computed<Middleware[]>(() => [
-  offset({
-    mainAxis: props.sideOffset,
-    crossAxis: props.alignOffset,
-  }),
-  flip({
-    boundary: props.collisionBoundary,
-    padding: props.collisionPadding,
-  }),
-  shift({
-    boundary: props.collisionBoundary,
-    padding: props.collisionPadding,
-  }),
-  size({
-    boundary: props.collisionBoundary,
-    padding: props.collisionPadding,
-    apply({ rects, availableWidth, availableHeight }) {
-      ctx.setPositionerSize({
-        width: rects.floating.width,
-        height: rects.floating.height,
-        availableWidth,
-        availableHeight,
-        anchorWidth: rects.reference.width,
-        anchorHeight: rects.reference.height,
-      })
-    },
-  }),
-  arrow({
-    element: ctx.arrowRef,
-    padding: props.arrowPadding as Padding,
-  }),
-  hide({
-    boundary: props.collisionBoundary,
-    padding: props.collisionPadding,
-  }),
-])
-
-const floating = useFloating(reference, positionerRef, {
-  open: () => ctx.mounted.value,
-  placement,
-  strategy: () => props.positionMethod,
-  middleware,
-  whileElementsMounted(referenceEl, floatingEl, update) {
-    if (props.disableAnchorTracking) {
-      update()
-      return () => {}
-    }
-
-    return autoUpdate(referenceEl, floatingEl, update, {
-      animationFrame: ctx.trackCursorAxis.value === 'both',
-    } as any)
-  },
-  transform: false,
-})
-
-const derivedSide = computed(() => getSide(floating.placement.value))
-const derivedAlign = computed(() => getAlign(floating.placement.value))
 const shouldRender = computed(() => ctx.mounted.value || portalKeepMounted?.value)
-const anchorHidden = computed(() =>
-  Boolean(floating.middlewareData.value.hide?.referenceHidden),
+const inert = computed(() =>
+  !ctx.open.value || ctx.trackCursorAxis.value === 'both' || ctx.disableHoverablePopup.value,
 )
-
-watchEffect(() => {
-  ctx.side.value = derivedSide.value
-  ctx.align.value = derivedAlign.value
-  ctx.anchorHidden.value = anchorHidden.value
-
-  const arrowData = floating.middlewareData.value.arrow
-  ctx.arrowX.value = typeof arrowData?.x === 'number' ? arrowData.x : undefined
-  ctx.arrowY.value = typeof arrowData?.y === 'number' ? arrowData.y : undefined
-  ctx.arrowUncentered.value = Boolean(arrowData && Math.abs(arrowData.centerOffset ?? 0) > 0)
-})
 
 const state = computed<TooltipPositionerState>(() => ({
   open: ctx.open.value,
-  side: derivedSide.value,
-  align: derivedAlign.value,
-  anchorHidden: anchorHidden.value,
+  side: positioning.side.value,
+  align: positioning.align.value,
+  anchorHidden: positioning.anchorHidden.value,
   instant: ctx.trackCursorAxis.value !== 'none' ? 'tracking-cursor' : ctx.instantType.value,
-}))
-
-const cssVars = computed(() => ({
-  [TooltipPositionerCssVars.availableWidth]: toCssPixel(ctx.availableWidth.value),
-  [TooltipPositionerCssVars.availableHeight]: toCssPixel(ctx.availableHeight.value),
-  [TooltipPositionerCssVars.anchorWidth]: toCssPixel(ctx.anchorWidth.value),
-  [TooltipPositionerCssVars.anchorHeight]: toCssPixel(ctx.anchorHeight.value),
-  [TooltipPositionerCssVars.positionerWidth]: toCssPixel(ctx.positionerWidth.value),
-  [TooltipPositionerCssVars.positionerHeight]: toCssPixel(ctx.positionerHeight.value),
-  [TooltipPositionerCssVars.transformOrigin]: getTransformOrigin(derivedSide.value, derivedAlign.value),
 }))
 
 const positionerProps = computed(() => {
@@ -151,13 +90,12 @@ const positionerProps = computed(() => {
 
   return {
     ...attrs,
+    role: (attrs as { role?: unknown }).role ?? 'presentation',
     hidden: shouldRender.value ? undefined : true,
-    inert: !ctx.open.value || ctx.trackCursorAxis.value === 'both' || ctx.disableHoverablePopup.value
-      ? ''
-      : undefined,
+    inert: inert.value ? '' : undefined,
     style: [
-      floating.floatingStyles.value,
-      cssVars.value,
+      positioning.positionerStyles.value,
+      inert.value ? { pointerEvents: 'none' } : undefined,
       resolvedStyle,
     ],
   }
@@ -179,47 +117,107 @@ const {
     ...popupStateMapping,
   },
   defaultTagName: 'div',
-  ref: positionerRef,
+  ref: positioning.positionerRef,
 })
 
-provide(tooltipPositionerContextKey, {
-  side: ctx.side,
-  align: ctx.align,
-  arrowRef: ctx.arrowRef,
-  arrowX: ctx.arrowX,
-  arrowY: ctx.arrowY,
-  arrowUncentered: ctx.arrowUncentered,
-})
+provide(tooltipPositionerContextKey, positioning)
+</script>
 
-function getSide(value: Placement): TooltipSide {
-  return value.split('-')[0] as TooltipSide
+<script lang="ts">
+export type TooltipSide = Side
+export type TooltipAlign = Align
+export type TooltipPositionerInstantType = TooltipInstantType | 'tracking-cursor'
+export type TooltipFloatingPlacement = Placement
+
+export interface TooltipPositionerState {
+  /**
+   * Whether the tooltip is currently open.
+   */
+  open: boolean
+  /**
+   * The side of the anchor the component is placed on.
+   */
+  side: TooltipSide
+  /**
+   * The alignment of the component relative to the anchor.
+   */
+  align: TooltipAlign
+  /**
+   * Whether the anchor element is hidden.
+   */
+  anchorHidden: boolean
+  /**
+   * Whether CSS transitions should be disabled.
+   */
+  instant: TooltipPositionerInstantType
 }
 
-function getAlign(value: Placement): TooltipAlign {
-  return (value.split('-')[1] as TooltipAlign | undefined) ?? 'center'
-}
-
-function toCssPixel(value: number | undefined) {
-  return value === undefined ? undefined : `${value}px`
-}
-
-function getTransformOrigin(side: TooltipSide, align: TooltipAlign) {
-  const oppositeSide = {
-    top: 'bottom',
-    right: 'left',
-    bottom: 'top',
-    left: 'right',
-  }[side]
-
-  if (align === 'center') {
-    return oppositeSide
-  }
-
-  if (side === 'top' || side === 'bottom') {
-    return `${align} ${oppositeSide}`
-  }
-
-  return `${oppositeSide} ${align}`
+export interface TooltipPositionerProps
+  extends BaseUIComponentProps<TooltipPositionerState> {
+  /**
+   * An element to position the popup against.
+   * By default, the popup will be positioned against the trigger.
+   */
+  anchor?: Element | VirtualElement | null
+  /**
+   * Determines which CSS `position` property to use.
+   * @default 'absolute'
+   */
+  positionMethod?: Strategy
+  /**
+   * Which side of the anchor element to align the popup against.
+   * May automatically change to avoid collisions.
+   * @default 'top'
+   */
+  side?: TooltipSide
+  /**
+   * How to align the popup relative to the specified side.
+   * @default 'center'
+   */
+  align?: TooltipAlign
+  /**
+   * Distance between the anchor and the popup in pixels.
+   * @default 0
+   */
+  sideOffset?: number | OffsetFunction
+  /**
+   * Additional offset along the alignment axis in pixels.
+   * @default 0
+   */
+  alignOffset?: number | OffsetFunction
+  /**
+   * An element or a rectangle that delimits the area that the popup is confined to.
+   * @default 'clipping-ancestors'
+   */
+  collisionBoundary?: Boundary
+  /**
+   * Additional space to maintain from the edge of the collision boundary.
+   * @default 5
+   */
+  collisionPadding?: Padding
+  /**
+   * Minimum distance to maintain between the arrow and the edges of the popup.
+   *
+   * Use it to prevent the arrow element from hanging out of the rounded corners of a popup.
+   * @default 5
+   */
+  arrowPadding?: Padding
+  /**
+   * Whether to maintain the popup in the viewport after
+   * the anchor element was scrolled out of view.
+   * @default false
+   */
+  sticky?: boolean
+  /**
+   * Whether to disable the popup from tracking any layout shift of its positioning anchor.
+   * @default false
+   */
+  disableAnchorTracking?: boolean
+  /**
+   * Determines how to handle collisions when positioning the popup.
+   * @default { fallbackAxisSide: 'end' }
+   */
+  collisionAvoidance?: CollisionAvoidance
 }
 </script>
 

@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import type { TooltipViewportProps, TooltipViewportState } from '../tooltip.types'
-import { computed, shallowRef, useAttrs, watch } from 'vue'
+import type { BaseUIComponentProps } from '../../utils/types'
+import type { TooltipInstantType } from '../root/TooltipRoot.vue'
+import { computed, onBeforeUnmount, onMounted, shallowRef, useAttrs, watch } from 'vue'
 import { useRenderElement } from '../../utils/useRenderElement'
 import { useTooltipRootContext } from '../root/TooltipRootContext'
 
@@ -16,6 +17,14 @@ const props = withDefaults(defineProps<TooltipViewportProps>(), {
 const attrs = useAttrs()
 const ctx = useTooltipRootContext()
 const activationDirection = shallowRef<TooltipViewportState['activationDirection']>(undefined)
+
+onMounted(() => {
+  ctx.setHasViewport(true)
+})
+
+onBeforeUnmount(() => {
+  ctx.setHasViewport(false)
+})
 
 watch(
   () => ctx.activeTriggerId.value,
@@ -85,6 +94,25 @@ const {
   },
   defaultTagName: 'div',
 })
+</script>
+
+<script lang="ts">
+export interface TooltipViewportState {
+  /**
+   * The activation direction of the transitioned content.
+   */
+  activationDirection: 'left' | 'right' | 'up' | 'down' | undefined
+  /**
+   * Whether the viewport is currently transitioning between contents.
+   */
+  transitioning: boolean
+  /**
+   * Present if animations should be instant.
+   */
+  instant: TooltipInstantType
+}
+
+export interface TooltipViewportProps extends BaseUIComponentProps<TooltipViewportState> {}
 </script>
 
 <template>

@@ -3,7 +3,7 @@ import type {
   TooltipInstantType,
   TooltipRootChangeEventDetails,
   TooltipRootChangeEventReason,
-} from '../tooltip.types'
+} from '../root/TooltipRoot.vue'
 import { shallowRef } from 'vue'
 import { createChangeEventDetails } from '../../utils/createBaseUIEventDetails'
 import { REASONS } from '../../utils/reasons'

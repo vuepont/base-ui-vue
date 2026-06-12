@@ -1,4 +1,4 @@
-import type { StateAttributesMapping } from '../../utils/getStateAttributesProps'
+import type { StateAttributesMapping } from './getStateAttributesProps'
 
 export enum CommonPopupDataAttributes {
   /**

@@ -1,8 +1,11 @@
 <script setup lang="ts" generic="Payload = unknown">
-import type { TooltipRootChangeEventDetails, TooltipTriggerProps, TooltipTriggerState } from '../tooltip.types'
+import type { BaseUIComponentProps, NativeButtonProps } from '../../utils/types'
+import type { TooltipRootChangeEventDetails } from '../root/TooltipRoot.vue'
+import type { TooltipHandle } from '../store/TooltipHandle'
 import { computed, shallowRef, useAttrs, watch } from 'vue'
 import { mergeProps } from '../../merge-props/mergeProps'
 import { useButton } from '../../use-button'
+import { triggerStateMapping } from '../../utils/popupStateMapping'
 import { REASONS } from '../../utils/reasons'
 import { useBaseUiId } from '../../utils/useBaseUiId'
 import { useMergedRefs } from '../../utils/useMergedRefs'
@@ -10,7 +13,6 @@ import { useRenderElement } from '../../utils/useRenderElement'
 import { useTimeout } from '../../utils/useTimeout'
 import { useTooltipRootContext } from '../root/TooltipRootContext'
 import { createTooltipChangeEventDetails } from '../store/TooltipHandle'
-import { triggerStateMapping } from '../utils/popupStateMapping'
 
 defineOptions({
   name: 'TooltipTrigger',
@@ -258,6 +260,56 @@ const {
   defaultTagName: 'button',
   ref: renderRef,
 })
+</script>
+
+<script lang="ts">
+export interface TooltipTriggerState {
+  /**
+   * Whether the tooltip is currently open.
+   */
+  open: boolean
+  /**
+   * Whether this trigger should ignore interaction.
+   */
+  disabled: boolean
+}
+
+export interface TooltipTriggerProps<Payload = unknown>
+  extends NativeButtonProps, BaseUIComponentProps<TooltipTriggerState> {
+  /**
+   * A handle to associate the trigger with a tooltip.
+   */
+  handle?: TooltipHandle<Payload>
+  /**
+   * A payload to pass to the tooltip when it is opened.
+   */
+  payload?: Payload
+  /**
+   * How long to wait before opening the tooltip. Specified in milliseconds.
+   * @default 600
+   */
+  delay?: number
+  /**
+   * Whether the tooltip should close when this trigger is clicked.
+   * @default true
+   */
+  closeOnClick?: boolean
+  /**
+   * How long to wait before closing the tooltip. Specified in milliseconds.
+   * @default 0
+   */
+  closeDelay?: number
+  /**
+   * If `true`, the tooltip will not open when interacting with this trigger.
+   * Note that this doesn't apply the `disabled` attribute to the trigger element.
+   * @default false
+   */
+  disabled?: boolean
+  /**
+   * The trigger id.
+   */
+  id?: string
+}
 </script>
 
 <template>

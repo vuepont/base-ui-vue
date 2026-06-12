@@ -7,12 +7,10 @@ import type {
 import type { TransitionStatus } from '../../utils/useTransitionStatus'
 import type { TooltipStore, TooltipTriggerRecord } from '../store/TooltipHandle'
 import type {
-  TooltipAlign,
   TooltipInstantType,
   TooltipRootChangeEventDetails,
-  TooltipSide,
   TooltipTrackCursorAxis,
-} from '../tooltip.types'
+} from './TooltipRoot.vue'
 import { inject } from 'vue'
 
 export interface TooltipRootContext<Payload = unknown> {
@@ -23,6 +21,7 @@ export interface TooltipRootContext<Payload = unknown> {
   disabled: Readonly<Ref<boolean>>
   disableHoverablePopup: Readonly<Ref<boolean>>
   trackCursorAxis: Readonly<Ref<TooltipTrackCursorAxis>>
+  hasViewport: Ref<boolean>
   instantType: Ref<TooltipInstantType>
   activeTriggerId: Ref<string | null>
   activeTrigger: ComputedRef<TooltipTriggerRecord<Payload> | undefined>
@@ -30,19 +29,6 @@ export interface TooltipRootContext<Payload = unknown> {
   popupId: Ref<string | undefined>
   popupRef: Ref<HTMLElement | null>
   positionerRef: Ref<HTMLElement | null>
-  arrowRef: Ref<HTMLElement | null>
-  side: Ref<TooltipSide>
-  align: Ref<TooltipAlign>
-  anchorHidden: Ref<boolean>
-  arrowX: ShallowRef<number | undefined>
-  arrowY: ShallowRef<number | undefined>
-  arrowUncentered: Ref<boolean>
-  positionerWidth: ShallowRef<number | undefined>
-  positionerHeight: ShallowRef<number | undefined>
-  availableWidth: ShallowRef<number | undefined>
-  availableHeight: ShallowRef<number | undefined>
-  anchorWidth: ShallowRef<number | undefined>
-  anchorHeight: ShallowRef<number | undefined>
   popupWidth: ShallowRef<number | undefined>
   popupHeight: ShallowRef<number | undefined>
   requestOpenChange: (
@@ -61,14 +47,7 @@ export interface TooltipRootContext<Payload = unknown> {
   completeOpenChange: () => void
   setMounted: (next: boolean) => void
   setPopupId: (id: string | undefined) => void
-  setPositionerSize: (size: {
-    width?: number
-    height?: number
-    availableWidth?: number
-    availableHeight?: number
-    anchorWidth?: number
-    anchorHeight?: number
-  }) => void
+  setHasViewport: (next: boolean) => void
 }
 
 export const tooltipRootContextKey: InjectionKey<TooltipRootContext>
