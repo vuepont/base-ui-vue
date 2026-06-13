@@ -1,3 +1,19 @@
+export { useFloatingPortalNode } from './components/FloatingPortal'
+export type {
+  FloatingPortal,
+  FloatingPortalContainer,
+  FloatingPortalContext,
+  FloatingPortalFocusManagerState,
+  FloatingPortalProps,
+  FloatingPortalState,
+  FloatingPortalTarget,
+  UseFloatingPortalNodeProps,
+  UseFloatingPortalNodeResult,
+} from './components/FloatingPortal'
+export {
+  floatingPortalContextKey,
+  usePortalContext,
+} from './components/FloatingPortal'
 export { createFloatingRootContext } from './components/FloatingRootStore'
 export {
   provideFloatingNode,

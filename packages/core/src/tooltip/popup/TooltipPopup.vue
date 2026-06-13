@@ -17,6 +17,12 @@ import { useRenderElement } from '../../utils/useRenderElement'
 import { useTooltipPositionerContext } from '../positioner/TooltipPositionerContext'
 import { useTooltipRootContext } from '../root/TooltipRootContext'
 
+/**
+ * A container for the tooltip contents.
+ * Renders a `<div>` element.
+ *
+ * Documentation: [Base UI Tooltip](https://baseui-vue.com/docs/components/tooltip)
+ */
 defineOptions({
   name: 'TooltipPopup',
   inheritAttrs: false,

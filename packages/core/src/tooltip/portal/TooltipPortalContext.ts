@@ -1,9 +1,19 @@
 import type { InjectionKey, Ref } from 'vue'
 import { inject } from 'vue'
 
-export const tooltipPortalContextKey: InjectionKey<Ref<boolean>>
+export type TooltipPortalContext = Ref<boolean>
+
+export const tooltipPortalContextKey: InjectionKey<TooltipPortalContext>
   = Symbol('TooltipPortalContext')
 
-export function useTooltipPortalContext(): Ref<boolean> | undefined {
-  return inject(tooltipPortalContextKey, undefined)
+export function useTooltipPortalContext(): TooltipPortalContext {
+  const context = inject(tooltipPortalContextKey, undefined)
+
+  if (context === undefined) {
+    throw new Error(
+      'Base UI Vue: <TooltipPortal> is missing.',
+    )
+  }
+
+  return context
 }

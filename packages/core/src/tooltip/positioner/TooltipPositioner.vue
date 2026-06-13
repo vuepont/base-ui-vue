@@ -53,7 +53,7 @@ const positioning = useAnchorPositioning({
   anchor: reference,
   positionMethod: () => props.positionMethod,
   mounted: () => ctx.mounted.value,
-  keepMounted: () => portalKeepMounted?.value,
+  keepMounted: () => portalKeepMounted.value,
   side: () => props.side,
   sideOffset: () => props.sideOffset,
   align: () => props.align,
@@ -70,7 +70,7 @@ const positioning = useAnchorPositioning({
   }),
 })
 
-const shouldRender = computed(() => ctx.mounted.value || portalKeepMounted?.value)
+const shouldRender = computed(() => ctx.mounted.value || portalKeepMounted.value)
 const inert = computed(() =>
   !ctx.open.value || ctx.trackCursorAxis.value === 'both' || ctx.disableHoverablePopup.value,
 )
