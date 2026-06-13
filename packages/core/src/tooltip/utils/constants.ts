@@ -1,1 +1,2 @@
 export const OPEN_DELAY = 600
+export const HOVERABLE_CLOSE_GRACE_DELAY = 100

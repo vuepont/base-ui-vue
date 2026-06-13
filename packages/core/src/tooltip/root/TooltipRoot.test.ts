@@ -9,6 +9,7 @@ import TooltipPositioner from '../positioner/TooltipPositioner.vue'
 import TooltipProvider from '../provider/TooltipProvider.vue'
 import { createTooltipHandle } from '../store/TooltipHandle'
 import TooltipTrigger from '../trigger/TooltipTrigger.vue'
+import { HOVERABLE_CLOSE_GRACE_DELAY } from '../utils/constants'
 import TooltipRoot from './TooltipRoot.vue'
 
 const CONTENT = 'Tooltip content'
@@ -85,6 +86,7 @@ describe('<TooltipRoot />', () => {
     expect(screen.getByTestId('arrow')).toHaveAttribute('data-side', 'top')
 
     await fireEvent.mouseLeave(trigger)
+    vi.advanceTimersByTime(HOVERABLE_CLOSE_GRACE_DELAY)
     await nextTick()
     await nextTick()
 

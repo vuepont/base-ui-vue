@@ -4,6 +4,7 @@ import type {
   Ref,
   ShallowRef,
 } from 'vue'
+import type { FloatingRootContext } from '../../floating-ui-vue/types'
 import type { TransitionStatus } from '../../utils/useTransitionStatus'
 import type { TooltipStore, TooltipTriggerRecord } from '../store/TooltipHandle'
 import type {
@@ -15,6 +16,7 @@ import { inject } from 'vue'
 
 export interface TooltipRootContext<Payload = unknown> {
   store: TooltipStore<Payload>
+  floatingRootContext: FloatingRootContext
   open: Readonly<Ref<boolean>>
   mounted: Ref<boolean>
   transitionStatus: Ref<TransitionStatus>

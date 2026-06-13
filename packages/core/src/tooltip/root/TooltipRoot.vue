@@ -5,6 +5,7 @@ import type { BaseUIComponentProps } from '../../utils/types'
 import type { TooltipHandle } from '../store/TooltipHandle'
 import type { TooltipRootContext } from './TooltipRootContext'
 import { computed, getCurrentInstance, onScopeDispose, provide, shallowRef, toRef, watch } from 'vue'
+import { createFloatingRootContext } from '../../floating-ui-vue/components/FloatingRootStore'
 import { REASONS } from '../../utils/reasons'
 import { useControllableState } from '../../utils/useControllableState'
 import { useTimeout } from '../../utils/useTimeout'
@@ -128,6 +129,8 @@ function requestOpenChange(
     return
   }
 
+  floatingRootContext.dispatchOpenChange(nextOpen, details)
+
   if (triggerId !== undefined) {
     activeTriggerId.value = triggerId
   }
@@ -227,6 +230,8 @@ store.controller.value = {
   open,
   activeTriggerId,
   disabled,
+  disableHoverablePopup,
+  trackCursorAxis,
   instantType,
   popupId,
   requestOpenChange,
@@ -244,8 +249,26 @@ onScopeDispose(() => {
   }
 })
 
+const floatingRootContext = createFloatingRootContext({
+  open,
+  transitionStatus,
+  domReferenceElement: () => activeTrigger.value?.element ?? null,
+  referenceElement: () => activeTrigger.value?.element ?? null,
+  floatingElement: () => popupRef.value,
+  floatingId: () => popupId.value,
+  triggerElements: store.triggerElements,
+  clearCloseTimer: closeTimer.clear,
+  onOpenChange(nextOpen, details) {
+    requestOpenChange(
+      nextOpen,
+      details as TooltipRootChangeEventDetails,
+    )
+  },
+})
+
 const context: TooltipRootContext<Payload> = {
   store,
+  floatingRootContext,
   open,
   mounted,
   transitionStatus,

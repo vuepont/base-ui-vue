@@ -1,8 +1,10 @@
 import type { Ref, ShallowRef } from 'vue'
+import type { FloatingTriggerMap } from '../../floating-ui-vue/types'
 import type {
   TooltipInstantType,
   TooltipRootChangeEventDetails,
   TooltipRootChangeEventReason,
+  TooltipTrackCursorAxis,
 } from '../root/TooltipRoot.vue'
 import { shallowRef } from 'vue'
 import { createChangeEventDetails } from '../../utils/createBaseUIEventDetails'
@@ -20,6 +22,8 @@ export interface TooltipRootController {
   open: Readonly<Ref<boolean>>
   activeTriggerId: Ref<string | null>
   disabled: Readonly<Ref<boolean>>
+  disableHoverablePopup: Readonly<Ref<boolean>>
+  trackCursorAxis: Readonly<Ref<TooltipTrackCursorAxis>>
   instantType: Ref<TooltipInstantType>
   popupId: Ref<string | undefined>
   requestOpenChange: (
@@ -43,6 +47,18 @@ export class TooltipStore<Payload = unknown> {
   readonly controller: ShallowRef<TooltipRootController | null> = shallowRef(null)
 
   private readonly triggers = new Map<string, TooltipTriggerRecord<Payload>>()
+
+  readonly triggerElements: FloatingTriggerMap = {
+    hasElement: (element: Element) => {
+      return Array.from(this.triggers.values()).some(record => record.element === element)
+    },
+    entries: () => {
+      const entries = Array.from(this.triggers.entries())
+        .map(([id, record]) => [id, record.element] as [string, HTMLElement])
+
+      return entries[Symbol.iterator]()
+    },
+  }
 
   readonly version = shallowRef(0)
 

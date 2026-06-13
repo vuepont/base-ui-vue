@@ -13,6 +13,7 @@ import { useRenderElement } from '../../utils/useRenderElement'
 import { useTimeout } from '../../utils/useTimeout'
 import { useTooltipRootContext } from '../root/TooltipRootContext'
 import { createTooltipChangeEventDetails } from '../store/TooltipHandle'
+import { HOVERABLE_CLOSE_GRACE_DELAY } from '../utils/constants'
 
 defineOptions({
   name: 'TooltipTrigger',
@@ -143,7 +144,11 @@ function handleMouseLeave(event: MouseEvent) {
     return
   }
 
-  const delay = context.getCloseDelay(props.closeDelay)
+  const closeDelay = context.getCloseDelay(props.closeDelay)
+  const delay = closeDelay === 0 && !context.disableHoverablePopup.value && context.trackCursorAxis.value !== 'both'
+    ? HOVERABLE_CLOSE_GRACE_DELAY
+    : closeDelay
+
   context.scheduleClose(delay, makeDetails(REASONS.triggerHover, event), triggerId)
 }
 
