@@ -90,6 +90,7 @@ export default defineConfig({
           { text: 'Number Field', link: '/docs/components/number-field' },
           { text: 'OTP Field', link: '/docs/components/otp-field' },
           { text: 'Progress', link: '/docs/components/progress' },
+          { text: 'Radio', link: '/docs/components/radio' },
           { text: 'Separator', link: '/docs/components/separator' },
           { text: 'Slider', link: '/docs/components/slider' },
           { text: 'Switch', link: '/docs/components/switch' },
