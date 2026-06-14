@@ -271,4 +271,132 @@ describe('<TooltipRoot />', () => {
     await nextTick()
     expect(screen.getByRole('tooltip')).toHaveTextContent('Second trigger')
   })
+
+  it('should close when the active trigger unmounts', async () => {
+    render(defineComponent({
+      components: {
+        TooltipPopup,
+        TooltipPortal,
+        TooltipPositioner,
+        TooltipRoot,
+        TooltipTrigger,
+      },
+      setup() {
+        const showFirstTrigger = ref(true)
+
+        return {
+          showFirstTrigger,
+        }
+      },
+      template: `
+        <TooltipRoot default-open default-trigger-id="trigger-1" v-slot="{ payload }">
+          <TooltipTrigger
+            v-if="showFirstTrigger"
+            id="trigger-1"
+            :payload="1"
+            :delay="0"
+          >
+            Trigger 1
+          </TooltipTrigger>
+          <TooltipTrigger id="trigger-2" :payload="2" :delay="0">
+            Trigger 2
+          </TooltipTrigger>
+          <button @click="showFirstTrigger = false">Remove first</button>
+          <TooltipPortal>
+            <TooltipPositioner>
+              <TooltipPopup>
+                <span data-testid="content">{{ payload }}</span>
+              </TooltipPopup>
+            </TooltipPositioner>
+          </TooltipPortal>
+        </TooltipRoot>
+      `,
+    }))
+
+    await nextTick()
+    expect(await screen.findByTestId('content')).toHaveTextContent('1')
+
+    await fireEvent.click(screen.getByRole('button', { name: 'Remove first' }))
+    await nextTick()
+    await Promise.resolve()
+    await nextTick()
+
+    const trigger2 = screen.getByRole('button', { name: 'Trigger 2' })
+
+    expect(screen.queryByRole('button', { name: 'Trigger 1' })).toBeNull()
+    expect(trigger2).not.toHaveAttribute('data-popup-open')
+    expect(screen.queryByTestId('content')).toBeNull()
+  })
+
+  it('should remain open when the active trigger unmount close is canceled', async () => {
+    const handleOpenChange = vi.fn((nextOpen, details) => {
+      if (!nextOpen) {
+        details.cancel()
+      }
+    })
+
+    render(defineComponent({
+      components: {
+        TooltipPopup,
+        TooltipPortal,
+        TooltipPositioner,
+        TooltipRoot,
+        TooltipTrigger,
+      },
+      setup() {
+        const showFirstTrigger = ref(true)
+
+        return {
+          handleOpenChange,
+          showFirstTrigger,
+        }
+      },
+      template: `
+        <TooltipRoot
+          default-open
+          default-trigger-id="trigger-1"
+          @open-change="handleOpenChange"
+          v-slot="{ payload }"
+        >
+          <TooltipTrigger
+            v-if="showFirstTrigger"
+            id="trigger-1"
+            :payload="1"
+            :delay="0"
+          >
+            Trigger 1
+          </TooltipTrigger>
+          <TooltipTrigger id="trigger-2" :payload="2" :delay="0">
+            Trigger 2
+          </TooltipTrigger>
+          <button @click="showFirstTrigger = false">Remove first</button>
+          <TooltipPortal>
+            <TooltipPositioner>
+              <TooltipPopup>
+                <span data-testid="content">{{ payload }}</span>
+              </TooltipPopup>
+            </TooltipPositioner>
+          </TooltipPortal>
+        </TooltipRoot>
+      `,
+    }))
+
+    await nextTick()
+    expect(await screen.findByTestId('content')).toHaveTextContent('1')
+
+    await fireEvent.click(screen.getByRole('button', { name: 'Remove first' }))
+    await nextTick()
+    await Promise.resolve()
+    await nextTick()
+
+    const trigger2 = screen.getByRole('button', { name: 'Trigger 2' })
+
+    expect(screen.queryByRole('button', { name: 'Trigger 1' })).toBeNull()
+    expect(handleOpenChange).toHaveBeenCalledWith(
+      false,
+      expect.objectContaining({ reason: 'none' }),
+    )
+    expect(trigger2).not.toHaveAttribute('data-popup-open')
+    expect(screen.getByTestId('content')).toHaveTextContent('1')
+  })
 })

@@ -294,7 +294,7 @@ describe('<TooltipArrow />', () => {
     })
 
     expect(() => render(TestComponent)).toThrow(
-      'Base UI Vue: TooltipPositionerContext is missing. <TooltipArrow> must be placed within <TooltipPositioner>.',
+      'Base UI Vue: TooltipPositionerContext is missing. Tooltip parts must be placed within <TooltipPositioner>.',
     )
   })
 

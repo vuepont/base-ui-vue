@@ -7,6 +7,7 @@ import { popupStateMapping } from '../../utils/popupStateMapping'
 import { useRenderElement } from '../../utils/useRenderElement'
 import { useTooltipPositionerContext } from '../positioner/TooltipPositionerContext'
 import { useTooltipRootContext } from '../root/TooltipRootContext'
+import { TooltipArrowDataAttributes } from './TooltipArrowDataAttributes'
 
 /**
  * Displays an element positioned against the tooltip anchor.
@@ -69,7 +70,10 @@ const {
   stateAttributesMapping: {
     ...popupStateMapping,
     uncentered(value) {
-      return value ? { 'data-uncentered': '' } : null
+      return value ? { [TooltipArrowDataAttributes.uncentered]: '' } : null
+    },
+    instant(value) {
+      return value ? { [TooltipArrowDataAttributes.instant]: value } : null
     },
   },
   defaultTagName: 'div',

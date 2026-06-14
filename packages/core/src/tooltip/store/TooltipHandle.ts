@@ -47,6 +47,7 @@ export class TooltipStore<Payload = unknown> {
   readonly controller: ShallowRef<TooltipRootController | null> = shallowRef(null)
 
   private readonly triggers = new Map<string, TooltipTriggerRecord<Payload>>()
+  private readonly retainedTriggers = new Map<string, TooltipTriggerRecord<Payload>>()
 
   readonly triggerElements: FloatingTriggerMap = {
     hasElement: (element: Element) => {
@@ -63,6 +64,7 @@ export class TooltipStore<Payload = unknown> {
   readonly version = shallowRef(0)
 
   registerTrigger(record: TooltipTriggerRecord<Payload>) {
+    this.retainedTriggers.delete(record.id)
     this.triggers.set(record.id, record)
     this.version.value += 1
     this.controller.value?.maybeActivateTrigger(record.id)
@@ -75,8 +77,18 @@ export class TooltipStore<Payload = unknown> {
       return
     }
 
+    const isActiveTrigger = this.controller.value?.activeTriggerId.value === id
+
+    if (isActiveTrigger) {
+      this.retainedTriggers.set(id, existing)
+    }
+
     this.triggers.delete(id)
     this.version.value += 1
+
+    if (isActiveTrigger) {
+      this.requestCloseWhenActiveTriggerStaysUnmounted(id)
+    }
   }
 
   getTrigger(id: string | null | undefined): TooltipTriggerRecord<Payload> | undefined {
@@ -87,7 +99,36 @@ export class TooltipStore<Payload = unknown> {
       return undefined
     }
 
-    return this.triggers.get(id)
+    return this.triggers.get(id) ?? this.retainedTriggers.get(id)
+  }
+
+  private requestCloseWhenActiveTriggerStaysUnmounted(id: string) {
+    queueMicrotask(() => {
+      const controller = this.controller.value
+
+      if (
+        !controller
+        || !controller.open.value
+        || controller.activeTriggerId.value !== id
+      ) {
+        this.retainedTriggers.delete(id)
+        return
+      }
+
+      if (this.triggers.has(id)) {
+        this.retainedTriggers.delete(id)
+        return
+      }
+
+      const details = createTooltipChangeEventDetails(REASONS.none)
+
+      controller.requestOpenChange(false, details)
+
+      if (!details.isCanceled) {
+        controller.activeTriggerId.value = null
+        this.retainedTriggers.delete(id)
+      }
+    })
   }
 
   open(triggerId: string) {

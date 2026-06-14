@@ -15,7 +15,7 @@ export function useTooltipPositionerContext(): TooltipPositionerContext {
 
   if (context === undefined) {
     throw new Error(
-      'Base UI Vue: TooltipPositionerContext is missing. <TooltipArrow> must be placed within <TooltipPositioner>.',
+      'Base UI Vue: TooltipPositionerContext is missing. Tooltip parts must be placed within <TooltipPositioner>.',
     )
   }
 

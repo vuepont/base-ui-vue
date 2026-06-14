@@ -1,10 +1,12 @@
+import { CommonTriggerDataAttributes } from '../../utils/popupStateMapping'
+
 export enum TooltipTriggerDataAttributes {
   /**
    * Present when the corresponding tooltip is open.
    */
-  popupOpen = 'data-popup-open',
+  popupOpen = CommonTriggerDataAttributes.popupOpen,
   /**
    * Present when the trigger is disabled, either by the `disabled` prop or by a parent `<TooltipRoot>`.
    */
-  triggerDisabled = 'data-trigger-disabled',
+  triggerDisabled = CommonTriggerDataAttributes.triggerDisabled,
 }

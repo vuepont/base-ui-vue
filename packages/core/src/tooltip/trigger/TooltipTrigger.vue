@@ -14,7 +14,14 @@ import { useTimeout } from '../../utils/useTimeout'
 import { useTooltipRootContext } from '../root/TooltipRootContext'
 import { createTooltipChangeEventDetails } from '../store/TooltipHandle'
 import { HOVERABLE_CLOSE_GRACE_DELAY } from '../utils/constants'
+import { TooltipTriggerDataAttributes } from './TooltipTriggerDataAttributes'
 
+/**
+ * An element to attach the tooltip to.
+ * Renders a `<button>` element.
+ *
+ * Documentation: [Base UI Vue Tooltip](https://baseui-vue.com/docs/components/tooltip)
+ */
 defineOptions({
   name: 'TooltipTrigger',
   inheritAttrs: false,
@@ -116,6 +123,11 @@ function handleMouseEnter(event: MouseEvent) {
     if (context.open.value) {
       context.requestOpenChange(false, makeDetails(REASONS.triggerHover, event), triggerId)
     }
+    return
+  }
+
+  if (context.open.value && context.activeTriggerId.value !== triggerId) {
+    requestOpen(event)
     return
   }
 
@@ -261,7 +273,12 @@ const {
   componentProps: props,
   state: triggerState,
   props: triggerProps,
-  stateAttributesMapping: triggerStateMapping,
+  stateAttributesMapping: {
+    ...triggerStateMapping,
+    disabled(value) {
+      return value ? { [TooltipTriggerDataAttributes.triggerDisabled]: '' } : null
+    },
+  },
   defaultTagName: 'button',
   ref: renderRef,
 })

@@ -1,10 +1,22 @@
 <script setup lang="ts">
 import type { BaseUIComponentProps } from '../../utils/types'
 import type { TooltipInstantType } from '../root/TooltipRoot.vue'
-import { computed, onBeforeUnmount, onMounted, shallowRef, useAttrs, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, useAttrs } from 'vue'
+import { usePopupViewport } from '../../utils/usePopupViewport'
 import { useRenderElement } from '../../utils/useRenderElement'
+import { useTooltipPositionerContext } from '../positioner/TooltipPositionerContext'
 import { useTooltipRootContext } from '../root/TooltipRootContext'
+import { TooltipViewportCssVars } from './TooltipViewportCssVars'
+import { TooltipViewportDataAttributes } from './TooltipViewportDataAttributes'
 
+/**
+ * A viewport for displaying content transitions.
+ * This component is only required if one popup can be opened by multiple triggers, its content
+ * changes based on the trigger, and switching between them is animated.
+ * Renders a `<div>` element.
+ *
+ * Documentation: [Base UI Vue Tooltip](https://baseui-vue.com/docs/components/tooltip)
+ */
 defineOptions({
   name: 'TooltipViewport',
   inheritAttrs: false,
@@ -16,7 +28,7 @@ const props = withDefaults(defineProps<TooltipViewportProps>(), {
 
 const attrs = useAttrs()
 const ctx = useTooltipRootContext()
-const activationDirection = shallowRef<TooltipViewportState['activationDirection']>(undefined)
+useTooltipPositionerContext()
 
 onMounted(() => {
   ctx.setHasViewport(true)
@@ -26,46 +38,32 @@ onBeforeUnmount(() => {
   ctx.setHasViewport(false)
 })
 
-watch(
-  () => ctx.activeTriggerId.value,
-  (nextId, previousId) => {
-    const nextTrigger = ctx.store.getTrigger(nextId)
-    const previousTrigger = ctx.store.getTrigger(previousId)
+const viewport = usePopupViewport({
+  activeTriggerElement: () => ctx.activeTrigger.value?.element,
+  activeTriggerId: ctx.activeTriggerId,
+  open: ctx.open,
+  payload: ctx.payload,
+  cssVars: TooltipViewportCssVars,
+})
 
-    if (!nextTrigger || !previousTrigger) {
-      activationDirection.value = undefined
-      return
-    }
-
-    const nextRect = nextTrigger.element.getBoundingClientRect()
-    const previousRect = previousTrigger.element.getBoundingClientRect()
-    const nextX = nextRect.left + nextRect.width / 2
-    const previousX = previousRect.left + previousRect.width / 2
-    const nextY = nextRect.top + nextRect.height / 2
-    const previousY = previousRect.top + previousRect.height / 2
-    const deltaX = nextX - previousX
-    const deltaY = nextY - previousY
-
-    activationDirection.value = Math.abs(deltaX) >= Math.abs(deltaY)
-      ? deltaX < 0 ? 'left' : 'right'
-      : deltaY < 0 ? 'up' : 'down'
-  },
-)
+const {
+  currentContainerRef,
+  previousContainerRef,
+  currentContentKey,
+  currentContainerProps,
+  previousContainerProps,
+  transitioning,
+} = viewport
 
 const state = computed<TooltipViewportState>(() => ({
-  activationDirection: activationDirection.value,
-  transitioning: false,
+  activationDirection: viewport.state.value.activationDirection,
+  transitioning: viewport.state.value.transitioning,
   instant: ctx.instantType.value,
 }))
 
 const viewportProps = computed(() => {
-  const resolvedStyle = typeof props.style === 'function'
-    ? props.style(state.value)
-    : props.style
-
   return {
     ...attrs,
-    style: resolvedStyle,
   }
 })
 
@@ -78,18 +76,19 @@ const {
   componentProps: {
     as: props.as,
     class: props.class,
+    style: props.style,
   },
   state,
   props: viewportProps,
   stateAttributesMapping: {
     activationDirection(value) {
-      return value ? { 'data-activation-direction': value } : null
+      return value ? { [TooltipViewportDataAttributes.activationDirection]: value } : null
     },
     transitioning(value) {
-      return value ? { 'data-transitioning': '' } : null
+      return value ? { [TooltipViewportDataAttributes.transitioning]: '' } : null
     },
     instant(value) {
-      return value ? { 'data-instant': value } : null
+      return value ? { [TooltipViewportDataAttributes.instant]: value } : null
     },
   },
   defaultTagName: 'div',
@@ -101,7 +100,7 @@ export interface TooltipViewportState {
   /**
    * The activation direction of the transitioned content.
    */
-  activationDirection: 'left' | 'right' | 'up' | 'down' | undefined
+  activationDirection: string | undefined
   /**
    * Whether the viewport is currently transitioning between contents.
    */
@@ -118,7 +117,25 @@ export interface TooltipViewportProps extends BaseUIComponentProps<TooltipViewpo
 <template>
   <slot v-if="renderless" :ref="renderRef" :props="mergedProps" :state="state" />
   <component :is="tag" v-else :ref="renderRef" v-bind="mergedProps">
-    <div data-current>
+    <template v-if="transitioning">
+      <div
+        ref="previousContainerRef"
+        v-bind="previousContainerProps"
+      />
+      <div
+        :key="currentContentKey"
+        ref="currentContainerRef"
+        v-bind="currentContainerProps"
+      >
+        <slot :state="state" />
+      </div>
+    </template>
+    <div
+      v-else
+      :key="currentContentKey"
+      ref="currentContainerRef"
+      v-bind="currentContainerProps"
+    >
       <slot :state="state" />
     </div>
   </component>

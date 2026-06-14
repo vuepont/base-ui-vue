@@ -15,6 +15,12 @@ import { createTooltipChangeEventDetails, TooltipStore } from '../store/TooltipH
 import { OPEN_DELAY } from '../utils/constants'
 import { tooltipRootContextKey } from './TooltipRootContext'
 
+/**
+ * Groups all parts of the tooltip.
+ * Doesn't render its own HTML element.
+ *
+ * Documentation: [Base UI Vue Tooltip](https://baseui-vue.com/docs/components/tooltip)
+ */
 defineOptions({
   name: 'TooltipRoot',
 })

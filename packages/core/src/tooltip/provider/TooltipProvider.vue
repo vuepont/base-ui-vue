@@ -3,6 +3,12 @@ import { computed, provide, shallowRef, toRef } from 'vue'
 import { OPEN_DELAY } from '../utils/constants'
 import { tooltipProviderContextKey } from './TooltipProviderContext'
 
+/**
+ * Provides a shared delay for multiple tooltips. The grouping logic ensures that
+ * once a tooltip becomes visible, the adjacent tooltips will be shown instantly.
+ *
+ * Documentation: [Base UI Vue Tooltip](https://baseui-vue.com/docs/components/tooltip)
+ */
 defineOptions({
   name: 'TooltipProvider',
 })

@@ -16,13 +16,19 @@ import type {
 import type { TooltipInstantType } from '../root/TooltipRoot.vue'
 import { computed, provide, useAttrs } from 'vue'
 import { adaptiveOrigin } from '../../utils/adaptiveOriginMiddleware'
-import { popupStateMapping } from '../../utils/popupStateMapping'
 import { POPUP_COLLISION_AVOIDANCE, useAnchorPositioning } from '../../utils/useAnchorPositioning'
-import { useRenderElement } from '../../utils/useRenderElement'
+import { useMergedRefs } from '../../utils/useMergedRefs'
+import { usePositioner } from '../../utils/usePositioner'
 import { useTooltipPortalContext } from '../portal/TooltipPortalContext'
 import { useTooltipRootContext } from '../root/TooltipRootContext'
 import { tooltipPositionerContextKey } from './TooltipPositionerContext'
 
+/**
+ * Positions the tooltip against the trigger.
+ * Renders a `<div>` element.
+ *
+ * Documentation: [Base UI Vue Tooltip](https://baseui-vue.com/docs/components/tooltip)
+ */
 defineOptions({
   name: 'TooltipPositioner',
   inheritAttrs: false,
@@ -84,21 +90,7 @@ const state = computed<TooltipPositionerState>(() => ({
 }))
 
 const positionerProps = computed(() => {
-  const resolvedStyle = typeof props.style === 'function'
-    ? props.style(state.value)
-    : props.style
-
-  return {
-    ...attrs,
-    role: (attrs as { role?: unknown }).role ?? 'presentation',
-    hidden: shouldRender.value ? undefined : true,
-    inert: inert.value ? '' : undefined,
-    style: [
-      positioning.positionerStyles.value,
-      inert.value ? { pointerEvents: 'none' } : undefined,
-      resolvedStyle,
-    ],
-  }
+  return attrs as Record<string, any>
 })
 
 const {
@@ -106,18 +98,17 @@ const {
   mergedProps,
   renderless,
   ref: renderRef,
-} = useRenderElement({
-  componentProps: {
-    as: props.as,
-    class: props.class,
-  },
-  state,
+} = usePositioner({
+  as: props.as,
+  class: props.class,
+  style: props.style,
+}, state, {
+  styles: positioning.positionerStyles,
+  transitionStatus: ctx.transitionStatus,
   props: positionerProps,
-  stateAttributesMapping: {
-    ...popupStateMapping,
-  },
-  defaultTagName: 'div',
-  ref: positioning.positionerRef,
+  refs: useMergedRefs(positioning.positionerRef, ctx.positionerRef),
+  hidden: () => !ctx.mounted.value,
+  inert,
 })
 
 provide(tooltipPositionerContextKey, positioning)

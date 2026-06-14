@@ -7,7 +7,11 @@ import type {
   TeleportProps,
 } from 'vue'
 import type { BaseUIComponentProps } from '../../utils/types'
-import type { RenderRef, UseRenderElementReturn } from '../../utils/useRenderElement'
+import type {
+  RenderRef,
+  UseRenderElementComponentProps,
+  UseRenderElementReturn,
+} from '../../utils/useRenderElement'
 import { computed, inject, isRef, shallowRef, toValue } from 'vue'
 import { mergeProps } from '../../merge-props/mergeProps'
 import { EMPTY_OBJECT } from '../../utils/constants'
@@ -92,7 +96,7 @@ export interface UseFloatingPortalNodeProps<
   ref?: RenderRef | undefined
   container?: FloatingPortalContainer | undefined
   to?: MaybeRefOrGetter<FloatingPortalTarget> | undefined
-  componentProps?: BaseUIComponentProps<State> | undefined
+  componentProps?: UseRenderElementComponentProps<State> | undefined
   elementProps?: MaybeRefOrGetter<Record<string, any> | undefined>
   state?: MaybeRefOrGetter<State | undefined>
 }
