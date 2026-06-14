@@ -91,8 +91,8 @@ Renders a `<div>` element.
 | Prop | Type | Default | Description |
 | ---- | ---- | ------- | ----------- |
 | `as` | `string \| Component` | `'div'` | The element or component to use for the root node. Pass `Slot` for renderless mode. |
-| `default-value` | `any \| null` | `0` | The uncontrolled value of the tab that should be initially active. When `null`, no tab is active. |
-| `value` | `any \| null` | `undefined` | The controlled value of the currently active tab. When `null`, no tab is active. |
+| `default-value` | `TabsTabValue` | `0` | The value of the Tab that should be active initially. Use when the component is uncontrolled. When the value is `null`, no Tab will be active. |
+| `value` | `TabsTabValue` | `undefined` | The value of the currently active Tab. Use when the component is controlled. When the value is `null`, no Tab will be active. |
 | `orientation` | `'horizontal' \| 'vertical'` | `'horizontal'` | The component orientation. |
 | `class` | `any \| ((state: State) => any)` | `undefined` | CSS class applied to the element, or a function that returns a class based on the component state. |
 | `style` | `StyleValue \| ((state: State) => StyleValue)` | `undefined` | Style applied to the element, or a function that returns a style object based on the component state. |
@@ -132,7 +132,7 @@ Renders a `<button>` element.
 | Prop | Type | Default | Description |
 | ---- | ---- | ------- | ----------- |
 | `as` | `string \| Component` | `'button'` | The element or component to use for the root node. Pass `Slot` for renderless mode. |
-| `value` | `any \| null` | Required | The value of the tab. |
+| `value` | `TabsTabValue` | `undefined` | The value of the tab. When omitted, the tab's zero-based index is used. |
 | `disabled` | `boolean` | `false` | Whether the tab should ignore user interaction. Disabled tabs remain focusable for composite keyboard navigation. |
 | `id` | `string` | `undefined` | The id of the tab element. |
 | `native-button` | `boolean` | `true` | Whether the component renders a native `<button>` element. Set to `false` when using `as` with a non-button element. |
@@ -179,7 +179,7 @@ Renders a `<div>` element.
 | Prop | Type | Default | Description |
 | ---- | ---- | ------- | ----------- |
 | `as` | `string \| Component` | `'div'` | The element or component to use for the root node. Pass `Slot` for renderless mode. |
-| `value` | `any \| null` | Required | The value of the corresponding tab. |
+| `value` | `TabsTabValue` | Required | The value of the corresponding tab. |
 | `keep-mounted` | `boolean` | `false` | Whether to keep the HTML element in the DOM while the panel is hidden. |
 | `id` | `string` | `undefined` | The id of the tab panel element. |
 | `class` | `any \| ((state: State) => any)` | `undefined` | CSS class applied to the element, or a function that returns a class based on the component state. |

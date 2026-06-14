@@ -91,7 +91,7 @@ const isValueControlled = computed(() => props.value !== undefined)
 const hasExplicitDefaultValueProp = props.defaultValue !== undefined
 
 const initialDefaultValue = props.defaultValue === undefined ? 0 : props.defaultValue
-const initialValue = isValueControlled.value ? props.value : initialDefaultValue
+const initialValue = props.value === undefined ? initialDefaultValue : props.value
 const tabPanelRefs = ref<Array<HTMLElement | null>>([])
 const tabPanelRefsHolder = { elementsRef: tabPanelRefs }
 const tabMap = shallowRef<Map<Element, CompositeMetadata<TabsTabMetadata> | null>>(new Map())
@@ -121,7 +121,7 @@ function getTabElementBySelectedValue(selectedValue: TabsTabValue | undefined) {
   }
 
   for (const [tabElement, tabMetadata] of tabMap.value.entries()) {
-    if (tabMetadata != null && areTabValuesEqual(selectedValue, tabMetadata.value ?? tabMetadata.index)) {
+    if (tabMetadata != null && areTabValuesEqual(selectedValue, getTabMetadataValue(tabMetadata))) {
       return tabElement as HTMLElement
     }
   }
@@ -131,7 +131,7 @@ function getTabElementBySelectedValue(selectedValue: TabsTabValue | undefined) {
 
 function getTabIdByPanelValue(panelValue: TabsTabValue) {
   for (const tabMetadata of tabMap.value.values()) {
-    if (tabMetadata != null && areTabValuesEqual(tabMetadata.value, panelValue)) {
+    if (tabMetadata != null && areTabValuesEqual(getTabMetadataValue(tabMetadata), panelValue)) {
       return tabMetadata.id
     }
   }
@@ -145,6 +145,10 @@ function getTabPanelIdByValue(tabValue: TabsTabValue) {
     }
   }
   return undefined
+}
+
+function getTabMetadataValue(tabMetadata: CompositeMetadata<TabsTabMetadata>): TabsTabValue | undefined {
+  return tabMetadata.value ?? tabMetadata.index ?? undefined
 }
 
 function registerMountedTabPanel(panelValue: TabsTabValue | number, panelId: string) {
@@ -246,7 +250,7 @@ watch(
 
 const selectedTabMetadata = computed(() => {
   for (const tabMetadata of tabMap.value.values()) {
-    if (tabMetadata != null && areTabValuesEqual(tabMetadata.value, value.value)) {
+    if (tabMetadata != null && areTabValuesEqual(getTabMetadataValue(tabMetadata), value.value)) {
       return tabMetadata
     }
   }
@@ -256,7 +260,7 @@ const selectedTabMetadata = computed(() => {
 const firstEnabledTabValue = computed(() => {
   for (const tabMetadata of tabMap.value.values()) {
     if (tabMetadata != null && !tabMetadata.disabled) {
-      return tabMetadata.value
+      return getTabMetadataValue(tabMetadata)
     }
   }
   return undefined
@@ -399,7 +403,7 @@ function computeActivationDirection(
       continue
     }
 
-    const tabValue = tabMetadata.value ?? tabMetadata.index
+    const tabValue = getTabMetadataValue(tabMetadata)
     if (areTabValuesEqual(oldValue, tabValue)) {
       oldTab = tabElement as HTMLElement
     }
@@ -414,7 +418,8 @@ function computeActivationDirection(
   if (oldTab == null || newTab == null) {
     if (
       oldTab !== newTab
-      && (typeof oldValue === 'number' || typeof oldValue === 'string')
+      && isDirectionFallbackValue(oldValue)
+      && isDirectionFallbackValue(newValue)
       && typeof oldValue === typeof newValue
     ) {
       if (orientation === 'horizontal') {
@@ -446,6 +451,10 @@ function computeActivationDirection(
   }
 
   return 'none'
+}
+
+function isDirectionFallbackValue(value: TabsTabValue): value is number | string {
+  return typeof value === 'number' || typeof value === 'string'
 }
 </script>
 

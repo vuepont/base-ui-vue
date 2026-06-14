@@ -19,7 +19,7 @@ import { tabsStateAttributesMapping } from '../root/stateAttributesMapping'
 import { useTabsRootContext } from '../root/TabsRootContext'
 import { areTabValuesEqual } from '../utils/areTabValuesEqual'
 
-export type TabsTabValue = any | null
+export type TabsTabValue = unknown
 export type TabsTabActivationDirection = 'left' | 'right' | 'up' | 'down' | 'none'
 
 export interface TabsTabPosition {
@@ -64,7 +64,7 @@ export interface TabsTabProps
   /**
    * The value of the Tab.
    */
-  value: TabsTabValue
+  value?: TabsTabValue
   /**
    * Whether the Tab is disabled.
    */
@@ -111,7 +111,8 @@ const {
   metadata: () => tabMetadata.value,
 })
 
-const active = computed(() => areTabValuesEqual(props.value, rootCtx.value.value))
+const value = computed<TabsTabValue>(() => props.value ?? index.value)
+const active = computed(() => areTabValuesEqual(value.value, rootCtx.value.value))
 const isNavigating = ref(false)
 const isPressing = ref(false)
 const isMainButton = ref(false)
@@ -163,7 +164,7 @@ const { getButtonProps, buttonRef } = useButton({
   focusableWhenDisabled: () => true,
 })
 
-const tabPanelId = computed(() => rootCtx.getTabPanelIdByValue(props.value))
+const tabPanelId = computed(() => rootCtx.getTabPanelIdByValue(value.value))
 
 function createTabDetails(event?: Event) {
   return createChangeEventDetails<TabsRootChangeEventReason, { activationDirection: TabsTabActivationDirection }>(
@@ -179,7 +180,7 @@ function handleClick(event: MouseEvent) {
     return
   }
 
-  listCtx.onTabActivation(props.value, createTabDetails(event))
+  listCtx.onTabActivation(value.value, createTabDetails(event))
 }
 
 function handleFocus(event: FocusEvent) {
@@ -199,7 +200,7 @@ function handleFocus(event: FocusEvent) {
     listCtx.activateOnFocus.value
     && (!isPressing.value || (isPressing.value && isMainButton.value))
   ) {
-    listCtx.onTabActivation(props.value, createTabDetails(event))
+    listCtx.onTabActivation(value.value, createTabDetails(event))
   }
 }
 

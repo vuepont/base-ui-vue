@@ -237,6 +237,67 @@ describe('<TabsRoot />', () => {
     })
   })
 
+  it('uses tab indexes as implicit tab values', async () => {
+    const user = userEvent.setup()
+
+    render(createTabsApp(`
+      <TabsRoot>
+        <TabsList>
+          <TabsTab>Tab 0</TabsTab>
+          <TabsTab>Tab 1</TabsTab>
+        </TabsList>
+        <TabsPanel :value="0" keep-mounted>Panel 0</TabsPanel>
+        <TabsPanel :value="1" keep-mounted>Panel 1</TabsPanel>
+      </TabsRoot>
+    `))
+
+    const tabs = screen.getAllByRole('tab')
+    const panels = screen.getAllByRole('tabpanel', { hidden: true })
+
+    await waitFor(() => {
+      expect(tabs[0]).toHaveAttribute('aria-selected', 'true')
+      expect(tabs[0]).toHaveAttribute('aria-controls', panels[0].id)
+      expect(tabs[1]).toHaveAttribute('aria-controls', panels[1].id)
+      expect(panels[0]).toHaveAttribute('aria-labelledby', tabs[0].id)
+      expect(panels[1]).toHaveAttribute('aria-labelledby', tabs[1].id)
+      expect(panels[0]).not.toHaveAttribute('hidden')
+      expect(panels[1]).toHaveAttribute('hidden')
+    })
+
+    await user.click(tabs[1])
+
+    await waitFor(() => {
+      expect(tabs[0]).toHaveAttribute('aria-selected', 'false')
+      expect(tabs[1]).toHaveAttribute('aria-selected', 'true')
+      expect(panels[0]).toHaveAttribute('hidden')
+      expect(panels[1]).not.toHaveAttribute('hidden')
+    })
+  })
+
+  it('falls back to the first enabled implicit tab value', async () => {
+    const handleValueChange = vi.fn()
+
+    render(createTabsApp(
+      `
+        <TabsRoot @value-change="handleValueChange">
+          <TabsList>
+            <TabsTab disabled>Tab 0</TabsTab>
+            <TabsTab>Tab 1</TabsTab>
+          </TabsList>
+        </TabsRoot>
+      `,
+      () => ({ handleValueChange }),
+    ))
+
+    await waitFor(() => {
+      expect(handleValueChange).toHaveBeenCalledTimes(1)
+      expect(handleValueChange.mock.calls[0][0]).toBe(1)
+      expect(handleValueChange.mock.calls[0][1].reason).toBe('initial')
+      expect(screen.getAllByRole('tab')[0]).toHaveAttribute('aria-selected', 'false')
+      expect(screen.getAllByRole('tab')[1]).toHaveAttribute('aria-selected', 'true')
+    })
+  })
+
   it('should pass selected prop to children', () => {
     render(createTabsApp(`
       <TabsRoot :value="1">
