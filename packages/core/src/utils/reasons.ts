@@ -1,4 +1,6 @@
 export const none = 'none' as const
+export const initial = 'initial' as const
+export const missing = 'missing' as const
 export const triggerPress = 'trigger-press' as const
 export const triggerHover = 'trigger-hover' as const
 export const triggerFocus = 'trigger-focus' as const
@@ -34,6 +36,8 @@ export const windowResize = 'window-resize' as const
 
 export const REASONS = {
   none,
+  initial,
+  missing,
   triggerPress,
   triggerHover,
   triggerFocus,

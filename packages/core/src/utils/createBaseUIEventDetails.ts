@@ -3,6 +3,8 @@ import { EMPTY_OBJECT } from './empty'
 
 interface ReasonToEventMap {
   [REASONS.none]: Event
+  [REASONS.initial]: Event
+  [REASONS.missing]: Event
 
   [REASONS.triggerPress]: MouseEvent | PointerEvent | TouchEvent | KeyboardEvent
   [REASONS.triggerHover]: MouseEvent
