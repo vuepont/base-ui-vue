@@ -2,6 +2,7 @@
 import type { BaseUIComponentProps } from '../../utils/types'
 import type { TooltipInstantType } from '../root/TooltipRoot.vue'
 import { computed, onBeforeUnmount, onMounted, useAttrs } from 'vue'
+import { useDirection } from '../../direction-provider/DirectionContext'
 import { usePopupViewport } from '../../utils/usePopupViewport'
 import { useRenderElement } from '../../utils/useRenderElement'
 import { useTooltipPositionerContext } from '../positioner/TooltipPositionerContext'
@@ -28,7 +29,8 @@ const props = withDefaults(defineProps<TooltipViewportProps>(), {
 
 const attrs = useAttrs()
 const ctx = useTooltipRootContext()
-useTooltipPositionerContext()
+const positioner = useTooltipPositionerContext()
+const direction = useDirection()
 
 onMounted(() => {
   ctx.setHasViewport(true)
@@ -42,6 +44,11 @@ const viewport = usePopupViewport({
   activeTriggerElement: () => ctx.activeTrigger.value?.element,
   activeTriggerId: ctx.activeTriggerId,
   open: ctx.open,
+  mounted: ctx.mounted,
+  popupElement: ctx.popupRef,
+  positionerElement: ctx.positionerRef,
+  side: positioner.side,
+  direction,
   payload: ctx.payload,
   cssVars: TooltipViewportCssVars,
 })

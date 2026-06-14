@@ -74,6 +74,7 @@ useHoverFloatingInteraction(ctx.floatingRootContext, {
 const popupProps = computed(() => {
   return mergeProps(
     getDisabledMountTransitionStyles(ctx.transitionStatus.value),
+    ctx.dismiss?.floating,
     attrs as Record<string, any>,
     {
       id: generatedId,

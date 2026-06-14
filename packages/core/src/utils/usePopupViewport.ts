@@ -1,8 +1,12 @@
 import type { ComputedRef, MaybeRefOrGetter, ShallowRef } from 'vue'
+import type { TextDirection } from '../direction-provider/DirectionContext'
+import type { Dimensions } from '../floating-ui-vue/types'
+import type { Side } from './useAnchorPositioning'
 import { computed, nextTick, onBeforeUnmount, shallowRef, toValue, watch } from 'vue'
 import { TransitionStatusDataAttributes } from './stateAttributesMapping'
 import { useAnimationFrame } from './useAnimationFrame'
 import { useAnimationsFinished } from './useAnimationsFinished'
+import { usePopupAutoResize } from './usePopupAutoResize'
 
 export interface PopupViewportCssVars {
   /**
@@ -39,6 +43,26 @@ export interface UsePopupViewportParameters {
    * Whether the popup is open.
    */
   open: MaybeRefOrGetter<boolean>
+  /**
+   * Whether the popup is mounted.
+   */
+  mounted: MaybeRefOrGetter<boolean>
+  /**
+   * Element to resize.
+   */
+  popupElement: MaybeRefOrGetter<HTMLElement | null | undefined>
+  /**
+   * Positioner element, the parent of the popup.
+   */
+  positionerElement: MaybeRefOrGetter<HTMLElement | null | undefined>
+  /**
+   * Current logical side of the popup.
+   */
+  side: MaybeRefOrGetter<Side | undefined>
+  /**
+   * Current text direction.
+   */
+  direction: MaybeRefOrGetter<TextDirection>
   /**
    * Trigger payload used to render the current content.
    */
@@ -89,6 +113,7 @@ export function usePopupViewport(parameters: UsePopupViewportParameters): UsePop
   const activeTriggerElement = computed(() => toValue(parameters.activeTriggerElement) ?? null)
   const activeTriggerId = computed(() => toValue(parameters.activeTriggerId) ?? null)
   const open = computed(() => toValue(parameters.open))
+  const mounted = computed(() => toValue(parameters.mounted))
   const payload = computed(() => toValue(parameters.payload))
 
   const currentContainerRef = shallowRef<HTMLDivElement | null>(null)
@@ -166,6 +191,35 @@ export function usePopupViewport(parameters: UsePopupViewportParameters): UsePop
 
   onBeforeUnmount(() => {
     cleanupFrame.cancel()
+  })
+
+  function handleMeasureLayout() {
+    currentContainerRef.value?.style.setProperty('animation', 'none')
+    currentContainerRef.value?.style.setProperty('transition', 'none')
+
+    previousContainerRef.value?.style.setProperty('display', 'none')
+  }
+
+  function handleMeasureLayoutComplete(previousDimensions: Dimensions | null) {
+    currentContainerRef.value?.style.removeProperty('animation')
+    currentContainerRef.value?.style.removeProperty('transition')
+
+    previousContainerRef.value?.style.removeProperty('display')
+
+    if (previousDimensions && (previousDimensions.width > 0 || previousDimensions.height > 0)) {
+      previousContentDimensions.value = previousDimensions
+    }
+  }
+
+  usePopupAutoResize({
+    popupElement: parameters.popupElement,
+    positionerElement: parameters.positionerElement,
+    mounted,
+    content: payload,
+    onMeasureLayout: handleMeasureLayout,
+    onMeasureLayoutComplete: handleMeasureLayoutComplete,
+    side: parameters.side,
+    direction: parameters.direction,
   })
 
   const transitioning = computed(() => previousContentNode.value != null)

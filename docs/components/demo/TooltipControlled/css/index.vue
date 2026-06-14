@@ -9,11 +9,11 @@ import {
   TooltipRoot,
   TooltipTrigger,
 } from 'base-ui-vue'
-import { ref } from 'vue'
+import { shallowRef } from 'vue'
 
 const tooltip = createTooltipHandle()
-const open = ref(false)
-const triggerId = ref<string | null>(null)
+const open = shallowRef(false)
+const triggerId = shallowRef<string | null>(null)
 
 function handleOpenChange(nextOpen: boolean, details: any) {
   open.value = nextOpen
@@ -21,7 +21,7 @@ function handleOpenChange(nextOpen: boolean, details: any) {
 }
 
 function openTimerTrigger() {
-  triggerId.value = 'timer-trigger'
+  triggerId.value = 'trigger-2'
   open.value = true
 }
 </script>
@@ -30,16 +30,23 @@ function openTimerTrigger() {
   <TooltipProvider>
     <div class="Container">
       <div class="ButtonGroup">
-        <TooltipTrigger id="audio-trigger" :handle="tooltip" class="IconButton" aria-label="Controlled tooltip">
+        <TooltipTrigger id="trigger-1" :handle="tooltip" class="IconButton" aria-label="Trigger 1">
           <svg class="Icon" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" aria-hidden="true">
             <path stroke-linecap="round" d="M1.5 11V7.5c0-2.5 2.5-6 6.5-6s6.5 3.5 6.5 6V11" />
             <path d="M12 7.5c1.3807 0 2.5 1.11929 2.5 2.5v2c0 1.3807-1.1193 2.5-2.5 2.5h-1.5v-7zm-8 0h1.5v7H4c-1.38071 0-2.5-1.1193-2.5-2.5v-2c0-1.38071 1.11929-2.5 2.5-2.5Z" />
           </svg>
         </TooltipTrigger>
-        <TooltipTrigger id="timer-trigger" :handle="tooltip" class="IconButton" aria-label="Controlled tooltip">
+        <TooltipTrigger id="trigger-2" :handle="tooltip" class="IconButton" aria-label="Trigger 2">
           <svg class="Icon" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" aria-hidden="true">
             <circle cx="8" cy="8.5" r="6" />
             <path stroke-linecap="square" stroke-linejoin="round" d="M8 9.5v-5m0-2v-2m-2 0h4M12 4l1.5-1.5" />
+          </svg>
+        </TooltipTrigger>
+        <TooltipTrigger id="trigger-3" :handle="tooltip" class="IconButton" aria-label="Trigger 3">
+          <svg class="Icon" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-linejoin="round" aria-hidden="true">
+            <path stroke-linecap="square" d="M2.5 4h11" />
+            <path stroke-linecap="round" d="M6.5 4V3c0-.82843.67157-1.5 1.5-1.5S9.5 2.17157 9.5 3v1" />
+            <path stroke-linecap="square" d="m3.5 4 .87069 9.1422c.07332.7699.7199 1.3578 1.49324 1.3578h4.27217c.7733 0 1.4199-.5879 1.4932-1.3578L12.5 4" />
           </svg>
         </TooltipTrigger>
       </div>
@@ -56,7 +63,7 @@ function openTimerTrigger() {
       @open-change="handleOpenChange"
     >
       <TooltipPortal>
-        <TooltipPositioner :side-offset="11">
+        <TooltipPositioner :side-offset="11" class="Positioner">
           <TooltipPopup class="Popup">
             <TooltipArrow class="Arrow" />
             Controlled tooltip

@@ -247,6 +247,7 @@ const renderRef = useMergedRefs(buttonRef, triggerRef)
 const triggerProps = computed(() =>
   getButtonProps(mergeProps(
     attrs as Record<string, any>,
+    root.value?.dismiss.reference,
     {
       'id': triggerId,
       'aria-describedby': open.value ? root.value?.popupId.value : undefined,

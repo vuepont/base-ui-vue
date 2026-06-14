@@ -28,6 +28,23 @@ export function isTargetInsideEnabledTrigger(
   return false
 }
 
+export function isEventTargetWithin(event: Event, node: Node | null | undefined) {
+  if (node == null) {
+    return false
+  }
+
+  if ('composedPath' in event) {
+    return event.composedPath().includes(node)
+  }
+
+  const eventAgain = event as Event
+  return eventAgain.target != null && node.contains(eventAgain.target as Node)
+}
+
+export function isRootElement(element: Element): boolean {
+  return element.matches('html,body')
+}
+
 export function isTypeableElement(element: unknown): boolean {
   return isHTMLElement(element) && element.matches(TYPEABLE_SELECTOR)
 }

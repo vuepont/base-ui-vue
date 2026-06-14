@@ -1,7 +1,8 @@
 import userEvent from '@testing-library/user-event'
 import { fireEvent, render, screen } from '@testing-library/vue'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { defineComponent, nextTick, ref } from 'vue'
+import { defineComponent, nextTick, ref, shallowRef } from 'vue'
+import { REASONS } from '../../utils/reasons'
 import TooltipArrow from '../arrow/TooltipArrow.vue'
 import TooltipPopup from '../popup/TooltipPopup.vue'
 import TooltipPortal from '../portal/TooltipPortal.vue'
@@ -176,7 +177,7 @@ describe('<TooltipRoot />', () => {
     expect(screen.queryByText(CONTENT)).toBeNull()
   })
 
-  it('supports controlled open and trigger id state', async () => {
+  it('should allow controlling the tooltip state programmatically', async () => {
     const user = userEvent.setup()
 
     render(defineComponent({
@@ -188,42 +189,134 @@ describe('<TooltipRoot />', () => {
         TooltipTrigger,
       },
       setup() {
-        const open = ref(false)
-        const triggerId = ref<string | null>(null)
+        const open = shallowRef(false)
+        const activeTrigger = shallowRef<string | null>(null)
 
         function handleOpenChange(nextOpen: boolean, details: any) {
           open.value = nextOpen
-          triggerId.value = details.trigger?.id ?? null
+          activeTrigger.value = details.trigger?.id ?? null
         }
 
         return {
+          activeTrigger,
           open,
-          triggerId,
           handleOpenChange,
         }
       },
       template: `
         <TooltipRoot
           :open="open"
-          :trigger-id="triggerId"
+          :trigger-id="activeTrigger"
           @open-change="handleOpenChange"
+          v-slot="{ payload }"
         >
-          <TooltipTrigger id="trigger-1" :delay="0">One</TooltipTrigger>
+          <TooltipTrigger id="trigger-1" :payload="1" :delay="0">Trigger 1</TooltipTrigger>
+          <TooltipTrigger id="trigger-2" :payload="2" :delay="0">Trigger 2</TooltipTrigger>
+          <TooltipTrigger id="trigger-3" :payload="3" :delay="0">Trigger 3</TooltipTrigger>
           <TooltipPortal>
             <TooltipPositioner>
-              <TooltipPopup>${CONTENT}</TooltipPopup>
+              <TooltipPopup>
+                <span data-testid="content">{{ payload }}</span>
+              </TooltipPopup>
             </TooltipPositioner>
           </TooltipPortal>
         </TooltipRoot>
-        <button @click="open = true; triggerId = 'trigger-1'">Open externally</button>
+        <button @click="open = true; activeTrigger = 'trigger-1'">Open Trigger 1</button>
+        <button @click="open = true; activeTrigger = 'trigger-2'">Open Trigger 2</button>
+        <button @click="open = true; activeTrigger = 'trigger-3'">Open Trigger 3</button>
+        <button @click="open = false">Close</button>
       `,
     }))
 
-    await user.click(screen.getByRole('button', { name: 'Open externally' }))
+    await user.click(screen.getByRole('button', { name: 'Open Trigger 1' }))
     await nextTick()
 
-    expect(screen.getByText(CONTENT)).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'One' })).toHaveAttribute('data-popup-open')
+    expect(screen.getByTestId('content')).toHaveTextContent('1')
+    expect(screen.getByRole('button', { name: 'Trigger 1' })).toHaveAttribute('data-popup-open')
+
+    await user.click(screen.getByRole('button', { name: 'Open Trigger 2' }))
+    await nextTick()
+
+    expect(screen.getByTestId('content')).toHaveTextContent('2')
+    expect(screen.getByRole('button', { name: 'Trigger 1' })).not.toHaveAttribute('data-popup-open')
+    expect(screen.getByRole('button', { name: 'Trigger 2' })).toHaveAttribute('data-popup-open')
+
+    await user.click(screen.getByRole('button', { name: 'Open Trigger 3' }))
+    await nextTick()
+
+    expect(screen.getByTestId('content')).toHaveTextContent('3')
+    expect(screen.getByRole('button', { name: 'Trigger 2' })).not.toHaveAttribute('data-popup-open')
+    expect(screen.getByRole('button', { name: 'Trigger 3' })).toHaveAttribute('data-popup-open')
+
+    await user.click(screen.getByRole('button', { name: 'Close' }))
+    await nextTick()
+    await nextTick()
+
+    expect(screen.queryByTestId('content')).toBeNull()
+  })
+
+  it('closes a controlled programmatically-opened tooltip on outside press', async () => {
+    const user = userEvent.setup()
+    const open = shallowRef(false)
+    const activeTrigger = shallowRef<string | null>(null)
+    const handleOpenChange = vi.fn((nextOpen: boolean, details: any) => {
+      open.value = nextOpen
+      activeTrigger.value = details.trigger?.id ?? null
+    })
+
+    render(defineComponent({
+      components: {
+        TooltipPopup,
+        TooltipPortal,
+        TooltipPositioner,
+        TooltipRoot,
+        TooltipTrigger,
+      },
+      setup() {
+        return {
+          activeTrigger,
+          handleOpenChange,
+          open,
+        }
+      },
+      template: `
+        <TooltipRoot
+          :open="open"
+          :trigger-id="activeTrigger"
+          @open-change="handleOpenChange"
+          v-slot="{ payload }"
+        >
+          <TooltipTrigger id="trigger-1" :payload="1" :delay="0">Trigger 1</TooltipTrigger>
+          <TooltipTrigger id="trigger-2" :payload="2" :delay="0">Trigger 2</TooltipTrigger>
+          <TooltipPortal>
+            <TooltipPositioner>
+              <TooltipPopup>
+                <span data-testid="content">{{ payload }}</span>
+              </TooltipPopup>
+            </TooltipPositioner>
+          </TooltipPortal>
+        </TooltipRoot>
+        <button @click="open = true; activeTrigger = 'trigger-2'">Open Trigger 2</button>
+        <button>Outside</button>
+      `,
+    }))
+
+    await user.click(screen.getByRole('button', { name: 'Open Trigger 2' }))
+    await nextTick()
+
+    expect(screen.getByTestId('content')).toHaveTextContent('2')
+    expect(screen.getByRole('button', { name: 'Trigger 2' })).toHaveAttribute('data-popup-open')
+
+    await user.click(screen.getByRole('button', { name: 'Outside' }))
+    await nextTick()
+    await nextTick()
+
+    expect(screen.queryByTestId('content')).toBeNull()
+    expect(screen.getByRole('button', { name: 'Trigger 2' })).not.toHaveAttribute('data-popup-open')
+    expect(handleOpenChange).toHaveBeenLastCalledWith(
+      false,
+      expect.objectContaining({ reason: REASONS.outsidePress }),
+    )
   })
 
   it('supports detached triggers and payload scoped slots', async () => {

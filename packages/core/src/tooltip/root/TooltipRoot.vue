@@ -5,6 +5,7 @@ import type { BaseUIComponentProps } from '../../utils/types'
 import type { TooltipHandle } from '../store/TooltipHandle'
 import type { TooltipRootContext } from './TooltipRootContext'
 import { computed, getCurrentInstance, onScopeDispose, provide, shallowRef, toRef, watch } from 'vue'
+import { useDismiss } from '../../floating-ui-vue'
 import { createFloatingRootContext } from '../../floating-ui-vue/components/FloatingRootStore'
 import { REASONS } from '../../utils/reasons'
 import { useControllableState } from '../../utils/useControllableState'
@@ -232,8 +233,31 @@ watch(open, (isOpen) => {
   }
 })
 
+const floatingRootContext = createFloatingRootContext({
+  open,
+  transitionStatus,
+  domReferenceElement: () => activeTrigger.value?.element ?? null,
+  referenceElement: () => activeTrigger.value?.element ?? null,
+  floatingElement: () => popupRef.value,
+  floatingId: () => popupId.value,
+  triggerElements: store.triggerElements,
+  clearCloseTimer: closeTimer.clear,
+  onOpenChange(nextOpen, details) {
+    requestOpenChange(
+      nextOpen,
+      details as TooltipRootChangeEventDetails,
+    )
+  },
+})
+
+const dismiss = useDismiss(floatingRootContext, {
+  enabled: () => !disabled.value,
+  referencePress: () => activeTrigger.value?.closeOnClick ?? true,
+})
+
 store.controller.value = {
   open,
+  dismiss,
   activeTriggerId,
   disabled,
   disableHoverablePopup,
@@ -255,26 +279,10 @@ onScopeDispose(() => {
   }
 })
 
-const floatingRootContext = createFloatingRootContext({
-  open,
-  transitionStatus,
-  domReferenceElement: () => activeTrigger.value?.element ?? null,
-  referenceElement: () => activeTrigger.value?.element ?? null,
-  floatingElement: () => popupRef.value,
-  floatingId: () => popupId.value,
-  triggerElements: store.triggerElements,
-  clearCloseTimer: closeTimer.clear,
-  onOpenChange(nextOpen, details) {
-    requestOpenChange(
-      nextOpen,
-      details as TooltipRootChangeEventDetails,
-    )
-  },
-})
-
 const context: TooltipRootContext<Payload> = {
   store,
   floatingRootContext,
+  dismiss,
   open,
   mounted,
   transitionStatus,

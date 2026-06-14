@@ -198,6 +198,116 @@ describe('<Tooltip.Viewport />', () => {
     })
   })
 
+  it('should resize the popup and positioner when the active trigger changes', async () => {
+    const animation = createDeferred<void>()
+    const rafCallbacks: FrameRequestCallback[] = []
+
+    vi.spyOn(window, 'requestAnimationFrame').mockImplementation((callback) => {
+      rafCallbacks.push(callback)
+      return rafCallbacks.length
+    })
+
+    Object.defineProperty(window.HTMLElement.prototype, 'getAnimations', {
+      configurable: true,
+      value: vi.fn(function (this: HTMLElement) {
+        if (this.getAttribute('role') !== 'tooltip') {
+          return []
+        }
+
+        return [
+          {
+            finished: animation.promise,
+            pending: false,
+            playState: 'running',
+          },
+        ]
+      }),
+    })
+
+    vi.spyOn(window.HTMLElement.prototype, 'offsetWidth', 'get')
+      .mockImplementation(function (this: HTMLElement) {
+        if (this.getAttribute('role') !== 'tooltip') {
+          return 0
+        }
+
+        const currentText = this.querySelector('[data-current]')?.textContent ?? this.textContent
+        return currentText?.includes('Content 1') ? 240 : 120
+      })
+
+    vi.spyOn(window.HTMLElement.prototype, 'offsetHeight', 'get')
+      .mockImplementation(function (this: HTMLElement) {
+        if (this.getAttribute('role') !== 'tooltip') {
+          return 0
+        }
+
+        const currentText = this.querySelector('[data-current]')?.textContent ?? this.textContent
+        return currentText?.includes('Content 1') ? 80 : 40
+      })
+
+    render(defineComponent({
+      components: {
+        TooltipPopup,
+        TooltipPortal,
+        TooltipPositioner,
+        TooltipRoot,
+        TooltipTrigger,
+        TooltipViewport,
+      },
+      template: `
+        <TooltipRoot v-slot="{ payload }">
+          <TooltipTrigger :payload="0" :delay="0" data-testid="trigger1">
+            Trigger 1
+          </TooltipTrigger>
+          <TooltipTrigger :payload="1" :delay="0" data-testid="trigger2">
+            Trigger 2
+          </TooltipTrigger>
+          <TooltipPortal disabled>
+            <TooltipPositioner data-testid="positioner">
+              <TooltipPopup data-testid="popup">
+                <TooltipViewport data-testid="viewport">
+                  <div data-testid="content">Content {{ payload }}</div>
+                </TooltipViewport>
+              </TooltipPopup>
+            </TooltipPositioner>
+          </TooltipPortal>
+        </TooltipRoot>
+      `,
+    }))
+
+    await fireEvent.focus(screen.getByTestId('trigger1'))
+    expect(await screen.findByText('Content 0')).toBeInTheDocument()
+
+    const popup = screen.getByTestId('popup')
+    const positioner = screen.getByTestId('positioner')
+
+    await waitFor(() => {
+      expect(positioner.style.getPropertyValue('--positioner-width')).toBe('120px')
+      expect(positioner.style.getPropertyValue('--positioner-height')).toBe('40px')
+    })
+
+    await fireEvent.focus(screen.getByTestId('trigger2'))
+
+    expect(await screen.findByText('Content 1')).toBeInTheDocument()
+
+    expect(popup.style.getPropertyValue('--popup-width')).toBe('120px')
+    expect(popup.style.getPropertyValue('--popup-height')).toBe('40px')
+    expect(positioner.style.getPropertyValue('--positioner-width')).toBe('240px')
+    expect(positioner.style.getPropertyValue('--positioner-height')).toBe('80px')
+
+    flushAnimationFrames(rafCallbacks)
+
+    expect(popup.style.getPropertyValue('--popup-width')).toBe('240px')
+    expect(popup.style.getPropertyValue('--popup-height')).toBe('80px')
+
+    animation.resolve()
+    flushAnimationFrames(rafCallbacks)
+
+    await waitFor(() => {
+      expect(popup.style.getPropertyValue('--popup-width')).toBe('auto')
+      expect(popup.style.getPropertyValue('--popup-height')).toBe('auto')
+    })
+  })
+
   it.each([
     {
       name: 'should calculate "right down" direction',
@@ -356,4 +466,10 @@ function createDOMRect(rect: Partial<DOMRectReadOnly>) {
       return this
     },
   } as DOMRect
+}
+
+function flushAnimationFrames(callbacks: FrameRequestCallback[]) {
+  while (callbacks.length > 0) {
+    callbacks.shift()?.(performance.now())
+  }
 }

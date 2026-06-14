@@ -1,5 +1,5 @@
 import type { Ref, ShallowRef } from 'vue'
-import type { FloatingTriggerMap } from '../../floating-ui-vue/types'
+import type { ElementProps, FloatingTriggerMap } from '../../floating-ui-vue/types'
 import type {
   TooltipInstantType,
   TooltipRootChangeEventDetails,
@@ -20,6 +20,7 @@ export interface TooltipTriggerRecord<Payload = unknown> {
 
 export interface TooltipRootController {
   open: Readonly<Ref<boolean>>
+  dismiss: ElementProps
   activeTriggerId: Ref<string | null>
   disabled: Readonly<Ref<boolean>>
   disableHoverablePopup: Readonly<Ref<boolean>>
@@ -53,11 +54,26 @@ export class TooltipStore<Payload = unknown> {
     hasElement: (element: Element) => {
       return Array.from(this.triggers.values()).some(record => record.element === element)
     },
+    hasMatchingElement: (predicate: (element: Element) => boolean) => {
+      return Array.from(this.triggers.values()).some(record => predicate(record.element))
+    },
+    getById: (id: string) => {
+      return this.triggers.get(id)?.element
+    },
     entries: () => {
       const entries = Array.from(this.triggers.entries())
         .map(([id, record]) => [id, record.element] as [string, HTMLElement])
 
       return entries[Symbol.iterator]()
+    },
+    elements: () => {
+      const elements = Array.from(this.triggers.values())
+        .map(record => record.element)
+
+      return elements[Symbol.iterator]()
+    },
+    get size() {
+      return Array.from(this.entries()).length
     },
   }
 

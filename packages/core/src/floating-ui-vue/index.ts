@@ -23,6 +23,8 @@ export {
   useFloatingTree,
 } from './components/FloatingTree'
 export { FloatingTreeStore } from './components/FloatingTreeStore'
+export { useDismiss } from './hooks/useDismiss'
+export type { UseDismissProps } from './hooks/useDismiss'
 export { useHoverFloatingInteraction } from './hooks/useHoverFloatingInteraction'
 export type { UseHoverFloatingInteractionProps } from './hooks/useHoverFloatingInteraction'
 export type * from './types'

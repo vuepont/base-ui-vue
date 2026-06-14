@@ -11,9 +11,8 @@ A popup that appears when an element is hovered or focused, showing a hint for s
 
 ## Usage guidelines
 
-- **Prefer using tooltips as visual labels only**: Tooltips should provide supplementary clarity. Do not hide essential information in a tooltip.
-- **Provide an accessible name for the trigger**: Tooltips are visual-only hints and are not a replacement for labels. Icon-only triggers should have an `aria-label` that closely matches the tooltip content.
-- **Use Popover for interactive content**: If the popup needs links, buttons, forms, or touch-friendly access, use a Popover-style component instead of Tooltip.
+- **Prefer using tooltips as visual labels only**: Tooltips should act as supplementary visual labels for sighted mouse and keyboard users. Tooltips alone are not accessible to touch or screen reader users. See [Alternatives to tooltips](#alternatives-to-tooltips) for more details.
+- **Provide an accessible name for the trigger**: Tooltips are visual-only elements and are not a replacement for labeling the trigger. The tooltip's trigger must have an `aria-label` attribute that closely matches the tooltip's content to ensure consistency for screen reader users.
 
 ## Anatomy
 
@@ -50,13 +49,43 @@ import {
 </template>
 ```
 
+## Alternatives to tooltips
+
+Tooltips should be supplementary popups that provide non-essential clarity in high-density UIs. A user should not miss critical information if they never see a tooltip.
+
+Tooltips don't work well with touch input. Unlike mouse pointers with hover capability, there's no easily discoverable way to reveal a tooltip before tapping its trigger on a touch device.
+
+iOS doesn't provide a system-standard, touch-friendly tooltip affordance, while Android may show a tooltip on long press. However, on the web, long press is often used to trigger contextual menus in the browser, which can lead to potential conflicts. For this reason, tooltips are disabled on touch devices.
+
+### Infotips
+
+Popups that open when hovering an info icon should use a Popover-style component that can also be opened by touch and assistive technology users.
+
+To know when to reach for a popover-style component instead of a tooltip, consider the **purpose** of the trigger element: if the trigger's purpose is to open the popup itself, it's a popover. If the trigger's purpose is unrelated to opening the popup, it's a tooltip.
+
+### Description text
+
+Tooltips are designed for sighted users and are not a reliable way to deliver important information to touch users or assistive technologies. If the description is important to understanding the element, don't hide it behind a tooltip. Use inline text, or a Popover-style component if space is limited, so the information is accessible to everyone.
+
+Since tooltips serve sighted mouse and keyboard users, iconography should clearly communicate the purpose of icon-only triggers, especially on mobile where the text label may not be visible.
+
+If the description is not critical, a tooltip can still be used to provide extra clarity for sighted mouse or keyboard users.
+
+### Contextual feedback messages
+
+Use a toast-style component for contextual feedback messages so the message can be announced to screen readers and support more complex content.
+
 ## Examples
 
-### Detached trigger
+### Detached triggers
 
-Use `createTooltipHandle()` when the trigger and tooltip root are defined in different places.
+A tooltip can be controlled by a trigger located either inside or outside the `<TooltipRoot>` component.
+For simple, one-off interactions, place the `<TooltipTrigger>` inside `<TooltipRoot>`, as shown in the example at the top of this page.
 
-```vue title="Detached trigger"
+However, if defining the tooltip's content next to its trigger is not practical, you can use a detached trigger.
+This involves placing the `<TooltipTrigger>` outside of `<TooltipRoot>` and linking them with a handle created by the `createTooltipHandle()` function.
+
+```vue title="Detached triggers"
 <script setup lang="ts">
 import { createTooltipHandle, TooltipRoot, TooltipTrigger } from 'base-ui-vue'
 
@@ -77,33 +106,127 @@ const tooltip = createTooltipHandle()
 
 ### Multiple triggers
 
-One tooltip can be shared by multiple triggers. Pass `payload` to a trigger and read it from the root scoped slot.
+A single tooltip can be opened by multiple trigger elements.
+You can achieve this by using the same `handle` for several detached triggers, or by placing multiple `<TooltipTrigger>` components inside a single `<TooltipRoot>`.
 
-```vue title="Payload scoped slot"
-<TooltipTrigger :handle="tooltip" :payload="{ label: 'Archive' }">
-  Archive
-</TooltipTrigger>
-
-<TooltipRoot :handle="tooltip" v-slot="{ payload }">
-  <TooltipPopup>
-    {{ payload?.label }}
-  </TooltipPopup>
+```vue title="Multiple triggers within the Root part"
+<TooltipRoot>
+  <TooltipTrigger>Trigger 1</TooltipTrigger>
+  <TooltipTrigger>Trigger 2</TooltipTrigger>
+  <!-- portal, positioner, and popup -->
 </TooltipRoot>
 ```
 
-<ComponentPreview name="TooltipMultiple" />
+```vue title="Multiple detached triggers"
+<script setup lang="ts">
+import { createTooltipHandle, TooltipRoot, TooltipTrigger } from 'base-ui-vue'
 
-### Controlled state
+const tooltip = createTooltipHandle()
+</script>
 
-Use the `open` prop and `open-change` event to control visibility. When a tooltip has multiple triggers, use `trigger-id` on `TooltipRoot` and `id` on `TooltipTrigger`.
+<template>
+  <TooltipTrigger :handle="tooltip">
+    Trigger 1
+  </TooltipTrigger>
+
+  <TooltipTrigger :handle="tooltip">
+    Trigger 2
+  </TooltipTrigger>
+
+  <TooltipRoot :handle="tooltip">
+    <!-- portal, positioner, and popup -->
+  </TooltipRoot>
+</template>
+```
+
+The tooltip can render different content depending on which trigger opened it.
+This is achieved by passing a `payload` to the `<TooltipTrigger>` and reading it from the scoped slot exposed by `<TooltipRoot>`.
+
+The payload can be strongly typed by providing a type argument to the `createTooltipHandle()` function:
+
+```vue{11,15,19} title="Detached triggers with payload"
+<script setup lang="ts">
+import {
+  createTooltipHandle,
+  TooltipPopup,
+  TooltipPortal,
+  TooltipPositioner,
+  TooltipRoot,
+  TooltipTrigger,
+} from 'base-ui-vue'
+
+const tooltip = createTooltipHandle<{ text: string }>()
+</script>
+
+<template>
+  <TooltipTrigger :handle="tooltip" :payload="{ text: 'Trigger 1' }">
+    Trigger 1
+  </TooltipTrigger>
+
+  <TooltipTrigger :handle="tooltip" :payload="{ text: 'Trigger 2' }">
+    Trigger 2
+  </TooltipTrigger>
+
+  <TooltipRoot :handle="tooltip" v-slot="{ payload }">
+    <TooltipPortal>
+      <TooltipPositioner :side-offset="8">
+        <TooltipPopup>
+          <span v-if="payload">
+            Tooltip opened by {{ payload.text }}
+          </span>
+        </TooltipPopup>
+      </TooltipPositioner>
+    </TooltipPortal>
+  </TooltipRoot>
+</template>
+```
+
+### Controlled mode with multiple triggers
+
+You can control the tooltip's open state externally using the `open` prop and `open-change` event on `<TooltipRoot>`.
+This allows you to manage the tooltip's visibility based on your application's state.
+When using multiple triggers, you have to manage which trigger is active with the `trigger-id` prop on `<TooltipRoot>` and the `id` prop on each `<TooltipTrigger>`.
+
+Note that there is no separate `trigger-id-change` event.
+Instead, the `open-change` event receives an additional `details` argument, which contains the trigger element that initiated the state change.
 
 <ComponentPreview name="TooltipControlled" />
+
+### Animating the Tooltip
+
+You can animate a tooltip as it moves between different trigger elements.
+This includes animating its position, size, and content.
+
+#### Position and Size
+
+To animate the tooltip's position, apply CSS transitions to the `left`, `right`, `top`, and `bottom` properties of the **Positioner** part.
+To animate its size, transition the `width` and `height` of the **Popup** part.
+
+When content changes between triggers, you can use the Positioner's `--positioner-width` and `--positioner-height` CSS variables to keep the moving box stable while the popup resizes.
+
+#### Content
+
+The tooltip also supports content transitions.
+This is useful when different triggers display different content within the same tooltip.
+
+To enable content animations, wrap the content in the `<TooltipViewport>` part.
+This part provides features to create direction-aware animations.
+It renders a `div` with a `data-activation-direction` attribute containing space-separated horizontal and vertical directions, such as `right down` or `left up`, that indicate the new trigger's position relative to the previous one.
+
+Inside the `<TooltipViewport>`, the content is further wrapped in `div`s with data attributes to help with styling:
+
+- `data-current`: The currently visible content when no transitions are present or the incoming content.
+- `data-previous`: The outgoing content during a transition.
+
+You can use these attributes to style the enter and exit animations.
+
+<ComponentPreview name="TooltipDetachedTriggersFull" />
 
 ## API reference
 
 ### Provider
 
-Provides shared delays for a group of tooltips.
+Provides shared delays for a group of tooltips. The grouping logic ensures that once a tooltip becomes visible, the adjacent tooltips will be shown instantly.
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -113,7 +236,7 @@ Provides shared delays for a group of tooltips.
 
 ### Root
 
-Groups all parts of a tooltip. Does not render an element.
+Groups all parts of a tooltip. Does not render an HTML element.
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -223,12 +346,19 @@ Displays an arrow positioned against the active trigger. Renders a `<div>` eleme
 
 ### Viewport
 
-Wraps payload-driven tooltip content in a `data-current` container for content transitions.
+Wraps payload-driven tooltip content in current and previous containers for content transitions.
 
 | Attribute | Description |
 | --- | --- |
-| `data-activation-direction` | Direction from the previous trigger to the current trigger. |
+| `data-activation-direction` | Space-separated direction from the previous trigger to the current trigger. |
+| `data-transitioning` | Present while previous and current content are both rendered for a transition. |
+| `data-instant` | Present when transitions should be skipped. |
 | `data-current` | Applied to the current content wrapper inside the viewport. |
+| `data-previous` | Applied to the outgoing content wrapper during a transition. |
+
+| CSS Variable | Description |
+| --- | --- |
+| `--popup-width` / `--popup-height` | Previous popup dimensions exposed on the `data-previous` wrapper. |
 
 ## createTooltipHandle
 

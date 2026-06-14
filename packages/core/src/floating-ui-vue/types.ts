@@ -21,6 +21,9 @@ export interface FloatingEvents {
 export interface ContextData {
   openEvent?: Event
   floatingContext?: FloatingContext
+  insideVueTree?: boolean
+  __escapeKeyBubbles?: boolean
+  __outsidePressBubbles?: boolean
   [key: string]: any
 }
 
@@ -34,7 +37,11 @@ export interface FloatingUIOpenChangeDetails {
 
 export interface FloatingTriggerMap {
   hasElement: (element: Element) => boolean
+  hasMatchingElement: (predicate: (element: Element) => boolean) => boolean
+  getById: (id: string) => Element | undefined
   entries: () => IterableIterator<[string, HTMLElement]>
+  elements: () => IterableIterator<Element>
+  readonly size: number
 }
 
 export interface FloatingRootState {
@@ -76,6 +83,13 @@ export interface FloatingNodeType {
 }
 
 export type FloatingTreeType = FloatingTreeStore
+
+export interface ElementProps {
+  reference?: Record<string, any> | undefined
+  floating?: Record<string, any> | undefined
+  item?: Record<string, any> | undefined
+  trigger?: Record<string, any> | undefined
+}
 
 export interface HandleCloseOptions {
   blockPointerEvents?: boolean

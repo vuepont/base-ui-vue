@@ -71,6 +71,7 @@ const positioning = useAnchorPositioning({
   disableAnchorTracking: () => props.disableAnchorTracking,
   collisionAvoidance: () => props.collisionAvoidance,
   adaptiveOrigin: () => ctx.hasViewport.value ? adaptiveOrigin : undefined,
+  positionerSizeVars: () => !ctx.hasViewport.value,
   autoUpdateOptions: () => ({
     animationFrame: ctx.trackCursorAxis.value === 'both',
   }),

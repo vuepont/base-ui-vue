@@ -212,6 +212,7 @@ export interface UseAnchorPositioningParameters extends UseAnchorPositioningShar
   lazyFlip?: MaybeRefOrGetter<boolean | undefined>
   adaptiveOrigin?: MaybeRefOrGetter<Middleware | undefined>
   autoUpdateOptions?: MaybeRefOrGetter<Partial<AutoUpdateOptions> | undefined>
+  positionerSizeVars?: MaybeRefOrGetter<boolean | undefined>
   /**
    * Optional middleware that can replace the measured reference rect before offsets and collision
    * middleware run.
@@ -248,6 +249,7 @@ export function useAnchorPositioning(
   const alignParam = computed(() => toValue(params.align) ?? 'center')
   const positionMethod = computed(() => toValue(params.positionMethod) ?? 'absolute')
   const adaptiveOriginMiddleware = computed(() => toValue(params.adaptiveOrigin))
+  const positionerSizeVars = computed(() => toValue(params.positionerSizeVars) ?? true)
   const collisionAvoidance = computed(() =>
     toValue(params.collisionAvoidance) ?? POPUP_COLLISION_AVOIDANCE,
   )
@@ -518,9 +520,12 @@ export function useAnchorPositioning(
       '--available-height': toCssPixel(sizeData.value.availableHeight),
       '--anchor-width': toCssPixel(sizeData.value.anchorWidth),
       '--anchor-height': toCssPixel(sizeData.value.anchorHeight),
-      '--positioner-width': toCssPixel(sizeData.value.positionerWidth),
-      '--positioner-height': toCssPixel(sizeData.value.positionerHeight),
       '--transform-origin': transformOrigin.value,
+    }
+
+    if (positionerSizeVars.value) {
+      styles['--positioner-width'] = toCssPixel(sizeData.value.positionerWidth)
+      styles['--positioner-height'] = toCssPixel(sizeData.value.positionerHeight)
     }
 
     if (!floating.isPositioned.value) {
