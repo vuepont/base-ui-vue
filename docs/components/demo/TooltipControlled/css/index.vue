@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { TooltipRootChangeEventDetails } from 'base-ui-vue'
 import {
   createTooltipHandle,
   TooltipArrow,
@@ -15,7 +16,7 @@ const tooltip = createTooltipHandle()
 const open = shallowRef(false)
 const triggerId = shallowRef<string | null>(null)
 
-function handleOpenChange(nextOpen: boolean, details: any) {
+function handleOpenChange(nextOpen: boolean, details: TooltipRootChangeEventDetails) {
   open.value = nextOpen
   triggerId.value = details.trigger?.id ?? null
 }

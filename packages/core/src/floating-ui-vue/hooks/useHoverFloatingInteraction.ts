@@ -183,6 +183,7 @@ export function useHoverFloatingInteraction(
 
     function onFloatingMouseLeave(event: MouseEvent) {
       if (hasParentChildren() && tree) {
+        tree.events.off('floating.closed', onNodeClosed)
         tree.events.on('floating.closed', onNodeClosed)
         return
       }

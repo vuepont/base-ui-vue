@@ -81,7 +81,7 @@ const arrowClass = 'relative block w-3 h-1.5 overflow-clip transition-[left] dur
               border border-neutral-950 dark:border-white
               bg-white dark:bg-neutral-950
               text-sm text-neutral-950 dark:text-white
-              origin-[var(--transform-origin)]
+              origin-(--transform-origin)
               shadow-[0.25rem_0.25rem_0] shadow-black/12 dark:shadow-none
               transition-[width,height,opacity,transform]
               duration-[0.35s]

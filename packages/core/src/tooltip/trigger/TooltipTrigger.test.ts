@@ -1,3 +1,4 @@
+import type { TooltipRootChangeEventDetails } from '../root/TooltipRoot.vue'
 import { fireEvent, render, screen } from '@testing-library/vue'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { defineComponent, nextTick, ref } from 'vue'
@@ -27,7 +28,7 @@ describe('<Tooltip.Trigger />', () => {
       setup() {
         const open = ref(false)
 
-        function handleOpenChange(nextOpen: boolean, details: any) {
+        function handleOpenChange(nextOpen: boolean, details: TooltipRootChangeEventDetails) {
           if (!nextOpen) {
             details.preventUnmountOnClose()
           }

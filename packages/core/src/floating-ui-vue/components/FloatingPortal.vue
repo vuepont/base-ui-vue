@@ -91,7 +91,7 @@ const {
   container: () => props.container,
   to: () => props.to,
   componentProps: props,
-  elementProps: computed(() => attrs as Record<string, any>),
+  elementProps: computed(() => attrs),
   state,
 })
 

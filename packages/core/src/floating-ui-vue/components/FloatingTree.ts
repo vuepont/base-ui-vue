@@ -43,6 +43,9 @@ export function useFloatingNodeId(externalTree?: FloatingTreeStore) {
   return id
 }
 
+/**
+ * Provides the current floating node id and parent id to nested floating elements.
+ */
 export function provideFloatingNode(id: string | undefined) {
   const parentId = useFloatingParentNodeId()
   provide(floatingNodeContextKey, {
@@ -51,6 +54,9 @@ export function provideFloatingNode(id: string | undefined) {
   })
 }
 
+/**
+ * Provides a floating tree store to descendants, creating one when needed.
+ */
 export function provideFloatingTree(externalTree?: FloatingTreeStore) {
   const tree = externalTree ?? new FloatingTreeStore()
   provide(floatingTreeContextKey, tree)

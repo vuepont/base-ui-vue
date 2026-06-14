@@ -198,7 +198,7 @@ export class TooltipHandle<Payload = unknown> {
 
 export function createTooltipChangeEventDetails(
   reason: TooltipRootChangeEventReason,
-  event?: any,
+  event?: Event,
   trigger?: HTMLElement,
 ): TooltipRootChangeEventDetails {
   return createChangeEventDetails<
@@ -211,5 +211,5 @@ export function createTooltipChangeEventDetails(
     {
       preventUnmountOnClose() {},
     },
-  ) as TooltipRootChangeEventDetails
+  )
 }

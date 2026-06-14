@@ -72,7 +72,7 @@ function triggerElement() {
 
 function makeDetails(
   reason: TooltipRootChangeEventDetails['reason'],
-  event?: any,
+  event?: MouseEvent | FocusEvent | KeyboardEvent | PointerEvent,
 ) {
   return createTooltipChangeEventDetails(reason, event, triggerElement())
 }
@@ -246,7 +246,7 @@ const renderRef = useMergedRefs(buttonRef, triggerRef)
 
 const triggerProps = computed(() =>
   getButtonProps(mergeProps(
-    attrs as Record<string, any>,
+    attrs,
     root.value?.dismiss.reference,
     {
       'id': triggerId,

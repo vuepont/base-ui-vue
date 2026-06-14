@@ -89,11 +89,11 @@ export interface UsePopupViewportResult {
   /**
    * Props for the current content container.
    */
-  currentContainerProps: ComputedRef<Record<string, any>>
+  currentContainerProps: ComputedRef<Record<string, unknown>>
   /**
    * Props for the previous content snapshot container.
    */
-  previousContainerProps: ComputedRef<Record<string, any>>
+  previousContainerProps: ComputedRef<Record<string, unknown>>
   /**
    * Whether the previous content snapshot should be rendered.
    */
@@ -126,8 +126,19 @@ export function usePopupViewport(parameters: UsePopupViewportParameters): UsePop
 
   const cleanupFrame = useAnimationFrame()
   const onAnimationsFinished = useAnimationsFinished(currentContainerRef, true, false)
+  let animationAbortController: AbortController | null = null
 
   const currentContentKey = usePopupContentKey(activeTriggerId, payload)
+
+  function abortPendingAnimationCleanup() {
+    animationAbortController?.abort()
+    animationAbortController = null
+  }
+
+  function clearPreviousContent() {
+    previousContentNode.value = null
+    previousContentDimensions.value = null
+  }
 
   watch(
     activeTriggerElement,
@@ -143,19 +154,30 @@ export function usePopupViewport(parameters: UsePopupViewportParameters): UsePop
         return
       }
 
+      abortPendingAnimationCleanup()
+
       previousContentNode.value = cloneContent(currentContainerRef.value)
       previousContentDimensions.value = measureElement(currentContainerRef.value)
       showStartingStyleAttribute.value = true
       newTriggerOffset.value = calculateRelativePosition(previousTrigger, nextTrigger)
+      const currentAnimationAbortController = new AbortController()
+      animationAbortController = currentAnimationAbortController
 
       cleanupFrame.request(() => {
         showStartingStyleAttribute.value = false
 
         nextTick(() => {
           onAnimationsFinished(() => {
-            previousContentNode.value = null
-            previousContentDimensions.value = null
-          })
+            if (currentAnimationAbortController.signal.aborted) {
+              return
+            }
+
+            if (animationAbortController === currentAnimationAbortController) {
+              animationAbortController = null
+            }
+
+            clearPreviousContent()
+          }, currentAnimationAbortController.signal)
         })
       })
 
@@ -166,8 +188,8 @@ export function usePopupViewport(parameters: UsePopupViewportParameters): UsePop
 
   watch(open, (isOpen) => {
     if (!isOpen) {
-      previousContentNode.value = null
-      previousContentDimensions.value = null
+      abortPendingAnimationCleanup()
+      clearPreviousContent()
       newTriggerOffset.value = null
       lastHandledTrigger.value = null
     }
@@ -190,6 +212,7 @@ export function usePopupViewport(parameters: UsePopupViewportParameters): UsePop
   )
 
   onBeforeUnmount(() => {
+    abortPendingAnimationCleanup()
     cleanupFrame.cancel()
   })
 

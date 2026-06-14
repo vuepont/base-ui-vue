@@ -1,3 +1,4 @@
+import type { TooltipRootChangeEventDetails } from './TooltipRoot.vue'
 import userEvent from '@testing-library/user-event'
 import { fireEvent, render, screen } from '@testing-library/vue'
 import { afterEach, describe, expect, it, vi } from 'vitest'
@@ -192,7 +193,7 @@ describe('<TooltipRoot />', () => {
         const open = shallowRef(false)
         const activeTrigger = shallowRef<string | null>(null)
 
-        function handleOpenChange(nextOpen: boolean, details: any) {
+        function handleOpenChange(nextOpen: boolean, details: TooltipRootChangeEventDetails) {
           open.value = nextOpen
           activeTrigger.value = details.trigger?.id ?? null
         }
@@ -259,7 +260,7 @@ describe('<TooltipRoot />', () => {
     const user = userEvent.setup()
     const open = shallowRef(false)
     const activeTrigger = shallowRef<string | null>(null)
-    const handleOpenChange = vi.fn((nextOpen: boolean, details: any) => {
+    const handleOpenChange = vi.fn((nextOpen: boolean, details: TooltipRootChangeEventDetails) => {
       open.value = nextOpen
       activeTrigger.value = details.trigger?.id ?? null
     })

@@ -18,7 +18,7 @@ afterEach(() => {
     })
   }
   else {
-    delete (window.HTMLElement.prototype as any).getAnimations
+    Reflect.deleteProperty(window.HTMLElement.prototype, 'getAnimations')
   }
 
   vi.restoreAllMocks()

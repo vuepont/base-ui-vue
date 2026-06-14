@@ -266,11 +266,15 @@ export function useDismiss(
       ? outsidePressEvent()
       : outsidePressEvent
 
+    if (resolved == null) {
+      return 'sloppy'
+    }
+
     if (typeof resolved === 'string') {
       return resolved
     }
 
-    return resolved[computedType]
+    return resolved[computedType] ?? 'sloppy'
   }
 
   function shouldIgnoreEvent(event: Event) {

@@ -13,7 +13,7 @@ export function isTargetInsideEnabledTrigger(
     return false
   }
 
-  const targetElement = target as Element
+  const targetElement = target
 
   if (triggerElements.hasElement(targetElement)) {
     return !targetElement.hasAttribute('data-trigger-disabled')

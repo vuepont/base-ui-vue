@@ -62,9 +62,13 @@ export function baseArrow(options: ArrowOptions | Derivable<ArrowOptions>): Midd
       const arrowOffsetParent = offsetParent === 'real'
         ? await platform.getOffsetParent?.(element)
         : elements.floating
-      let clientSize = elements.floating[clientProp] || rects.floating[length]
+      let clientSize = 0
 
-      if (!clientSize || !(await platform.isElement?.(arrowOffsetParent))) {
+      if (arrowOffsetParent && await platform.isElement?.(arrowOffsetParent)) {
+        clientSize = arrowOffsetParent[clientProp]
+      }
+
+      if (!clientSize) {
         clientSize = elements.floating[clientProp] || rects.floating[length]
       }
 

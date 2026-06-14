@@ -91,6 +91,13 @@ function isFocusableElement(element: Element | null): element is FocusableElemen
   return true
 }
 
+function isHTMLElementOrSVGElement(element: Element): element is FocusableElement {
+  return (
+    isHTMLElement(element)
+    || (typeof SVGElement !== 'undefined' && element instanceof SVGElement)
+  )
+}
+
 function isVisibleInTabbableTree(element: Element, isAncestor: boolean) {
   const styles = getComputedStyle(element)
 
@@ -177,9 +184,9 @@ function appendCandidates(container: ParentNode, list: FocusableElement[]) {
   })
 }
 
-function appendMatchingElements(container: ParentNode, selector: string, list: HTMLElement[]) {
+function appendMatchingElements(container: ParentNode, selector: string, list: FocusableElement[]) {
   getComposedChildren(container).forEach((child) => {
-    if (isHTMLElement(child) && child.matches(selector)) {
+    if (isHTMLElementOrSVGElement(child) && child.matches(selector)) {
       list.push(child)
     }
 
@@ -286,11 +293,11 @@ export function disableFocusInside(container: HTMLElement) {
 }
 
 export function enableFocusInside(container: HTMLElement) {
-  const elements: HTMLElement[] = []
+  const elements: FocusableElement[] = []
   appendMatchingElements(container, '[data-tabindex]', elements)
   elements.forEach((element) => {
-    const tabindex = element.dataset.tabindex
-    delete element.dataset.tabindex
+    const tabindex = element.getAttribute('data-tabindex')
+    element.removeAttribute('data-tabindex')
 
     if (tabindex) {
       element.setAttribute('tabindex', tabindex)

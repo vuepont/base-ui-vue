@@ -29,6 +29,10 @@ export enum CommonPopupDataAttributes {
    * Indicates how the popup is aligned relative to the specified side.
    */
   align = 'data-align',
+  /**
+   * Present when animations should be skipped.
+   */
+  instant = 'data-instant',
 }
 
 export enum CommonTriggerDataAttributes {
@@ -76,7 +80,7 @@ export const popupStateMapping = {
     return value ? { [CommonPopupDataAttributes.align]: value } : null
   },
   instant(value) {
-    return value ? { 'data-instant': value } : null
+    return value ? { [CommonPopupDataAttributes.instant]: value } : null
   },
 } satisfies StateAttributesMapping<{
   open: boolean
