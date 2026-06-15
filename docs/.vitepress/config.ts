@@ -99,6 +99,7 @@ export default defineConfig({
           { text: 'Toggle', link: '/docs/components/toggle' },
           { text: 'Toggle Group', link: '/docs/components/toggle-group' },
           { text: 'Toolbar', link: '/docs/components/toolbar' },
+          { text: 'Tooltip', link: '/docs/components/tooltip' },
         ],
       },
       {

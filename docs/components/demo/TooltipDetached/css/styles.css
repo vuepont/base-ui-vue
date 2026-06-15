@@ -1,0 +1,40 @@
+@import "../../Tooltip/css/styles.css";
+
+.IconButton {
+  box-sizing: border-box;
+  display: flex;
+  width: 2rem;
+  height: 2rem;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  border: 1px solid var(--color-gray-900);
+  background-color: var(--color-gray-50);
+  color: var(--color-gray-900);
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.IconButton[data-popup-open] {
+  background-color: var(--color-gray-100);
+}
+
+@media (hover: hover) {
+  .IconButton:hover:not([data-trigger-disabled]) {
+    background-color: var(--color-gray-100);
+  }
+}
+
+.IconButton:active:not([data-trigger-disabled]) {
+  background-color: var(--color-gray-200);
+}
+
+.IconButton:focus-visible {
+  outline: 2px solid var(--color-blue);
+  outline-offset: -1px;
+}
+
+.Icon {
+  width: 1rem;
+  height: 1rem;
+}

@@ -1,0 +1,121 @@
+.Panel {
+  display: flex;
+  border: 1px solid var(--color-gray-900);
+  background-color: var(--color-gray-50);
+}
+
+.Button {
+  box-sizing: border-box;
+  display: flex;
+  width: 2rem;
+  height: 2rem;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  border: 0;
+  background-color: transparent;
+  color: var(--color-gray-900);
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.Button[data-popup-open] {
+  background-color: var(--color-gray-100);
+}
+
+@media (hover: hover) {
+  .Button:hover:not([data-trigger-disabled]) {
+    background-color: var(--color-gray-100);
+  }
+}
+
+.Button:active:not([data-trigger-disabled]) {
+  background-color: var(--color-gray-200);
+}
+
+.Button:focus-visible {
+  outline: 2px solid var(--color-blue);
+  outline-offset: -1px;
+}
+
+.Symbol {
+  font-size: 0.875rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.Italic {
+  font-style: italic;
+}
+
+.Underline {
+  text-decoration: underline;
+  text-underline-offset: 0.125rem;
+}
+
+.Popup {
+  box-sizing: border-box;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 0.25rem 0.5rem;
+  border: 1px solid var(--color-gray-900);
+  background-color: var(--color-gray-50);
+  color: var(--color-gray-900);
+  box-shadow: 0.25rem 0.25rem 0 rgb(0 0 0 / 12%);
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  transform-origin: var(--transform-origin);
+  transition:
+    scale 100ms ease-out,
+    opacity 100ms ease-out;
+}
+
+.Popup[data-starting-style],
+.Popup[data-ending-style] {
+  opacity: 0;
+  scale: 0.98;
+}
+
+.Popup[data-instant] {
+  transition: none;
+}
+
+.Arrow {
+  display: block;
+  width: 12px;
+  height: 6px;
+  overflow: clip;
+}
+
+.Arrow[data-side='top'] {
+  bottom: -6px;
+  rotate: 180deg;
+}
+
+.Arrow[data-side='bottom'] {
+  top: -6px;
+}
+
+.Arrow[data-side='left'] {
+  right: -9px;
+  rotate: 90deg;
+}
+
+.Arrow[data-side='right'] {
+  left: -9px;
+  rotate: -90deg;
+}
+
+.Arrow::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  box-sizing: border-box;
+  width: calc(6px * sqrt(2));
+  height: calc(6px * sqrt(2));
+  border: 1px solid var(--color-gray-900);
+  background-color: var(--color-gray-50);
+  transform: translate(-50%, 50%) rotate(45deg);
+}

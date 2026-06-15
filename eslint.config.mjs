@@ -8,4 +8,9 @@ export default antfu(
       '.agents/**',
     ],
   },
+  {
+    rules: {
+      'ts/prefer-literal-enum-member': 'off',
+    },
+  },
 )

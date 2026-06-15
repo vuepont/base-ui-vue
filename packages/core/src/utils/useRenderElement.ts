@@ -56,6 +56,9 @@ export interface UseRenderElementParams<State extends Record<string, any>> {
   ref?: RenderRef
 }
 
+export type UseRenderElementComponentProps<State extends Record<string, any>>
+  = UseRenderElementParams<State>['componentProps']
+
 export interface UseRenderElementReturn<State> {
   /** The resolved tag or component to render. `undefined` in renderless mode. */
   tag: ComputedRef<string | Component | undefined>

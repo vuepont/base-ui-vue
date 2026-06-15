@@ -1,0 +1,56 @@
+@import "../../TooltipDetached/css/styles.css";
+
+.Container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.ButtonGroup {
+  display: flex;
+}
+
+.IconButton:not(:first-child) {
+  border-left: 0;
+}
+
+.Positioner {
+  width: var(--positioner-width);
+  height: var(--positioner-height);
+  max-width: var(--available-width);
+}
+
+.ActionButton {
+  box-sizing: border-box;
+  display: flex;
+  height: 2rem;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 0 0.75rem;
+  border: 1px solid var(--color-gray-900);
+  background-color: var(--color-gray-50);
+  color: var(--color-gray-900);
+  font-family: inherit;
+  font-size: 0.875rem;
+  line-height: 1;
+  white-space: nowrap;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+@media (hover: hover) {
+  .ActionButton:hover {
+    background-color: var(--color-gray-100);
+  }
+}
+
+.ActionButton:active {
+  background-color: var(--color-gray-200);
+}
+
+.ActionButton:focus-visible {
+  outline: 2px solid var(--color-blue);
+  outline-offset: -1px;
+}

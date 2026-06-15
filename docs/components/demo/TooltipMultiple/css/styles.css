@@ -1,0 +1,59 @@
+@import "../../TooltipDetached/css/styles.css";
+
+.ButtonGroup {
+  display: flex;
+}
+
+.IconButton:not(:first-child) {
+  border-left: 0;
+}
+
+.Positioner {
+  width: var(--positioner-width);
+  height: var(--positioner-height);
+  max-width: var(--available-width);
+  transition:
+    top 350ms cubic-bezier(0.22, 1, 0.36, 1),
+    left 350ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.Positioner[data-instant] {
+  transition: none;
+}
+
+.Popup {
+  width: var(--popup-width, auto);
+  max-width: min(24rem, var(--available-width));
+  transition:
+    width 350ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 160ms ease-out,
+    scale 160ms ease-out;
+}
+
+.Viewport {
+  --viewport-inline-padding: 0.5rem;
+
+  box-sizing: border-box;
+  width: 100%;
+  overflow: clip;
+}
+
+.Viewport [data-current] {
+  width: max-content;
+  max-width: calc(min(24rem, var(--available-width)) - 2 * var(--viewport-inline-padding));
+  translate: 0;
+  opacity: 1;
+  transition:
+    translate 350ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 175ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.Viewport[data-activation-direction='left'] [data-current][data-starting-style] {
+  translate: -50% 0;
+  opacity: 0;
+}
+
+.Viewport[data-activation-direction='right'] [data-current][data-starting-style] {
+  translate: 50% 0;
+  opacity: 0;
+}
