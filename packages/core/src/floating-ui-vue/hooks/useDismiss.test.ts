@@ -269,6 +269,27 @@ describe('useDismiss', () => {
     })
   })
 
+  describe('outsidePressEvent: nullish resolver', () => {
+    it.each([null, undefined] as const)(
+      'falls back to sloppy when resolver returns %s',
+      async (resolvedEvent) => {
+        const outsidePressEvent = (() => resolvedEvent) as unknown as UseDismissProps['outsidePressEvent']
+        const { lastDetails } = renderDismissApp({ outsidePressEvent })
+
+        fireEvent.click(document.body)
+        await nextTick()
+
+        expect(screen.getByRole('tooltip')).toBeInTheDocument()
+
+        fireEvent.pointerDown(document.body, { pointerType: 'mouse', button: 0 })
+        await nextTick()
+
+        expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
+        expect(lastDetails.value?.reason).toBe(REASONS.outsidePress)
+      },
+    )
+  })
+
   describe('outsidePressEvent: intentional', () => {
     it('dragging outside the floating element does not close', async () => {
       renderDismissApp({ outsidePressEvent: 'intentional' })

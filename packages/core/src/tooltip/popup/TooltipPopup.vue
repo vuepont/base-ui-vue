@@ -75,7 +75,7 @@ const popupProps = computed(() => {
   return mergeProps(
     getDisabledMountTransitionStyles(ctx.transitionStatus.value),
     ctx.dismiss?.floating,
-    attrs as Record<string, any>,
+    attrs,
     {
       id: generatedId,
       role: 'tooltip',

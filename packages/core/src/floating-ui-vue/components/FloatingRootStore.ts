@@ -50,8 +50,8 @@ export function createFloatingRootContext(
     useState(key) {
       return state[key]
     },
-    select(key) {
-      return state[key].value as FloatingRootState[typeof key]
+    select<K extends keyof FloatingRootState>(key: K) {
+      return state[key].value
     },
     setOpen(open, eventDetails) {
       options.onOpenChange?.(open, eventDetails)
