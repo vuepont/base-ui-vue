@@ -47,7 +47,7 @@
     "type-check": "vue-tsc -p tsconfig.check.json --noEmit",
     "test": "vitest",
     "test-update": "vitest -u",
-    "pub:release": "pnpm publish --no-git-checks --access public"
+    "pub:release": "pnpm stage publish --no-git-checks --access public"
   },
   "peerDependencies": {
     "vue": ">= 3.5.0"
