@@ -15,19 +15,19 @@ import { sponsors, sponsorsCta } from '../meta'
       Sponsors
     </h2>
 
-    <div class="flex flex-wrap items-center gap-x-12 gap-y-8 opacity-40 grayscale transition-opacity hover:opacity-60 dark:opacity-80 dark:grayscale-0 dark:hover:opacity-100">
+    <div class="flex flex-wrap items-center gap-x-8 gap-y-6">
       <a
         v-for="sponsor in sponsors"
         :key="sponsor.name"
         :href="sponsor.href"
         target="_blank"
         rel="noopener noreferrer"
-        class="transition-transform duration-200 hover:scale-[1.02] dark:rounded-sm dark:bg-white dark:px-3 dark:py-2"
+        class="transition-transform duration-200 hover:scale-[1.02] focus-visible:scale-[1.02] dark:rounded-sm dark:bg-white dark:px-3 dark:py-2"
       >
         <img
           :src="sponsor.logo"
           :alt="sponsor.alt"
-          class="h-5 w-auto md:h-6"
+          class="h-7 w-auto md:h-8"
         >
       </a>
     </div>
