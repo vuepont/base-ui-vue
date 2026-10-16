@@ -199,19 +199,27 @@ export default <Environment>{
 
 ## Browser Mode (Separate from Environments)
 
-For real browser testing, use Vitest Browser Mode:
+For real browser testing, use Vitest Browser Mode. In **v4 the provider is an object** (not a string), and the context imports from `vitest/browser`:
 
 ```ts
+import { playwright } from '@vitest/browser-playwright'
+
 defineConfig({
   test: {
     browser: {
       enabled: true,
-      name: 'chromium', // or 'firefox', 'webkit'
-      provider: 'playwright',
+      provider: playwright({ launchOptions: { slowMo: 100 } }),
+      instances: [{ browser: 'chromium' }], // or 'firefox', 'webkit'
     },
   },
 })
 ```
+
+```ts
+import { page } from 'vitest/browser' // v4: was '@vitest/browser/context'
+```
+
+> v5: DOM-environment global assignments (e.g. `window.innerWidth`) now propagate to the underlying jsdom/happy-dom implementation. Locators are exact/strict by default (`getByText('Item')` no longer matches `Item 1`). `browser.api` is deprecated — move it to the top-level `api` option. Browser mode adds a built-in Trace View (`browser.traceView: true`).
 
 ## CSS and Assets
 
