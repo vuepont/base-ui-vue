@@ -1,9 +1,11 @@
 ---
 name: setting-up
-description: Project setup files including .gitignore, GitHub Actions workflows, and VS Code extensions. Use when initializing new projects or adding CI/editor config.
+description: Project setup files including .gitignore, GitHub Actions workflows, npm OIDC trusted publishing, and VS Code extensions. Use when initializing new projects or adding CI/editor/release config.
 ---
 
 # Project Setup
+
+Start from [antfu/starter-ts](https://github.com/antfu/starter-ts); the files below mirror it.
 
 ## .gitignore
 
@@ -15,6 +17,7 @@ Create when `.gitignore` is not present:
 .cache
 .DS_Store
 .eslintcache
+.githooks
 .idea
 .env
 .nuxt
@@ -27,6 +30,7 @@ dist
 lib-cov
 logs
 node_modules
+skills/npm-*
 temp
 ```
 
@@ -45,17 +49,17 @@ on: [pull_request]
 
 jobs:
   autofix:
-    uses: sxzz/workflows/.github/workflows/autofix.yml@v1
+    uses: sxzz/workflows/.github/workflows/autofix.yml@main
     permissions:
       contents: read
 ```
 
-### Unit Test Workflow
+### CI Workflow
 
-**`.github/workflows/unit-test.yml`** - Run tests on push/PR:
+**`.github/workflows/ci.yml`** - Run the checks on push/PR:
 
 ```yaml
-name: Unit Test
+name: CI
 
 on:
   push:
@@ -67,7 +71,7 @@ permissions: {}
 
 jobs:
   unit-test:
-    uses: sxzz/workflows/.github/workflows/unit-test.yml@v1
+    uses: sxzz/workflows/.github/workflows/unit-test.yml@main
 ```
 
 ### Release Workflow
@@ -84,13 +88,24 @@ on:
 
 jobs:
   release:
-    uses: sxzz/workflows/.github/workflows/release.yml@v1
+    uses: sxzz/workflows/.github/workflows/release.yml@main
     with:
       publish: true
     permissions:
       contents: write
       id-token: write
 ```
+
+## Publishing with npm Trusted Publishing (OIDC)
+
+Prefer [npm Trusted Publishing](https://docs.npmjs.com/trusted-publishers) over long-lived `NPM_TOKEN` secrets. The workflow above authenticates with a short-lived GitHub OIDC token (`id-token: write`), so there is nothing to leak or rotate, and every release is built on CI from a tagged commit.
+
+One-time setup per package:
+
+1. Run `pnpm publish` locally once so the package exists on npm.
+2. Open `https://www.npmjs.com/package/<name>/access` and link the GitHub repository + `release.yml` workflow as a trusted publisher.
+
+After that, `nr release` (`bumpp`) bumps the version, commits, tags and pushes; the tag triggers `release.yml`, which publishes. Never add an `NPM_TOKEN` secret to new projects, and don't run `npm publish` from a local machine for subsequent releases.
 
 ## VS Code Extensions
 

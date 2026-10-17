@@ -4,32 +4,38 @@
     "antfu": {
       "source": "antfu/skills",
       "sourceType": "github",
-      "computedHash": "6935586ef3ab02e18747a4477d396e692bc96e8f28b0d95b374ffc37fce74cda"
+      "skillPath": "skills/antfu/SKILL.md",
+      "computedHash": "46935e4dc837849a1df6fa968c3ec32c647bd0faecf34f7a3577503f85d7bc52"
     },
     "vitepress": {
       "source": "antfu/skills",
       "sourceType": "github",
-      "computedHash": "629d8ec4bcbf7cac86c15c3ca5f173933f01729bcb6396c0d74733755a896a41"
+      "skillPath": "skills/vitepress/SKILL.md",
+      "computedHash": "b7fd97083e6b963b478b430552861cf1514f39b8e3e7fdf0a348e86d76ecf418"
     },
     "vitest": {
       "source": "antfu/skills",
       "sourceType": "github",
-      "computedHash": "669c7275f7e1379b06b2bcfa593603aead4c983b951c7e8edbc09640aa38d0a1"
+      "skillPath": "skills/vitest/SKILL.md",
+      "computedHash": "21af2b13d47d31f3094b61c0f41abc8d6a7eed0df3c9a4029ea671f6978b7209"
     },
     "vue": {
       "source": "antfu/skills",
       "sourceType": "github",
-      "computedHash": "9c241141e07e836e4f0537c63e8f929fba3767c2997250be38e699f19b75e3f2"
+      "skillPath": "skills/vue/SKILL.md",
+      "computedHash": "29ad402cf2ff868b3b43160883fbc42e135223655a41d16092d0d205f2c1ed31"
     },
     "vue-best-practices": {
-      "source": "antfu/skills",
+      "source": "vuejs-ai/skills",
       "sourceType": "github",
-      "computedHash": "d7d22c8cb343583c3904692c4d1d7b50382945e433e4f6e053f4aabb9846cbc3"
+      "skillPath": "skills/vue-best-practices/SKILL.md",
+      "computedHash": "3df585ad31aec78fe55c56c1411262737e6b231677a3153dec512a882fde80cd"
     },
     "vue-testing-best-practices": {
-      "source": "antfu/skills",
+      "source": "vuejs-ai/skills",
       "sourceType": "github",
-      "computedHash": "18c7d8f42f350f927e37de055e34c97b8cfb9f79c12cf942f7f3d2a0821057b5"
+      "skillPath": "skills/vue-testing-best-practices/SKILL.md",
+      "computedHash": "58d365899f54be9e5fa2c2e455093f9567620600578ae92aaa2f31d9b19a59ad"
     }
   }
 }
